@@ -771,10 +771,20 @@ elif active_view == "correlations":
                     except Exception as e: st.error(str(e))
                     st.markdown('</div>', unsafe_allow_html=True)
 
-        # full correlation matrix as table
+        # full correlation matrix as table — no matplotlib needed
         st.markdown('<div class="section-head">Correlation Matrix</div>', unsafe_allow_html=True)
         corr_df = df[col_analysis["numeric"]].corr().round(3)
-        st.dataframe(corr_df.style.background_gradient(cmap='RdYlGn', vmin=-1, vmax=1), use_container_width=True)
+        # manual colour coding without matplotlib
+        def color_corr(val):
+            try:
+                v = float(val)
+                if v > 0.7:  return "background-color:#bbf7d0;color:#14532d"
+                if v > 0.4:  return "background-color:#d1fae5;color:#166534"
+                if v < -0.7: return "background-color:#fecaca;color:#7f1d1d"
+                if v < -0.4: return "background-color:#fee2e2;color:#991b1b"
+                return "background-color:#f8fafc;color:#475569"
+            except: return ""
+        st.dataframe(corr_df.style.applymap(color_corr), use_container_width=True)
 
 # ═════════════════════════════════════════════════════════════════════════════
 # PAGE: ANOMALIES
