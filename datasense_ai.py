@@ -4,8 +4,7 @@ import pandas as pd
 import numpy as np
 import anthropic
 
-os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"] if hasattr(st, 'secrets') and "ANTHROPIC_API_KEY" in st.secrets else os.environ.get("ANTHROPIC_API_KEY","your-api-key-here")
-
+os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
 st.set_page_config(page_title="DataSense AI", page_icon="🧠", layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
