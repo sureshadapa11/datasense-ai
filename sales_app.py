@@ -5,7 +5,7 @@ import pandas as pd
 import anthropic
 
 # ── PUT YOUR API KEY HERE ──────────────────────────────────────
-os.environ["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"] = st.secrets["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"]
+os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
 # ──────────────────────────────────────────────────────────────
 
 st.set_page_config(
