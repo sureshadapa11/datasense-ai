@@ -163,16 +163,62 @@ with st.sidebar:
     st.markdown("<p style='color:rgba(255,255,255,0.6);font-size:11px;text-transform:uppercase;letter-spacing:0.08em;font-weight:600'>CHARTS</p>", unsafe_allow_html=True)
     chart_clicked = None
     cols = st.columns(2)
-    charts = [
-        ("📈 Trend",       "trend"),
-        ("📦 Products",    "product"),
-        ("🌍 Regions",     "region"),
-        ("👤 Salespeople", "salesperson"),
-        ("🍩 Categories",  "category"),
-        ("🔥 Heat Cat",    "heatmap_cat"),
-        ("🔥 Heat Prod",   "heatmap_prod"),
-    ]
-    for i, (label, key) in enumerate(charts):
+
+    # build chart buttons dynamically based on uploaded file columns
+    if uploaded:
+        try:
+            ext2 = os.path.splitext(uploaded.name)[1].lower()
+            df_preview = pd.read_csv(uploaded) if ext2 == ".csv" else pd.read_excel(uploaded)
+            uploaded.seek(0)
+            col_names = [c.lower() for c in df_preview.columns.tolist()]
+            num_cols  = df_preview.select_dtypes(include='number').columns.tolist()
+            cat_cols  = df_preview.select_dtypes(include='object').columns.tolist()
+
+            # always show trend if a date column exists
+            dynamic_charts = []
+            if any(w in ' '.join(col_names) for w in ['date','time','month','year','week']):
+                dynamic_charts.append(("📈 Trend", "trend"))
+
+            # add a bar chart for each categorical column (max 4)
+            icon_map = {
+                'product':'📦','region':'🌍','salesperson':'👤','category':'🍩',
+                'department':'🏢','country':'🌐','city':'🏙️','status':'🔖',
+                'type':'🏷️','brand':'🎯','team':'👥','manager':'👔',
+            }
+            added = 0
+            for c in cat_cols[:6]:
+                if added >= 4:
+                    break
+                icon = next((v for k,v in icon_map.items() if k in c.lower()), '📊')
+                label = c.replace('_',' ').title()
+                dynamic_charts.append((f"{icon} {label}", f"col_{c}"))
+                added += 1
+
+            # heatmaps if we have date + category
+            if any(w in ' '.join(col_names) for w in ['date','time','month']) and len(cat_cols) >= 1:
+                dynamic_charts.append(("🔥 Heatmap", "heatmap_cat"))
+
+            if not dynamic_charts:
+                dynamic_charts = [("📊 Summary", "summary")]
+
+            st.session_state["dynamic_charts"] = dynamic_charts
+            st.session_state["df_cat_cols"]    = cat_cols
+            st.session_state["df_num_cols"]    = num_cols
+
+        except Exception:
+            dynamic_charts = [
+                ("📈 Trend","trend"),("📦 Products","product"),
+                ("🌍 Regions","region"),("👤 Salespeople","salesperson"),
+                ("🍩 Categories","category"),("🔥 Heatmap","heatmap_cat"),
+            ]
+    else:
+        dynamic_charts = [
+            ("📈 Trend","trend"),("📦 Products","product"),
+            ("🌍 Regions","region"),("👤 Salespeople","salesperson"),
+            ("🍩 Categories","category"),("🔥 Heatmap","heatmap_cat"),
+        ]
+
+    for i, (label, key) in enumerate(dynamic_charts):
         with cols[i % 2]:
             if st.button(label, key=f"btn_{key}", use_container_width=True):
                 chart_clicked = key
