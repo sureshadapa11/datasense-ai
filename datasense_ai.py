@@ -10,7 +10,10 @@ try:
 except Exception:
     pass
 
-st.set_page_config(page_title="DataSense AI", page_icon="🧠", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(
+    page_title="DataSense AI", page_icon="🧠",
+    layout="wide", initial_sidebar_state="expanded"
+)
 
 st.markdown("""
 <style>
@@ -20,24 +23,30 @@ html,body,[class*="css"]{font-family:'Inter',sans-serif;}
 section[data-testid="stSidebar"]{background:linear-gradient(160deg,#1e3a5f 0%,#2563eb 100%);border-right:none;}
 section[data-testid="stSidebar"] *{color:#fff!important;}
 section[data-testid="stSidebar"] .stMarkdown p{color:rgba(255,255,255,0.75)!important;}
-.kpi-card{background:#fff;border-radius:16px;padding:1.25rem 1.5rem;box-shadow:0 2px 12px rgba(37,99,235,0.08);margin-bottom:0.5rem;}
-.kpi-label{font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;}
+.kpi-card{background:#fff;border-radius:16px;padding:1.25rem 1.5rem;
+  box-shadow:0 2px 12px rgba(37,99,235,0.08);margin-bottom:0.5rem;}
+.kpi-label{font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;
+  letter-spacing:0.06em;margin-bottom:6px;}
 .kpi-value{font-size:26px;font-weight:700;}
 .kpi-sub{font-size:11px;color:#94a3b8;margin-top:3px;}
-.ins-kpi{background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:0 1px 8px rgba(37,99,235,0.07);text-align:center;}
-.ins-kpi-label{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;}
-.ins-kpi-val{font-size:20px;font-weight:700;color:#2563eb;}
-.ins-kpi-sub{font-size:11px;color:#cbd5e1;margin-top:2px;}
-.chart-card{background:#fff;border-radius:16px;padding:1.25rem;box-shadow:0 2px 12px rgba(37,99,235,0.06);margin-bottom:1rem;}
-.chart-title{font-size:13px;font-weight:600;color:#475569;margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.05em;}
-.dataset-badge{display:inline-block;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);border-radius:20px;padding:3px 12px;font-size:11px;font-weight:600;color:#fff;margin-bottom:0.5rem;}
-.stButton>button{background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:10px;font-size:12px;transition:all 0.2s;}
+.chart-card{background:#fff;border-radius:16px;padding:1.25rem;
+  box-shadow:0 2px 12px rgba(37,99,235,0.06);margin-bottom:1rem;}
+.chart-title{font-size:13px;font-weight:600;color:#475569;margin-bottom:0.75rem;
+  text-transform:uppercase;letter-spacing:0.05em;}
+.dataset-badge{display:inline-block;background:rgba(255,255,255,0.2);
+  border:1px solid rgba(255,255,255,0.4);border-radius:20px;padding:3px 12px;
+  font-size:11px;font-weight:600;color:#fff;margin-bottom:0.5rem;}
+.stButton>button{background:rgba(255,255,255,0.15);color:#fff;
+  border:1px solid rgba(255,255,255,0.3);border-radius:10px;font-size:12px;transition:all 0.2s;}
 .stButton>button:hover{background:rgba(255,255,255,0.3);border-color:rgba(255,255,255,0.7);}
-div[data-testid="stFileUploader"]{background:#fff;border:2px dashed #2563eb;border-radius:12px;padding:0.5rem;}
+div[data-testid="stFileUploader"]{background:#fff;border:2px dashed #2563eb;
+  border-radius:12px;padding:0.5rem;}
 div[data-testid="stFileUploader"] *{color:#1e293b!important;}
-div[data-testid="stFileUploader"] button{background:#2563eb!important;color:#fff!important;border:none!important;border-radius:8px!important;}
+div[data-testid="stFileUploader"] button{background:#2563eb!important;color:#fff!important;
+  border:none!important;border-radius:8px!important;}
 div[data-testid="stFileUploaderDropzoneInstructions"] span{color:#2563eb!important;font-weight:600;}
-.stTabs [data-baseweb="tab-list"]{background:#fff;border-radius:12px;padding:4px;box-shadow:0 1px 6px rgba(0,0,0,0.06);}
+.stTabs [data-baseweb="tab-list"]{background:#fff;border-radius:12px;padding:4px;
+  box-shadow:0 1px 6px rgba(0,0,0,0.06);}
 .stTabs [data-baseweb="tab"]{color:#64748b;border-radius:8px;font-weight:500;}
 .stTabs [aria-selected="true"]{background:#2563eb;color:#fff;}
 .stTextInput>div>div>input{background:#fff;color:#1e293b;border:1px solid #e2e8f0;border-radius:10px;}
@@ -46,91 +55,188 @@ h1,h2,h3,h4{color:#1e293b!important;}
 </style>
 """, unsafe_allow_html=True)
 
-CHARTJS   = "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"
-COLORS    = ['#2563eb','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#84cc16','#ec4899','#14b8a6']
+CHARTJS = "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"
+COLORS  = ['#2563eb','#10b981','#f59e0b','#ef4444','#8b5cf6',
+           '#06b6d4','#f97316','#84cc16','#ec4899','#14b8a6']
 
 DATASET_TYPES = {
-    "sales":    {"icon":"🛒","color":"#2563eb","keywords":["revenue","sales","product","region","order","customer","discount","profit","units","sold"]},
-    "finance":  {"icon":"💰","color":"#059669","keywords":["expense","budget","cashflow","profit","loss","asset","liability","income","cost","invoice"]},
-    "hr":       {"icon":"👥","color":"#7c3aed","keywords":["employee","salary","department","hire","leave","performance","headcount","staff","payroll","role"]},
-    "marketing":{"icon":"📣","color":"#db2777","keywords":["campaign","click","impression","conversion","lead","channel","ctr","cpc","roas","audience"]},
-    "inventory":{"icon":"📦","color":"#d97706","keywords":["stock","inventory","sku","warehouse","supplier","reorder","quantity","item","shelf"]},
-    "generic":  {"icon":"📊","color":"#475569","keywords":[]},
+    "sales":    {"icon":"🛒","keywords":["revenue","sales","product","region","order","customer","discount","profit","units","sold"]},
+    "finance":  {"icon":"💰","keywords":["expense","budget","cashflow","profit","loss","asset","liability","income","cost","invoice"]},
+    "hr":       {"icon":"👥","keywords":["employee","salary","department","hire","leave","performance","headcount","staff","payroll","role"]},
+    "marketing":{"icon":"📣","keywords":["campaign","click","impression","conversion","lead","channel","ctr","cpc","roas","audience"]},
+    "inventory":{"icon":"📦","keywords":["stock","inventory","sku","warehouse","supplier","reorder","quantity","item","shelf"]},
+    "generic":  {"icon":"📊","keywords":[]},
 }
 
-# ── HELPERS ───────────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+# FIX 1: load_dataframe() — single read, cached in session_state
+# This fixes the root cause: file pointer exhausted after sidebar read
+# ─────────────────────────────────────────────────────────────────────────────
+def load_dataframe(uploaded_file):
+    """Read uploaded file ONCE and cache in session_state by filename."""
+    cache_key = f"df_cache_{uploaded_file.name}"
+    if cache_key in st.session_state:
+        return st.session_state[cache_key]
+
+    uploaded_file.seek(0)
+    ext = os.path.splitext(uploaded_file.name)[1].lower()
+
+    if ext == ".csv":
+        df = pd.read_csv(uploaded_file)
+    else:
+        df = None
+        for hr in [0, 1, 2]:
+            try:
+                uploaded_file.seek(0)
+                tmp = pd.read_excel(uploaded_file, header=hr)
+                tmp = tmp.loc[:, ~tmp.columns.str.contains('^Unnamed', na=False)]
+                tmp = tmp.dropna(how='all').dropna(axis=1, how='all')
+                if len(tmp.columns) > 1 and len(tmp) > 1:
+                    df = tmp
+                    break
+            except Exception:
+                continue
+        if df is None:
+            uploaded_file.seek(0)
+            df = pd.read_excel(uploaded_file)
+
+    # clean column names
+    df.columns = [str(c).strip().replace('\n', ' ') for c in df.columns]
+    df = df.dropna(how='all').dropna(axis=1, how='all').reset_index(drop=True)
+
+    st.session_state[cache_key] = df
+    return df
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FIX 2: analyze_columns() — proper type detection order
+# Old version tried pd.to_datetime on numeric cols, causing false date matches
+# ─────────────────────────────────────────────────────────────────────────────
+def analyze_columns(df):
+    result = {"numeric": [], "categorical": [], "date": [], "text": []}
+    id_names = {'id','index','no','num','number','#','sr','sr.','row','seq'}
+
+    for col in df.columns:
+        series = df[col].dropna()
+        if len(series) == 0:
+            continue
+
+        # Step 1 — if already numeric dtype, classify immediately (skip date check)
+        if pd.api.types.is_numeric_dtype(df[col]):
+            is_id = (str(col).lower().strip() in id_names or
+                     (df[col].nunique() == len(df) and str(col).lower().strip().endswith('id')))
+            if not is_id:
+                result["numeric"].append(col)
+            continue
+
+        # Step 2 — for string/object cols, check if it's a date
+        if pd.api.types.is_object_dtype(df[col]) or pd.api.types.is_string_dtype(df[col]):
+            try:
+                converted = pd.to_datetime(series, infer_datetime_format=True, errors='coerce')
+                valid_ratio = converted.notna().sum() / len(series)
+                if valid_ratio > 0.7:
+                    result["date"].append(col)
+                    continue
+            except Exception:
+                pass
+
+        # Step 3 — check if already datetime dtype
+        if pd.api.types.is_datetime64_any_dtype(df[col]):
+            result["date"].append(col)
+            continue
+
+        # Step 4 — categorical vs text
+        unique_ratio = series.nunique() / len(series)
+        if series.nunique() <= 30 or unique_ratio <= 0.3:
+            result["categorical"].append(col)
+        else:
+            result["text"].append(col)
+
+    return result
+
+def detect_dataset_type(df):
+    cols = ' '.join(df.columns.tolist()).lower()
+    scores = {k: sum(1 for w in v["keywords"] if w in cols)
+              for k, v in DATASET_TYPES.items() if k != "generic"}
+    best = max(scores, key=scores.get)
+    return best if scores[best] > 0 else "generic"
+
 def fmt_num(v):
     try:
         if pd.isna(v): return "—"
+        v = float(v)
         if abs(v) >= 1_000_000: return f"{v/1_000_000:.1f}M"
         if abs(v) >= 1_000:     return f"{v:,.0f}"
         if abs(v) >= 1:         return f"{v:,.1f}"
         return f"{v:.3f}"
-    except: return str(v)
+    except:
+        return "—"
 
-def detect_dataset_type(df):
-    cols = ' '.join(df.columns.tolist()).lower()
-    scores = {k: sum(1 for w in v["keywords"] if w in cols) for k,v in DATASET_TYPES.items() if k != "generic"}
-    best = max(scores, key=scores.get)
-    return best if scores[best] > 0 else "generic"
-
-def analyze_columns(df):
-    """Detect column types — skip ID-like columns from numeric analysis."""
-    analysis = {"numeric":[], "categorical":[], "date":[], "text":[]}
-    for col in df.columns:
-        s = df[col].dropna()
-        if len(s) == 0:
-            continue
-        # date detection
-        try:
-            converted = pd.to_datetime(s, infer_datetime_format=True, errors='coerce')
-            if converted.notna().sum() > len(s) * 0.6:
-                analysis["date"].append(col)
-                continue
-        except: pass
-        # numeric — skip if looks like an ID (all unique integers starting from 1)
-        if pd.api.types.is_numeric_dtype(df[col]):
-            is_id = (df[col].nunique() == len(df) and
-                     str(col).lower() in ['id','index','no','num','number','#','sr','sr.'])
-            if not is_id:
-                analysis["numeric"].append(col)
-        elif s.nunique() <= max(20, len(df) * 0.3):
-            analysis["categorical"].append(col)
-        else:
-            analysis["text"].append(col)
-    return analysis
-
+# ─────────────────────────────────────────────────────────────────────────────
+# FIX 3: build_sidebar_menu() — always returns at least Overview + Raw Data
+# Old version could return empty list if no columns detected
+# ─────────────────────────────────────────────────────────────────────────────
 def build_sidebar_menu(col_analysis):
-    """Build sidebar menu based purely on detected column types."""
     menu = [("🏠 Overview", "overview")]
+
     if col_analysis["numeric"]:
         menu.append(("📊 KPIs", "kpis"))
+
     if col_analysis["date"] and col_analysis["numeric"]:
         menu.append(("📈 Time Trends", "trend"))
+
+    icon_map = {
+        "product":"📦","region":"🌍","department":"🏢","category":"🍩",
+        "channel":"📣","status":"🔖","type":"🏷️","country":"🌐",
+        "team":"👥","brand":"🎯","campaign":"📢","gender":"👤",
+    }
     for cat in col_analysis["categorical"][:4]:
-        icons = {"product":"📦","region":"🌍","department":"🏢","category":"🍩",
-                 "channel":"📣","status":"🔖","type":"🏷️","country":"🌐","team":"👥","brand":"🎯"}
-        icon = next((v for k,v in icons.items() if k in cat.lower()), "📊")
-        label = cat.replace('_',' ').title()
+        icon = next((v for k, v in icon_map.items() if k in cat.lower()), "📊")
+        label = cat.replace('_', ' ').replace('-', ' ').title()
         menu.append((f"{icon} {label}", f"bar_{cat}"))
+
     if col_analysis["categorical"] and col_analysis["numeric"]:
         menu.append(("🍩 Distribution", "pie"))
-    if col_analysis["date"] and col_analysis["categorical"] and col_analysis["numeric"]:
+
+    if (col_analysis["date"] and col_analysis["categorical"]
+            and col_analysis["numeric"]):
         menu.append(("🔥 Heatmap", "heatmap"))
+
     menu.append(("📋 Raw Data", "table"))
     return menu
 
-# ── CHART BUILDER ─────────────────────────────────────────────────────────────
-LINE_JS   = "new Chart(document.getElementById('c'),{type:'line',data:d,options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#475569',font:{size:11}}}},scales:{x:{ticks:{color:'#94a3b8',font:{size:11}},grid:{display:false}},y:{ticks:{color:'#94a3b8',font:{size:11}},grid:{color:'#f1f5f9'}}}}}}});"
-BAR_JS    = "new Chart(document.getElementById('c'),{type:'bar',data:d,options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#94a3b8',font:{size:11}},grid:{display:false}},y:{ticks:{color:'#94a3b8',font:{size:11},callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}},grid:{color:'#f1f5f9'}}}}}}});"
-HBAR_JS   = "new Chart(document.getElementById('c'),{type:'bar',data:d,options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{color:'#94a3b8',font:{size:11}},grid:{display:false}},x:{ticks:{color:'#94a3b8',font:{size:11},callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}},grid:{color:'#f1f5f9'}}}}}}});"
-PIE_JS    = "new Chart(document.getElementById('c'),{type:'doughnut',data:d,options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#475569',font:{size:12},padding:16}}}}}}});"
+# ── CHART RENDERERS ───────────────────────────────────────────────────────────
+LINE_JS = ("new Chart(document.getElementById('c'),{type:'line',data:d,"
+           "options:{responsive:true,maintainAspectRatio:false,"
+           "plugins:{legend:{display:true,labels:{color:'#475569',font:{size:11}}}},"
+           "scales:{x:{ticks:{color:'#94a3b8',font:{size:11}},grid:{display:false}},"
+           "y:{ticks:{color:'#94a3b8',font:{size:11}},grid:{color:'#f1f5f9'}}}}}}});")
+
+BAR_JS  = ("new Chart(document.getElementById('c'),{type:'bar',data:d,"
+           "options:{responsive:true,maintainAspectRatio:false,"
+           "plugins:{legend:{display:false}},"
+           "scales:{x:{ticks:{color:'#94a3b8',font:{size:11}},grid:{display:false}},"
+           "y:{ticks:{color:'#94a3b8',font:{size:11},"
+           "callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}},grid:{color:'#f1f5f9'}}}}}}});")
+
+HBAR_JS = ("new Chart(document.getElementById('c'),{type:'bar',data:d,"
+           "options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,"
+           "plugins:{legend:{display:false}},"
+           "scales:{y:{ticks:{color:'#94a3b8',font:{size:11}},grid:{display:false}},"
+           "x:{ticks:{color:'#94a3b8',font:{size:11},"
+           "callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}},grid:{color:'#f1f5f9'}}}}}}});")
+
+PIE_JS  = ("new Chart(document.getElementById('c'),{type:'doughnut',data:d,"
+           "options:{responsive:true,maintainAspectRatio:false,"
+           "plugins:{legend:{position:'right',"
+           "labels:{color:'#475569',font:{size:12},padding:16}}}}}}});")
 
 def make_html(elem, height, script):
     return (f'<!DOCTYPE html><html><head><meta charset="utf-8">'
             f'<script src="{CHARTJS}"></script>'
-            f'<style>body{{margin:0;padding:4px;background:white}}canvas{{width:100%!important}}</style>'
-            f'</head><body><div style="height:{height};position:relative">{elem}</div>'
+            f'<style>body{{margin:0;padding:4px;background:white}}'
+            f'canvas{{width:100%!important}}</style>'
+            f'</head><body>'
+            f'<div style="height:{height};position:relative">{elem}</div>'
             f'<script>{script}</script></body></html>')
 
 def render_trend(df, col_analysis):
@@ -140,34 +246,51 @@ def render_trend(df, col_analysis):
     df2['_dt'] = pd.to_datetime(df2[date_col], errors='coerce')
     df2 = df2.dropna(subset=['_dt'])
     df2['_period'] = df2['_dt'].dt.strftime('%b %Y')
-    order = df2.drop_duplicates('_period').sort_values('_dt')['_period'].tolist()
+    order = (df2.drop_duplicates('_period')
+               .sort_values('_dt')['_period'].tolist())
     datasets = []
     for i, nc in enumerate(num_cols):
         agg = df2.groupby('_period')[nc].sum().reindex(order).fillna(0)
-        datasets.append({"label": nc.replace('_',' ').title(),
-                         "data": [round(float(v),2) for v in agg.values],
-                         "borderColor": COLORS[i], "backgroundColor": COLORS[i]+"22",
-                         "fill": i==0, "tension": 0.4, "pointRadius": 4, "borderWidth": 2})
+        datasets.append({
+            "label": nc.replace('_', ' ').title(),
+            "data":  [round(float(v), 2) for v in agg.values],
+            "borderColor": COLORS[i],
+            "backgroundColor": COLORS[i] + "22",
+            "fill": i == 0, "tension": 0.4,
+            "pointRadius": 4, "borderWidth": 2,
+        })
     j = json.dumps({"labels": order, "datasets": datasets})
-    return make_html('<canvas id="c"></canvas>', "340px", f"var d={j};{LINE_JS}")
+    return make_html('<canvas id="c"></canvas>', "340px",
+                     "var d=" + j + ";" + LINE_JS)
 
 def render_bar(df, cat_col, num_col, top_n=12):
-    grp = df.groupby(cat_col)[num_col].sum().sort_values(ascending=False).head(top_n)
-    labels = [str(x).replace('"','') for x in grp.index]
-    values = [round(float(v),2) for v in grp.values]
-    j = json.dumps({"labels": labels, "datasets": [{"data": values,
-        "backgroundColor": COLORS[:len(labels)], "borderRadius": 6, "borderSkipped": False}]})
-    ctype = HBAR_JS if len(labels) > 6 else BAR_JS
-    h = str(max(300, len(labels)*45+80))+"px" if len(labels) > 6 else "320px"
-    return make_html('<canvas id="c"></canvas>', h, f"var d={j};{ctype}")
+    grp = (df.groupby(cat_col)[num_col].sum()
+             .sort_values(ascending=False).head(top_n))
+    labels = [str(x).replace('"', '') for x in grp.index]
+    values = [round(float(v), 2) for v in grp.values]
+    j = json.dumps({"labels": labels, "datasets": [{
+        "data": values,
+        "backgroundColor": COLORS[:len(labels)],
+        "borderRadius": 6, "borderSkipped": False,
+    }]})
+    js   = HBAR_JS if len(labels) > 6 else BAR_JS
+    h    = (str(max(300, len(labels) * 45 + 80)) + "px"
+            if len(labels) > 6 else "320px")
+    return make_html('<canvas id="c"></canvas>', h,
+                     "var d=" + j + ";" + js)
 
 def render_pie(df, cat_col, num_col):
-    grp = df.groupby(cat_col)[num_col].sum().sort_values(ascending=False).head(8)
-    labels = [str(x).replace('"','') for x in grp.index]
-    values = [round(float(v),2) for v in grp.values]
-    j = json.dumps({"labels": labels, "datasets": [{"data": values,
-        "backgroundColor": COLORS[:len(labels)], "borderWidth": 0}]})
-    return make_html('<canvas id="c"></canvas>', "320px", f"var d={j};{PIE_JS}")
+    grp = (df.groupby(cat_col)[num_col].sum()
+             .sort_values(ascending=False).head(8))
+    labels = [str(x).replace('"', '') for x in grp.index]
+    values = [round(float(v), 2) for v in grp.values]
+    j = json.dumps({"labels": labels, "datasets": [{
+        "data": values,
+        "backgroundColor": COLORS[:len(labels)],
+        "borderWidth": 0,
+    }]})
+    return make_html('<canvas id="c"></canvas>', "320px",
+                     "var d=" + j + ";" + PIE_JS)
 
 def render_heatmap(df, col_analysis):
     date_col = col_analysis["date"][0]
@@ -176,101 +299,133 @@ def render_heatmap(df, col_analysis):
     df2 = df.copy()
     df2['_dt']     = pd.to_datetime(df2[date_col], errors='coerce')
     df2['_period'] = df2['_dt'].dt.strftime('%b')
-    order = df2.drop_duplicates('_period').sort_values('_dt')['_period'].tolist()
+    order = (df2.drop_duplicates('_period')
+               .sort_values('_dt')['_period'].tolist())
     cats  = df2[cat_col].dropna().unique().tolist()[:6]
     hdata = {}
     for cat in cats:
-        sub = df2[df2[cat_col]==cat].groupby('_period')[num_col].sum()
-        hdata[str(cat).replace('"','')] = [round(float(sub.get(p,0)),2) for p in order]
-    j = json.dumps({"periods": order, "cats": [str(c).replace('"','') for c in cats], "data": hdata})
-    script = ("var d="+j+";var all=[];d.cats.forEach(function(c){d.data[c].forEach(function(v){all.push(v);});});"
-              "var mn=Math.min.apply(null,all.filter(function(v){return v>0;})||[0]),mx=Math.max.apply(null,all)||1;"
-              "function bg(v){var t=v===0?0:(v-mn)/(mx-mn);return 'rgba(37,99,235,'+((t*0.8)+0.05)+')';}  "
-              "function fg(v){return (v-mn)/(mx-mn)>0.5?'#fff':'#1e293b';}"
-              "var tbl=document.getElementById('c');"
-              "var h='<tr><th style=\"padding:8px 10px;background:#f8faff;color:#94a3b8;border:1px solid #e2e8f0\">Period</th>'"
-              "+d.cats.map(function(c){return '<th style=\"padding:8px 10px;background:#f8faff;color:#475569;border:1px solid #e2e8f0;font-weight:600\">'+c+'</th>';}).join('')+'</tr>';"
-              "d.periods.forEach(function(p,i){h+='<tr><td style=\"padding:8px 10px;color:#64748b;border:1px solid #e2e8f0;font-weight:500\">'+p+'</td>';"
-              "d.cats.forEach(function(c){var v=d.data[c][i]||0;"
-              "h+='<td style=\"padding:8px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:500;background:'+bg(v)+';color:'+fg(v)+'\">'+Math.round(v).toLocaleString()+'</td>';});"
-              "h+='</tr>';});tbl.innerHTML=h;")
-    return make_html('<table id="c" style="width:100%;border-collapse:collapse;font-size:12px"></table>', "auto", script)
+        sub = df2[df2[cat_col] == cat].groupby('_period')[num_col].sum()
+        hdata[str(cat).replace('"', '')] = [
+            round(float(sub.get(p, 0)), 2) for p in order]
+    j = json.dumps({
+        "periods": order,
+        "cats": [str(c).replace('"', '') for c in cats],
+        "data": hdata,
+    })
+    script = (
+        "var d=" + j + ";"
+        "var all=[];d.cats.forEach(function(c){d.data[c].forEach(function(v){all.push(v);});});"
+        "var mn=Math.min.apply(null,all.filter(function(v){return v>0;})||[0]),"
+        "mx=Math.max.apply(null,all)||1;"
+        "function bg(v){var t=v===0?0:(v-mn)/(mx-mn);"
+        "return 'rgba(37,99,235,'+((t*0.8)+0.05)+')';}  "
+        "function fg(v){return (v-mn)/(mx-mn)>0.5?'#fff':'#1e293b';}"
+        "var tbl=document.getElementById('c');"
+        "var h='<tr><th style=\"padding:8px 10px;background:#f8faff;color:#94a3b8;"
+        "border:1px solid #e2e8f0\">Period</th>'"
+        "+d.cats.map(function(c){return '<th style=\"padding:8px 10px;background:#f8faff;"
+        "color:#475569;border:1px solid #e2e8f0;font-weight:600\">'+c+'</th>';}).join('')+'</tr>';"
+        "d.periods.forEach(function(p,i){"
+        "h+='<tr><td style=\"padding:8px 10px;color:#64748b;border:1px solid #e2e8f0;"
+        "font-weight:500\">'+p+'</td>';"
+        "d.cats.forEach(function(c){var v=d.data[c][i]||0;"
+        "h+='<td style=\"padding:8px 10px;text-align:center;border:1px solid #e2e8f0;"
+        "font-weight:500;background:'+bg(v)+';color:'+fg(v)+'\">'+"
+        "Math.round(v).toLocaleString()+'</td>';});"
+        "h+='</tr>';});tbl.innerHTML=h;"
+    )
+    return make_html(
+        '<table id="c" style="width:100%;border-collapse:collapse;font-size:12px"></table>',
+        "auto", script)
 
-# ── INSIGHTS SECTION ──────────────────────────────────────────────────────────
+# ── INSIGHTS RENDERER ─────────────────────────────────────────────────────────
 def render_insights(df, col_analysis):
-    """Render structured visual insights — KPI cards + charts for every column type."""
+    if not col_analysis["numeric"] and not col_analysis["categorical"]:
+        st.info("No numeric or categorical columns detected for insights.")
+        return
 
-    # 1. KPI stats for every numeric column
+    # KPI stats
     if col_analysis["numeric"]:
-        st.markdown("#### 📊 Numeric Column Stats")
-        for i in range(0, len(col_analysis["numeric"]), 4):
-            batch = col_analysis["numeric"][i:i+4]
-            cols = st.columns(len(batch))
+        st.markdown("#### 📊 KPI Summary")
+        for batch_start in range(0, len(col_analysis["numeric"]), 4):
+            batch = col_analysis["numeric"][batch_start:batch_start + 4]
+            cols  = st.columns(len(batch))
             for j, nc in enumerate(batch):
                 s = df[nc].dropna()
                 with cols[j]:
-                    st.markdown(f"""
-                    <div class="kpi-card">
-                      <div class="kpi-label">{nc.replace('_',' ').title()}</div>
-                      <div class="kpi-value" style="color:{COLORS[j%len(COLORS)]};font-size:20px">{fmt_num(s.sum())}</div>
-                      <div class="kpi-sub">
-                        Avg: {fmt_num(s.mean())} &nbsp;|&nbsp;
-                        Min: {fmt_num(s.min())} &nbsp;|&nbsp;
-                        Max: {fmt_num(s.max())}
-                      </div>
-                    </div>""", unsafe_allow_html=True)
+                    st.markdown(
+                        f'<div class="kpi-card">'
+                        f'<div class="kpi-label">{nc.replace("_"," ").title()}</div>'
+                        f'<div class="kpi-value" style="color:{COLORS[j%len(COLORS)]};font-size:22px">'
+                        f'{fmt_num(s.sum())}</div>'
+                        f'<div class="kpi-sub">Avg: {fmt_num(s.mean())}</div>'
+                        f'<div class="kpi-sub">Min: {fmt_num(s.min())} · Max: {fmt_num(s.max())}</div>'
+                        f'</div>', unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # 2. Bar chart for every categorical column
+    # Bar charts for each categorical column
     if col_analysis["categorical"] and col_analysis["numeric"]:
         st.markdown("#### 📦 Category Breakdowns")
         num_col = col_analysis["numeric"][0]
-        cats = col_analysis["categorical"][:4]
+        cats    = col_analysis["categorical"][:4]
         for i in range(0, len(cats), 2):
-            batch = cats[i:i+2]
-            cols = st.columns(len(batch))
+            batch = cats[i:i + 2]
+            cols  = st.columns(len(batch))
             for j, cat in enumerate(batch):
                 with cols[j]:
-                    st.markdown(f'<div class="chart-card"><div class="chart-title">{cat.replace("_"," ").title()} by {num_col.replace("_"," ").title()}</div>', unsafe_allow_html=True)
-                    html = render_bar(df, cat, num_col)
-                    n = df[cat].nunique()
-                    st.components.v1.html(html, height=max(280, min(n*40+80, 500)))
+                    st.markdown(
+                        f'<div class="chart-card">'
+                        f'<div class="chart-title">'
+                        f'{cat.replace("_"," ").title()} by {num_col.replace("_"," ").title()}'
+                        f'</div>', unsafe_allow_html=True)
+                    try:
+                        n    = df[cat].nunique()
+                        html = render_bar(df, cat, num_col)
+                        st.components.v1.html(html, height=max(280, min(n * 40 + 80, 500)))
+                    except Exception as e:
+                        st.warning(f"Could not render chart: {e}")
                     st.markdown('</div>', unsafe_allow_html=True)
 
-    # 3. Pie chart for first categorical
+    # Pie charts
     if col_analysis["categorical"] and col_analysis["numeric"]:
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("#### 🍩 Distribution")
-        pc1, pc2 = st.columns([1,1])
-        with pc1:
-            cat = col_analysis["categorical"][0]
-            num = col_analysis["numeric"][0]
-            st.markdown(f'<div class="chart-card"><div class="chart-title">{cat.replace("_"," ").title()} Share</div>', unsafe_allow_html=True)
-            st.components.v1.html(render_pie(df, cat, num), height=300)
-            st.markdown('</div>', unsafe_allow_html=True)
-        with pc2:
-            if len(col_analysis["categorical"]) > 1:
-                cat2 = col_analysis["categorical"][1]
-                st.markdown(f'<div class="chart-card"><div class="chart-title">{cat2.replace("_"," ").title()} Share</div>', unsafe_allow_html=True)
-                st.components.v1.html(render_pie(df, cat2, num), height=300)
+        st.markdown("#### 🍩 Distributions")
+        cats_for_pie = col_analysis["categorical"][:2]
+        num_col      = col_analysis["numeric"][0]
+        pie_cols     = st.columns(len(cats_for_pie))
+        for j, cat in enumerate(cats_for_pie):
+            with pie_cols[j]:
+                st.markdown(
+                    f'<div class="chart-card">'
+                    f'<div class="chart-title">{cat.replace("_"," ").title()} Share</div>',
+                    unsafe_allow_html=True)
+                try:
+                    st.components.v1.html(render_pie(df, cat, num_col), height=300)
+                except Exception as e:
+                    st.warning(f"Could not render pie: {e}")
                 st.markdown('</div>', unsafe_allow_html=True)
 
-    # 4. Time trend if date columns exist
+    # Time trend
     if col_analysis["date"] and col_analysis["numeric"]:
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("#### 📈 Time Trend")
         st.markdown('<div class="chart-card">', unsafe_allow_html=True)
-        st.components.v1.html(render_trend(df, col_analysis), height=320)
+        try:
+            st.components.v1.html(render_trend(df, col_analysis), height=320)
+        except Exception as e:
+            st.warning(f"Could not render trend: {e}")
         st.markdown('</div>', unsafe_allow_html=True)
 
 def ask_claude(question, df_info):
     try:
-        client = anthropic.Anthropic()
+        client   = anthropic.Anthropic()
         response = client.messages.create(
-            model="claude-sonnet-4-20250514", max_tokens=800,
-            system=f"You are an expert data analyst.\nDataset info:\n{df_info}\nBe concise, use real numbers, format with bullet points.",
-            messages=[{"role":"user","content":question}]
+            model="claude-sonnet-4-20250514",
+            max_tokens=800,
+            system=(f"You are an expert data analyst.\n"
+                    f"Dataset info:\n{df_info}\n"
+                    f"Be concise, use real numbers, format with bullet points."),
+            messages=[{"role": "user", "content": question}],
         )
         return response.content[0].text
     except anthropic.AuthenticationError:
@@ -278,123 +433,115 @@ def ask_claude(question, df_info):
     except Exception as e:
         return f"Error: {e}"
 
-# ── SIDEBAR ───────────────────────────────────────────────────────────────────
+# ═════════════════════════════════════════════════════════════════════════════
+# SIDEBAR — file uploader only; nav built AFTER data is loaded
+# FIX 4: moved nav buttons below data load so col_analysis is available
+# ═════════════════════════════════════════════════════════════════════════════
 with st.sidebar:
-    st.markdown("<h2 style='color:white;font-size:20px;margin-bottom:0'>🧠 DataSense AI</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='color:rgba(255,255,255,0.6);font-size:12px;margin-top:2px'>Powered by Claude</p>", unsafe_allow_html=True)
+    st.markdown(
+        "<h2 style='color:white;font-size:20px;margin-bottom:0'>🧠 DataSense AI</h2>",
+        unsafe_allow_html=True)
+    st.markdown(
+        "<p style='color:rgba(255,255,255,0.6);font-size:12px;margin-top:2px'>Powered by Claude</p>",
+        unsafe_allow_html=True)
     st.markdown("---")
-    st.markdown("<p style='color:rgba(255,255,255,0.6);font-size:11px;text-transform:uppercase;letter-spacing:0.08em;font-weight:600'>UPLOAD DATA</p>", unsafe_allow_html=True)
-    uploaded = st.file_uploader("", type=["csv","xlsx","xls"], label_visibility="collapsed")
+    st.markdown(
+        "<p style='color:rgba(255,255,255,0.6);font-size:11px;text-transform:uppercase;"
+        "letter-spacing:0.08em;font-weight:600'>UPLOAD DATA</p>",
+        unsafe_allow_html=True)
+    uploaded = st.file_uploader("", type=["csv", "xlsx", "xls"],
+                                label_visibility="collapsed")
     if uploaded:
         st.success(f"✓ {uploaded.name}")
-
-    # ── DYNAMIC SIDEBAR NAV ───────────────────────────────────────────────────
-    chart_clicked = None
-    if uploaded:
-        try:
-            ext = os.path.splitext(uploaded.name)[1].lower()
-            if ext == ".csv":
-                df_side = pd.read_csv(uploaded)
-            else:
-                for hr in [0,1,2]:
-                    try:
-                        uploaded.seek(0)
-                        df_side = pd.read_excel(uploaded, header=hr)
-                        df_side = df_side.loc[:, ~df_side.columns.str.contains('^Unnamed')]
-                        df_side = df_side.dropna(how='all').dropna(axis=1, how='all')
-                        if len(df_side.columns) > 1 and len(df_side) > 1:
-                            break
-                    except: continue
-            uploaded.seek(0)
-            df_side.columns = [str(c).strip() for c in df_side.columns]
-
-            col_a_side = analyze_columns(df_side)
-            dtype_side = detect_dataset_type(df_side)
-            info_side  = DATASET_TYPES[dtype_side]
-            menu_side  = build_sidebar_menu(col_a_side)
-
-            st.markdown("---")
-            st.markdown(f'<div class="dataset-badge">{info_side["icon"]} {dtype_side.upper()} DATASET</div>', unsafe_allow_html=True)
-            st.markdown("<p style='color:rgba(255,255,255,0.6);font-size:11px;text-transform:uppercase;letter-spacing:0.08em;font-weight:600'>NAVIGATION</p>", unsafe_allow_html=True)
-
-            nav_cols = st.columns(2)
-            for i, (label, key) in enumerate(menu_side):
-                with nav_cols[i % 2]:
-                    if st.button(label, key=f"nav_{key}", use_container_width=True):
-                        chart_clicked = key
-                        st.session_state["active_view"] = key
-                        st.session_state["last_file"]   = uploaded.name
-
-        except Exception as e:
-            st.error(f"Nav error: {e}")
-
-    st.markdown("---")
-    st.markdown("<p style='color:rgba(255,255,255,0.6);font-size:11px'>• What are the key trends?<br>• Which category performs best?<br>• Any outliers or anomalies?<br>• Give me a full summary</p>", unsafe_allow_html=True)
 
 # ── WELCOME SCREEN ────────────────────────────────────────────────────────────
 if not uploaded:
     st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("<h2 style='color:#1e293b'>Welcome to DataSense AI 🧠</h2>", unsafe_allow_html=True)
-    st.markdown("Upload **any** CSV or Excel file — DataSense AI automatically detects your dataset type and builds a unique dashboard.")
-    c1,c2,c3,c4 = st.columns(4)
+    st.markdown(
+        "<h2 style='color:#1e293b'>Welcome to DataSense AI 🧠</h2>",
+        unsafe_allow_html=True)
+    st.markdown(
+        "Upload **any** CSV or Excel file — DataSense AI automatically "
+        "detects your dataset type and builds a unique dashboard.")
+    c1, c2, c3, c4 = st.columns(4)
     for col_obj, icon, title, desc in [
-        (c1,"🛒","Sales","Revenue, products, regions, orders"),
-        (c2,"💰","Finance","Expenses, budget, cashflow, profit"),
-        (c3,"👥","HR","Employees, salary, departments"),
-        (c4,"📊","Any Data","Works with any CSV or Excel file"),
+        (c1, "🛒", "Sales",   "Revenue, products, regions, orders"),
+        (c2, "💰", "Finance", "Expenses, budget, cashflow, profit"),
+        (c3, "👥", "HR",      "Employees, salary, departments"),
+        (c4, "📊", "Any Data","Works with any CSV or Excel file"),
     ]:
         with col_obj:
-            st.markdown(f'<div class="kpi-card"><div style="font-size:28px;margin-bottom:8px">{icon}</div><div style="font-weight:600;color:#1e293b;margin-bottom:4px">{title}</div><div style="font-size:12px;color:#64748b">{desc}</div></div>', unsafe_allow_html=True)
+            st.markdown(
+                f'<div class="kpi-card">'
+                f'<div style="font-size:28px;margin-bottom:8px">{icon}</div>'
+                f'<div style="font-weight:600;color:#1e293b;margin-bottom:4px">{title}</div>'
+                f'<div style="font-size:12px;color:#64748b">{desc}</div>'
+                f'</div>', unsafe_allow_html=True)
     st.stop()
 
-# ── LOAD DATA ─────────────────────────────────────────────────────────────────
+# ═════════════════════════════════════════════════════════════════════════════
+# FIX 1 APPLIED: load file once into session_state cache
+# ═════════════════════════════════════════════════════════════════════════════
 try:
-    ext = os.path.splitext(uploaded.name)[1].lower()
-    if ext == ".csv":
-        df = pd.read_csv(uploaded)
-    else:
-        for hr in [0,1,2]:
-            try:
-                uploaded.seek(0)
-                df = pd.read_excel(uploaded, header=hr)
-                df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
-                df = df.dropna(how='all').dropna(axis=1, how='all')
-                if len(df.columns) > 1 and len(df) > 1:
-                    break
-            except: continue
-    uploaded.seek(0)
-    df.columns = [str(c).strip().replace('\n',' ') for c in df.columns]
-    df = df.dropna(how='all').dropna(axis=1, how='all').reset_index(drop=True)
+    df = load_dataframe(uploaded)
 except Exception as e:
-    st.error(f"Could not load file: {e}"); st.stop()
+    st.error(f"Could not load file: {e}")
+    st.stop()
 
-# reset active view when a new file is uploaded
+# reset state on new file
 if st.session_state.get("last_file") != uploaded.name:
     st.session_state["active_view"] = "overview"
     st.session_state["last_file"]   = uploaded.name
     st.session_state["messages"]    = []
 
+# FIX 2 APPLIED: proper column type detection
 col_analysis = analyze_columns(df)
 dtype        = detect_dataset_type(df)
 info         = DATASET_TYPES[dtype]
 menu         = build_sidebar_menu(col_analysis)
-active_view  = st.session_state.get("active_view", "overview")
-if chart_clicked:
-    active_view = chart_clicked
 
-df_info = (f"File: {uploaded.name} | Type: {dtype} | Shape: {df.shape[0]} rows x {df.shape[1]} cols\n"
-           f"Columns: {', '.join(df.columns.tolist())}\n"
-           f"Numeric: {', '.join(col_analysis['numeric'])}\n"
-           f"Categorical: {', '.join(col_analysis['categorical'])}\n"
-           f"Date: {', '.join(col_analysis['date'])}\n"
-           f"Stats:\n{df.describe().to_string()}\n"
-           f"Sample:\n{df.head(3).to_string()}")
+# ═════════════════════════════════════════════════════════════════════════════
+# FIX 4: sidebar nav buttons rendered AFTER col_analysis is ready
+# ═════════════════════════════════════════════════════════════════════════════
+with st.sidebar:
+    st.markdown("---")
+    st.markdown(
+        f'<div class="dataset-badge">{info["icon"]} {dtype.upper()} DATASET</div>',
+        unsafe_allow_html=True)
+    st.markdown(
+        "<p style='color:rgba(255,255,255,0.6);font-size:11px;text-transform:uppercase;"
+        "letter-spacing:0.08em;font-weight:600'>NAVIGATION</p>",
+        unsafe_allow_html=True)
+    nav_cols = st.columns(2)
+    for i, (label, key) in enumerate(menu):
+        with nav_cols[i % 2]:
+            if st.button(label, key=f"nav_{key}", use_container_width=True):
+                st.session_state["active_view"] = key
+    st.markdown("---")
+    st.markdown(
+        "<p style='color:rgba(255,255,255,0.6);font-size:11px'>"
+        "• What are the key trends?<br>"
+        "• Which category performs best?<br>"
+        "• Any outliers or anomalies?<br>"
+        "• Give me a full summary</p>",
+        unsafe_allow_html=True)
+
+active_view = st.session_state.get("active_view", "overview")
 
 # ── HEADER ────────────────────────────────────────────────────────────────────
-file_title = (uploaded.name.replace(".csv","").replace(".xlsx","").replace(".xls","")
+file_title = (uploaded.name
+              .replace(".csv","").replace(".xlsx","").replace(".xls","")
               .replace("_"," ").replace("-"," ").title())
-st.markdown(f"<h3 style='margin-bottom:0.25rem'>{info['icon']} {file_title}</h3>", unsafe_allow_html=True)
-st.markdown(f"<p style='color:#64748b;font-size:13px;margin-bottom:1rem'>{df.shape[0]:,} rows · {df.shape[1]} columns · {dtype.title()} dataset · {len(col_analysis['numeric'])} numeric · {len(col_analysis['categorical'])} categorical · {len(col_analysis['date'])} date columns</p>", unsafe_allow_html=True)
+st.markdown(
+    f"<h3 style='margin-bottom:0.25rem'>{info['icon']} {file_title}</h3>",
+    unsafe_allow_html=True)
+st.markdown(
+    f"<p style='color:#64748b;font-size:13px;margin-bottom:1rem'>"
+    f"{df.shape[0]:,} rows · {df.shape[1]} columns · {dtype.title()} dataset · "
+    f"{len(col_analysis['numeric'])} numeric · "
+    f"{len(col_analysis['categorical'])} categorical · "
+    f"{len(col_analysis['date'])} date</p>",
+    unsafe_allow_html=True)
 
 # ── TOP KPI ROW ───────────────────────────────────────────────────────────────
 if col_analysis["numeric"]:
@@ -402,89 +549,120 @@ if col_analysis["numeric"]:
     for i, nc in enumerate(col_analysis["numeric"][:4]):
         s = df[nc].dropna()
         with kcols[i]:
-            st.markdown(f'<div class="kpi-card"><div class="kpi-label">{nc.replace("_"," ").title()}</div>'
-                        f'<div class="kpi-value" style="color:{COLORS[i]}">{fmt_num(s.sum())}</div>'
-                        f'<div class="kpi-sub">Avg {fmt_num(s.mean())} · Max {fmt_num(s.max())}</div></div>',
-                        unsafe_allow_html=True)
+            st.markdown(
+                f'<div class="kpi-card">'
+                f'<div class="kpi-label">{nc.replace("_"," ").title()}</div>'
+                f'<div class="kpi-value" style="color:{COLORS[i]}">{fmt_num(s.sum())}</div>'
+                f'<div class="kpi-sub">Avg {fmt_num(s.mean())} · Max {fmt_num(s.max())}</div>'
+                f'</div>', unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
 
+df_info = (f"File: {uploaded.name} | Type: {dtype} | "
+           f"Shape: {df.shape[0]} rows x {df.shape[1]} cols\n"
+           f"Columns: {', '.join(df.columns.tolist())}\n"
+           f"Numeric: {', '.join(col_analysis['numeric'])}\n"
+           f"Categorical: {', '.join(col_analysis['categorical'])}\n"
+           f"Date: {', '.join(col_analysis['date'])}\n"
+           f"Stats:\n{df.describe().to_string()}\n"
+           f"Sample:\n{df.head(3).to_string()}")
+
 # ── TABS ──────────────────────────────────────────────────────────────────────
-tab1, tab2, tab3, tab4 = st.tabs(["🏠 Overview", "💡 Insights", "💬 Ask Claude", "📋 Raw Data"])
+tab1, tab2, tab3, tab4 = st.tabs(
+    ["🏠 Overview", "💡 Insights", "💬 Ask Claude", "📋 Raw Data"])
 
-# ── TAB 1: OVERVIEW ───────────────────────────────────────────────────────────
+# ── TAB 1: OVERVIEW / ACTIVE VIEW ─────────────────────────────────────────────
 with tab1:
-    view_label = next((l for l,k in menu if k==active_view), "Overview")
+    view_label = next((l for l, k in menu if k == active_view), "Overview")
     st.markdown(f"**{view_label}**")
-
     try:
         if active_view == "overview":
-            # show 2-column overview of best available charts
             oc1, oc2 = st.columns(2)
             with oc1:
                 st.markdown('<div class="chart-card">', unsafe_allow_html=True)
                 if col_analysis["date"] and col_analysis["numeric"]:
-                    st.markdown('<div class="chart-title">Trend Over Time</div>', unsafe_allow_html=True)
+                    st.markdown('<div class="chart-title">Trend Over Time</div>',
+                                unsafe_allow_html=True)
                     st.components.v1.html(render_trend(df, col_analysis), height=260)
                 elif col_analysis["categorical"] and col_analysis["numeric"]:
                     cat = col_analysis["categorical"][0]
                     num = col_analysis["numeric"][0]
-                    st.markdown(f'<div class="chart-title">{cat.title()} Breakdown</div>', unsafe_allow_html=True)
+                    st.markdown(
+                        f'<div class="chart-title">{cat.title()} Breakdown</div>',
+                        unsafe_allow_html=True)
                     st.components.v1.html(render_bar(df, cat, num), height=260)
+                else:
+                    st.info("Upload a file with numeric columns to see charts.")
                 st.markdown('</div>', unsafe_allow_html=True)
+
             with oc2:
                 st.markdown('<div class="chart-card">', unsafe_allow_html=True)
                 if col_analysis["categorical"] and col_analysis["numeric"]:
                     cat = col_analysis["categorical"][0]
                     num = col_analysis["numeric"][0]
-                    st.markdown(f'<div class="chart-title">{cat.title()} Distribution</div>', unsafe_allow_html=True)
+                    st.markdown(
+                        f'<div class="chart-title">{cat.title()} Distribution</div>',
+                        unsafe_allow_html=True)
                     st.components.v1.html(render_pie(df, cat, num), height=260)
                 st.markdown('</div>', unsafe_allow_html=True)
 
         elif active_view == "kpis":
             if col_analysis["numeric"]:
-                for i in range(0, len(col_analysis["numeric"]), 4):
-                    batch = col_analysis["numeric"][i:i+4]
-                    cols = st.columns(len(batch))
+                for batch_start in range(0, len(col_analysis["numeric"]), 4):
+                    batch = col_analysis["numeric"][batch_start:batch_start + 4]
+                    cols  = st.columns(len(batch))
                     for j, nc in enumerate(batch):
                         s = df[nc].dropna()
                         with cols[j]:
                             st.markdown(
                                 f'<div class="kpi-card">'
                                 f'<div class="kpi-label">{nc.replace("_"," ").title()}</div>'
-                                f'<div class="kpi-value" style="color:{COLORS[j%len(COLORS)]}">{fmt_num(s.sum())}</div>'
+                                f'<div class="kpi-value" style="color:{COLORS[j%len(COLORS)]}">'
+                                f'{fmt_num(s.sum())}</div>'
                                 f'<div class="kpi-sub">Avg: {fmt_num(s.mean())}</div>'
-                                f'<div class="kpi-sub">Min: {fmt_num(s.min())} · Max: {fmt_num(s.max())}</div>'
+                                f'<div class="kpi-sub">Min: {fmt_num(s.min())} · '
+                                f'Max: {fmt_num(s.max())}</div>'
                                 f'</div>', unsafe_allow_html=True)
+            else:
+                st.info("No numeric columns detected.")
 
-        elif active_view == "trend" and col_analysis["date"] and col_analysis["numeric"]:
-            st.markdown('<div class="chart-card">', unsafe_allow_html=True)
-            st.components.v1.html(render_trend(df, col_analysis), height=380)
-            st.markdown('</div>', unsafe_allow_html=True)
+        elif active_view == "trend":
+            if col_analysis["date"] and col_analysis["numeric"]:
+                st.markdown('<div class="chart-card">', unsafe_allow_html=True)
+                st.components.v1.html(render_trend(df, col_analysis), height=400)
+                st.markdown('</div>', unsafe_allow_html=True)
+            else:
+                st.info("Trend requires at least one date and one numeric column.")
 
         elif active_view.startswith("bar_"):
             cat_col = active_view[4:]
             if cat_col in df.columns and col_analysis["numeric"]:
                 num_col = col_analysis["numeric"][0]
                 st.markdown('<div class="chart-card">', unsafe_allow_html=True)
+                n    = df[cat_col].nunique()
                 html = render_bar(df, cat_col, num_col)
-                n = df[cat_col].nunique()
-                st.components.v1.html(html, height=max(320, min(n*45+80, 600)))
+                st.components.v1.html(html, height=max(320, min(n * 45 + 80, 600)))
                 st.markdown('</div>', unsafe_allow_html=True)
+            else:
+                st.info(f"Column '{cat_col}' not found or no numeric columns available.")
 
-        elif active_view == "pie" and col_analysis["categorical"] and col_analysis["numeric"]:
-            cat_col = col_analysis["categorical"][0]
-            num_col = col_analysis["numeric"][0]
-            st.markdown('<div class="chart-card">', unsafe_allow_html=True)
-            st.components.v1.html(render_pie(df, cat_col, num_col), height=360)
-            st.markdown('</div>', unsafe_allow_html=True)
+        elif active_view == "pie":
+            if col_analysis["categorical"] and col_analysis["numeric"]:
+                cat_col = col_analysis["categorical"][0]
+                num_col = col_analysis["numeric"][0]
+                st.markdown('<div class="chart-card">', unsafe_allow_html=True)
+                st.components.v1.html(render_pie(df, cat_col, num_col), height=360)
+                st.markdown('</div>', unsafe_allow_html=True)
+            else:
+                st.info("Distribution requires categorical and numeric columns.")
 
         elif active_view == "heatmap":
-            if col_analysis["date"] and col_analysis["categorical"] and col_analysis["numeric"]:
+            if (col_analysis["date"] and col_analysis["categorical"]
+                    and col_analysis["numeric"]):
                 st.markdown('<div class="chart-card">', unsafe_allow_html=True)
                 st.components.v1.html(render_heatmap(df, col_analysis), height=520)
                 st.markdown('</div>', unsafe_allow_html=True)
             else:
-                st.info("Heatmap needs date, category and numeric columns.")
+                st.info("Heatmap needs date, categorical and numeric columns.")
 
         elif active_view == "table":
             st.dataframe(df.head(200), use_container_width=True)
@@ -494,6 +672,8 @@ with tab1:
 
     except Exception as e:
         st.error(f"Chart error: {e}")
+        import traceback
+        st.code(traceback.format_exc())
 
 # ── TAB 2: INSIGHTS ───────────────────────────────────────────────────────────
 with tab2:
@@ -506,20 +686,31 @@ with tab3:
         st.session_state.messages = []
     for msg in st.session_state.messages:
         if msg["role"] == "user":
-            st.markdown(f'<div style="background:#2563eb;border-radius:16px 16px 4px 16px;padding:0.75rem 1rem;margin:0.5rem 0;color:#fff;font-size:14px">🧑 {msg["content"]}</div>', unsafe_allow_html=True)
+            st.markdown(
+                f'<div style="background:#2563eb;border-radius:16px 16px 4px 16px;'
+                f'padding:0.75rem 1rem;margin:0.5rem 0;color:#fff;font-size:14px">'
+                f'🧑 {msg["content"]}</div>',
+                unsafe_allow_html=True)
         else:
-            st.markdown(f'<div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px 16px 16px 4px;padding:0.75rem 1rem;margin:0.5rem 0;color:#1e293b;font-size:14px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">🤖 {msg["content"]}</div>', unsafe_allow_html=True)
+            st.markdown(
+                f'<div style="background:#fff;border:1px solid #e2e8f0;'
+                f'border-radius:16px 16px 16px 4px;padding:0.75rem 1rem;'
+                f'margin:0.5rem 0;color:#1e293b;font-size:14px;'
+                f'box-shadow:0 1px 4px rgba(0,0,0,0.06)">🤖 {msg["content"]}</div>',
+                unsafe_allow_html=True)
     with st.form("chat_form", clear_on_submit=True):
-        fc1, fc2 = st.columns([5,1])
+        fc1, fc2 = st.columns([5, 1])
         with fc1:
-            question = st.text_input("", placeholder="e.g. What are the key insights from this data?", label_visibility="collapsed")
+            question = st.text_input(
+                "", placeholder="e.g. What are the key insights?",
+                label_visibility="collapsed")
         with fc2:
             submitted = st.form_submit_button("Ask →", use_container_width=True)
     if submitted and question:
-        st.session_state.messages.append({"role":"user","content":question})
+        st.session_state.messages.append({"role": "user", "content": question})
         with st.spinner("Thinking..."):
             answer = ask_claude(question, df_info)
-        st.session_state.messages.append({"role":"assistant","content":answer})
+        st.session_state.messages.append({"role": "assistant", "content": answer})
         st.rerun()
     if st.session_state.get("messages"):
         if st.button("Clear chat"):
@@ -530,5 +721,5 @@ with tab3:
 with tab4:
     st.markdown(f"**{df.shape[0]:,} rows × {df.shape[1]} columns**")
     st.dataframe(df, use_container_width=True)
-    csv = df.to_csv(index=False).encode('utf-8')
+    csv = df.to_csv(index=False).encode("utf-8")
     st.download_button("⬇ Download CSV", csv, f"{file_title}.csv", "text/csv")
