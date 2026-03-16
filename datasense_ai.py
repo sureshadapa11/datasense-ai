@@ -190,11 +190,19 @@ def get_kpis(df, col_analysis, dtype):
     kpis = []
     colors = ["#2563eb","#10b981","#f59e0b","#8b5cf6","#ef4444","#06b6d4"]
     for i, nc in enumerate(col_analysis["numeric"][:6]):
-        total = df[nc].sum()
-        avg   = df[nc].mean()
-        fmt   = lambda v: f"{v:,.0f}" if v >= 1 else f"{v:.2f}"
-        kpis.append({"label": nc.replace('_',' ').title(), "value": fmt(total),
-                     "sub": f"Avg: {fmt(avg)}", "color": colors[i % len(colors)]})
+        col_data = df[nc].dropna()
+        if len(col_data) == 0:
+            continue
+        total = col_data.sum()
+        avg   = col_data.mean()
+        if pd.isna(total) or pd.isna(avg):
+            continue
+        def fmt(v):
+            if pd.isna(v): return "N/A"
+            return f"{v:,.0f}" if abs(v) >= 1 else f"{v:.2f}"
+        kpis.append({"label": nc.replace('_',' ').replace('Col ','Column ').title(),
+                     "value": fmt(total), "sub": f"Avg: {fmt(avg)}",
+                     "color": colors[i % len(colors)]})
     return kpis
 
 def ask_claude(question, df_info):
@@ -269,8 +277,34 @@ if not uploaded:
 # Load data
 try:
     ext = os.path.splitext(uploaded.name)[1].lower()
-    df = pd.read_csv(uploaded) if ext==".csv" else pd.read_excel(uploaded)
+    if ext == ".csv":
+        df = pd.read_csv(uploaded)
+    else:
+        # try different header rows for messy Excel files
+        for header_row in [0, 1, 2]:
+            try:
+                uploaded.seek(0)
+                df_try = pd.read_excel(uploaded, header=header_row)
+                # check if this gives us better column names
+                unnamed = sum(1 for c in df_try.columns if 'unnamed' in str(c).lower())
+                if unnamed <= len(df_try.columns) // 2:
+                    df = df_try
+                    break
+            except:
+                continue
+        else:
+            uploaded.seek(0)
+            df = pd.read_excel(uploaded)
     uploaded.seek(0)
+    # drop columns where ALL values are NaN
+    df = df.dropna(axis=1, how='all')
+    # drop rows where ALL values are NaN
+    df = df.dropna(axis=0, how='all')
+    # clean up unnamed columns
+    df.columns = [str(c).strip() if 'unnamed' not in str(c).lower() else f"Col_{i+1}"
+                  for i, c in enumerate(df.columns)]
+    # reset index
+    df = df.reset_index(drop=True)
 except Exception as e:
     st.error(f"Could not load file: {e}"); st.stop()
 
