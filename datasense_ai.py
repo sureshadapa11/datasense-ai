@@ -755,7 +755,7 @@ with st.sidebar:
              ("📊  KPI Report","kpis"),("📈  Trends","trends"),
              ("📦  Categories","categories"),("🔗  Correlations","correlations"),
              ("🔍  Anomalies","anomalies"),("🤖  AI Analysis","ai"),
-             ("🔎  Data Agent","agent"),("📋  Data Table","table")]
+             ("📋  Data Table","table")]
 
     if not col_analysis["date"] or not col_analysis["numeric"]:
         pages = [p for p in pages if p[1] != "trends"]
@@ -783,7 +783,7 @@ active_view = st.session_state.get("active_view", "overview")
 file_title = (uploaded.name.replace(".csv","").replace(".xlsx","").replace(".xls","")
               .replace("_"," ").replace("-"," ").title())
 
-hc1, hc2, hc3 = st.columns([3, 1, 1])
+hc1, hc2, hc3, hc4 = st.columns([3, 1, 1, 1])
 with hc1:
     st.markdown(f"<h3 style='margin-bottom:2px;font-weight:800'>{cfg['icon']} {file_title}</h3>",
                 unsafe_allow_html=True)
@@ -800,6 +800,10 @@ with hc3:
     if st.button("🔄 Refresh AI", use_container_width=True):
         for k in list(st.session_state.keys()):
             if k.startswith("ai_"): del st.session_state[k]
+        st.rerun()
+with hc4:
+    if st.button("🔎 Data Agent", use_container_width=True):
+        st.session_state["active_view"] = "agent"
         st.rerun()
 
 st.markdown("<br>", unsafe_allow_html=True)
