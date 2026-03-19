@@ -755,7 +755,7 @@ with st.sidebar:
              ("📊  KPI Report","kpis"),("📈  Trends","trends"),
              ("📦  Categories","categories"),("🔗  Correlations","correlations"),
              ("🔍  Anomalies","anomalies"),("🤖  AI Analysis","ai"),
-             ("📋  Data Table","table")]
+             ("🔎  Data Agent","agent"),("📋  Data Table","table")]
 
     if not col_analysis["date"] or not col_analysis["numeric"]:
         pages = [p for p in pages if p[1] != "trends"]
@@ -1195,6 +1195,266 @@ elif active_view == "table":
         st.download_button("⬇ Download filtered CSV", csv2, f"{file_title}_filtered.csv", "text/csv", use_container_width=True)
     with dl2:
         st.caption(f"{len(display_df):,} of {len(df):,} rows shown")
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PAGE: DATA AGENT
+# ══════════════════════════════════════════════════════════════════════════════
+elif active_view == "agent":
+    st.markdown(f'''
+    <div style="background:linear-gradient(135deg,#0f172a,#1e3a5f);border-radius:16px;
+    padding:1.5rem 2rem;margin-bottom:1.5rem;border:1px solid #1e293b">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <span style="font-size:28px">🤖</span>
+        <div>
+          <div style="font-size:16px;font-weight:800;color:#f1f5f9">Data Agent</div>
+          <div style="font-size:12px;color:#64748b">Ask questions in plain English — get back data, tables and charts</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">
+        <span style="background:rgba(255,255,255,0.08);border-radius:20px;padding:3px 12px;font-size:11px;color:#94a3b8">🔍 Filter data</span>
+        <span style="background:rgba(255,255,255,0.08);border-radius:20px;padding:3px 12px;font-size:11px;color:#94a3b8">📊 Aggregate & group</span>
+        <span style="background:rgba(255,255,255,0.08);border-radius:20px;padding:3px 12px;font-size:11px;color:#94a3b8">📈 Show charts</span>
+        <span style="background:rgba(255,255,255,0.08);border-radius:20px;padding:3px 12px;font-size:11px;color:#94a3b8">🔢 Calculate stats</span>
+        <span style="background:rgba(255,255,255,0.08);border-radius:20px;padding:3px 12px;font-size:11px;color:#94a3b8">📋 Export results</span>
+      </div>
+    </div>
+    ''', unsafe_allow_html=True)
+
+    # Sample questions based on dataset type
+    sample_qs = {
+        "sales": [
+            "Show me top 5 products by revenue",
+            "Which region has the lowest sales?",
+            "Filter rows where revenue > 10000",
+            "Show me sales trend by month",
+            "Who is the top salesperson?",
+            "Show all completed orders",
+        ],
+        "hr": [
+            "Show employees with salary > 80000",
+            "Which department has the highest average salary?",
+            "Show all employees with Excellent performance",
+            "Filter employees hired after 2020",
+            "What is the average bonus by department?",
+            "Show top 10 highest paid employees",
+        ],
+        "finance": [
+            "Show months where expense > budget",
+            "Which category has the highest total expense?",
+            "Show revenue vs profit by month",
+            "Filter rows where profit < 0",
+            "What is the total revenue vs total expense?",
+            "Show top 5 months by profit",
+        ],
+        "marketing": [
+            "Which channel has the best ROAS?",
+            "Show campaigns with CTR > 5%",
+            "Filter rows where spend > 3000",
+            "Which campaign drives the most conversions?",
+            "Show top 5 days by revenue",
+            "Compare channels by total spend",
+        ],
+        "generic": [
+            "Show me the top 10 rows by value",
+            "Filter data where column > average",
+            "Group by category and sum values",
+            "Show me summary statistics",
+            "Find rows with missing values",
+            "Show the distribution of values",
+        ],
+    }
+
+    qs = sample_qs.get(dtype, sample_qs["generic"])
+
+    # Quick question buttons
+    st.markdown('<div class="sec-head">Quick Queries</div>', unsafe_allow_html=True)
+    btn_cols = st.columns(3)
+    for i, q_text in enumerate(qs):
+        with btn_cols[i % 3]:
+            if st.button(q_text, key=f"quick_{i}", use_container_width=True):
+                if "agent_messages" not in st.session_state:
+                    st.session_state.agent_messages = []
+                st.session_state.agent_pending = q_text
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Chat area
+    if "agent_messages" not in st.session_state:
+        st.session_state.agent_messages = []
+
+    # Display chat history
+    for msg in st.session_state.agent_messages:
+        if msg["role"] == "user":
+            st.markdown(
+                f'''<div style="background:#0f172a;border-radius:12px 12px 4px 12px;
+                padding:0.75rem 1rem;margin:0.5rem 0;color:#e2e8f0;font-size:13px;
+                border:1px solid #1e293b">🧑 {msg["content"]}</div>''',
+                unsafe_allow_html=True)
+        else:
+            st.markdown(
+                f'''<div style="background:#fff;border:1px solid #e2e8f0;
+                border-radius:12px 12px 12px 4px;padding:0.75rem 1rem;
+                margin:0.5rem 0;font-size:13px;color:#1e293b">
+                🤖 {msg["content"]}</div>''',
+                unsafe_allow_html=True)
+            if "dataframe" in msg:
+                st.dataframe(msg["dataframe"], use_container_width=True)
+                csv_out = msg["dataframe"].to_csv(index=False).encode("utf-8")
+                st.download_button("⬇ Download this result", csv_out,
+                                   "query_result.csv", "text/csv",
+                                   key=f"dl_{msg.get('id',0)}")
+            if "chart" in msg:
+                st.plotly_chart(msg["chart"], use_container_width=True)
+
+    # Input form
+    with st.form("agent_form", clear_on_submit=True):
+        fc1, fc2 = st.columns([5, 1])
+        with fc1:
+            agent_q = st.text_input(
+                "", placeholder=f"e.g. Show me top 10 {col_analysis['numeric'][0] if col_analysis['numeric'] else 'values'} by {col_analysis['categorical'][0] if col_analysis['categorical'] else 'category'}...",
+                label_visibility="collapsed",
+                value=st.session_state.get("agent_pending", ""))
+        with fc2:
+            agent_sub = st.form_submit_button("Query →", use_container_width=True)
+
+    # Clear pending
+    if "agent_pending" in st.session_state:
+        del st.session_state["agent_pending"]
+        st.rerun()
+
+    if agent_sub and agent_q:
+        st.session_state.agent_messages.append({"role": "user", "content": agent_q})
+
+        # Ask Claude to write pandas code to answer the question
+        with st.spinner("Thinking..."):
+            try:
+                client = anthropic.Anthropic()
+                system = f"""You are a data analyst and Python/pandas expert.
+The user has a dataframe called `df` with these properties:
+- Shape: {df.shape[0]} rows x {df.shape[1]} columns
+- Columns: {df.columns.tolist()}
+- Dtypes: {df.dtypes.to_dict()}
+- Sample data:
+{df.head(3).to_string()}
+
+The user will ask a question about this data. You must:
+1. Write Python/pandas code to answer it
+2. Store the RESULT in a variable called `result`
+3. `result` must be either:
+   - A DataFrame (for tables/filtered data)
+   - A dict with keys: "answer" (string), "dataframe" (optional DataFrame), "chart_type" (optional: "bar","line","pie","scatter"), "chart_x", "chart_y", "chart_color" (optional column names)
+4. Also set `answer_text` = a 1-2 sentence plain English summary of the result
+
+Rules:
+- Use ONLY pandas operations on `df`
+- Handle errors gracefully
+- For "top N" queries, sort and head()
+- For "filter" queries, use boolean indexing
+- For "group by" queries, use groupby().agg()
+- For "trend" or "over time" queries, suggest chart_type="line"
+- For "compare" queries, suggest chart_type="bar"
+- For "distribution" or "share", suggest chart_type="pie"
+- NEVER import anything - only use df, pd, and np which are already available
+- Output ONLY the Python code, no explanation, no markdown, no backticks"""
+
+                response = client.messages.create(
+                    model="claude-sonnet-4-20250514",
+                    max_tokens=1000,
+                    system=system,
+                    messages=[{"role": "user", "content": agent_q}]
+                )
+
+                code = response.content[0].text.strip()
+                # Remove any accidental markdown
+                if "```" in code:
+                    code = code.split("```python")[-1].split("```")[0].strip()
+                    if not code:
+                        code = code.split("```")[-2].strip()
+
+                # Execute the code
+                exec_globals = {"df": df.copy(), "pd": pd, "np": np,
+                                "result": None, "answer_text": ""}
+                try:
+                    exec(code, exec_globals)
+                    result = exec_globals.get("result")
+                    answer_text = exec_globals.get("answer_text", "")
+
+                    msg = {"role": "assistant", "id": len(st.session_state.agent_messages),
+                           "content": answer_text or "Here are the results:"}
+
+                    if isinstance(result, pd.DataFrame):
+                        msg["dataframe"] = result
+                        msg["content"] = (answer_text or
+                                          f"Found {len(result):,} rows matching your query.")
+
+                    elif isinstance(result, dict):
+                        if "answer" in result:
+                            msg["content"] = result["answer"]
+                        if "dataframe" in result and isinstance(result["dataframe"], pd.DataFrame):
+                            msg["dataframe"] = result["dataframe"]
+                        # Build chart if requested
+                        if "chart_type" in result and "dataframe" in result:
+                            try:
+                                cdf = result["dataframe"]
+                                cx  = result.get("chart_x", cdf.columns[0])
+                                cy  = result.get("chart_y", cdf.columns[1] if len(cdf.columns)>1 else cdf.columns[0])
+                                cc  = result.get("chart_color")
+                                ct  = result["chart_type"]
+                                if ct == "bar":
+                                    fig = px.bar(cdf, x=cx, y=cy, color=cc,
+                                                 color_discrete_sequence=COLORS)
+                                elif ct == "line":
+                                    fig = px.line(cdf, x=cx, y=cy, color=cc,
+                                                  color_discrete_sequence=COLORS,
+                                                  markers=True)
+                                elif ct == "pie":
+                                    fig = px.pie(cdf, names=cx, values=cy,
+                                                 color_discrete_sequence=COLORS, hole=0.4)
+                                elif ct == "scatter":
+                                    fig = px.scatter(cdf, x=cx, y=cy, color=cc,
+                                                     color_discrete_sequence=COLORS)
+                                else:
+                                    fig = None
+                                if fig:
+                                    fig.update_layout(**mk_layout(height=340, showlegend=True))
+                                    msg["chart"] = fig
+                            except Exception:
+                                pass
+                    elif result is not None:
+                        msg["content"] = str(result)
+
+                    st.session_state.agent_messages.append(msg)
+
+                except Exception as exec_err:
+                    # Fallback: ask Claude to just answer in plain text
+                    fallback = client.messages.create(
+                        model="claude-sonnet-4-20250514",
+                        max_tokens=400,
+                        system="You are a data analyst. Dataset:\n" + df_info + "\nAnswer concisely with numbers.",
+                        messages=[{"role": "user", "content": agent_q}]
+                    )
+                    st.session_state.agent_messages.append({
+                        "role": "assistant",
+                        "content": fallback.content[0].text,
+                        "id": len(st.session_state.agent_messages)
+                    })
+
+            except anthropic.AuthenticationError:
+                st.session_state.agent_messages.append({
+                    "role": "assistant", "id": 0,
+                    "content": "Auth error — check your API key."
+                })
+            except Exception as e:
+                st.session_state.agent_messages.append({
+                    "role": "assistant", "id": 0,
+                    "content": f"Error: {e}"
+                })
+        st.rerun()
+
+    if st.session_state.get("agent_messages"):
+        if st.button("🗑️ Clear conversation", use_container_width=False):
+            st.session_state.agent_messages = []
+            st.rerun()
 
 else:
     st.info("Select a page from the sidebar.")
