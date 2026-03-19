@@ -66,7 +66,6 @@ PLOTLY_LAYOUT = dict(
     paper_bgcolor='white', plot_bgcolor='white',
     font=dict(family='DM Sans, sans-serif', size=12, color='#475569'),
     margin=dict(l=20, r=20, t=30, b=20),
-    showlegend=True,
     xaxis=dict(showgrid=False, linecolor='#e2e8f0'),
     yaxis=dict(gridcolor='#f1f5f9', linecolor='#e2e8f0'),
 )
@@ -238,7 +237,7 @@ def plot_trend(df, col_analysis):
             name=nc.replace('_',' ').title(),
             line=dict(color=COLORS[i], width=2.5),
             fill='tozeroy' if i==0 else 'none',
-            fillcolor=COLORS[i]+'18',
+            fillcolor='rgba(37,99,235,0.08)',
             mode='lines+markers', marker=dict(size=5)
         ))
     fig.update_layout(**PLOTLY_LAYOUT, height=380,
@@ -254,7 +253,12 @@ def plot_bar(df, cat_col, num_col, top_n=12, horizontal=False):
     else:
         fig = px.bar(grp, x=cat_col, y=num_col,
                      color=cat_col, color_discrete_sequence=COLORS)
-    fig.update_layout(**PLOTLY_LAYOUT, height=350, showlegend=False)
+    layout = dict(**PLOTLY_LAYOUT)
+    layout['height'] = 350
+    layout['showlegend'] = False
+    layout['xaxis'] = dict(showgrid=False, linecolor='#e2e8f0')
+    layout['yaxis'] = dict(gridcolor='#f1f5f9', linecolor='#e2e8f0')
+    fig.update_layout(**layout)
     fig.update_traces(marker_line_width=0)
     return fig
 
@@ -262,23 +266,30 @@ def plot_pie(df, cat_col, num_col):
     grp = df.groupby(cat_col)[num_col].sum().sort_values(ascending=False).head(8).reset_index()
     fig = px.pie(grp, names=cat_col, values=num_col,
                  color_discrete_sequence=COLORS, hole=0.4)
-    fig.update_layout(**PLOTLY_LAYOUT, height=320,
-                      legend=dict(orientation='v', x=1.0))
+    layout = dict(**PLOTLY_LAYOUT)
+    layout['height'] = 320
+    layout['showlegend'] = True
+    layout['legend'] = dict(orientation='v', x=1.0)
+    fig.update_layout(**layout)
     fig.update_traces(textposition='inside', textinfo='percent+label')
     return fig
 
 def plot_histogram(df, num_col, bins=20):
     fig = px.histogram(df, x=num_col, nbins=bins,
                        color_discrete_sequence=['#2563eb'])
-    fig.update_layout(**PLOTLY_LAYOUT, height=260, showlegend=False)
+    layout = dict(**PLOTLY_LAYOUT)
+    layout['height'] = 260
+    layout['showlegend'] = False
+    layout['xaxis'] = dict(showgrid=False, linecolor='#e2e8f0')
+    layout['yaxis'] = dict(gridcolor='#f1f5f9', linecolor='#e2e8f0')
+    fig.update_layout(**layout)
     fig.update_traces(marker_line_width=0.5, marker_line_color='white')
     return fig
 
 def plot_scatter(df, col1, col2):
     sample = df[[col1, col2]].dropna().head(500)
     fig = px.scatter(sample, x=col1, y=col2,
-                     color_discrete_sequence=['#2563eb'],
-                     trendline='ols', trendline_color_override='#ef4444')
+                     color_discrete_sequence=['#2563eb'])
     fig.update_layout(**PLOTLY_LAYOUT, height=300)
     fig.update_traces(marker=dict(size=7, opacity=0.6))
     return fig
@@ -298,7 +309,10 @@ def plot_heatmap(df, col_analysis):
     pivot = pivot.reindex(columns=[m for m in months_order if m in pivot.columns])
     fig = px.imshow(pivot, color_continuous_scale='Blues',
                     aspect='auto', text_auto='.0f')
-    fig.update_layout(**PLOTLY_LAYOUT, height=max(250, len(cats)*50+80))
+    layout = dict(**PLOTLY_LAYOUT)
+    layout['height'] = max(250, len(cats)*50+80)
+    layout['showlegend'] = False
+    fig.update_layout(**layout)
     fig.update_coloraxes(showscale=False)
     return fig
 
