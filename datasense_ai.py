@@ -783,7 +783,7 @@ active_view = st.session_state.get("active_view", "overview")
 file_title = (uploaded.name.replace(".csv","").replace(".xlsx","").replace(".xls","")
               .replace("_"," ").replace("-"," ").title())
 
-hc1, hc2, hc3, hc4 = st.columns([3, 1, 1, 1])
+hc1, hc2, hc3 = st.columns([3, 1, 1])
 with hc1:
     st.markdown(f"<h3 style='margin-bottom:2px;font-weight:800'>{cfg['icon']} {file_title}</h3>",
                 unsafe_allow_html=True)
@@ -801,10 +801,21 @@ with hc3:
         for k in list(st.session_state.keys()):
             if k.startswith("ai_"): del st.session_state[k]
         st.rerun()
-with hc4:
-    if st.button("🔎 Data Agent", use_container_width=True):
-        st.session_state["active_view"] = "agent"
-        st.rerun()
+
+# ── DATA AGENT button — full width below title ────────────────────────────────
+st.markdown(
+    f'''<div style="margin-bottom:1rem">
+    <button onclick="window.location.href=\'#\';" style="
+        width:100%; padding:10px 20px; background:linear-gradient(135deg,#0f172a,#1e3a5f);
+        color:#e2e8f0; border:1px solid #334155; border-radius:10px;
+        font-size:13px; font-weight:600; cursor:pointer; text-align:left;
+        display:flex; align-items:center; gap:8px;">
+        🔎 Data Agent — Ask questions about your {file_title} data in plain English
+    </button></div>''', unsafe_allow_html=True)
+
+if st.button("🔎 Open Data Agent — Ask questions, filter data, get charts", use_container_width=True):
+    st.session_state["active_view"] = "agent"
+    st.rerun()
 
 st.markdown("<br>", unsafe_allow_html=True)
 
