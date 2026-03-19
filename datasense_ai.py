@@ -112,20 +112,30 @@ def analyze_columns(df):
     for col in df.columns:
         s = df[col].dropna()
         if len(s) == 0: continue
+
+        # Step 1: already datetime
+        if pd.api.types.is_datetime64_any_dtype(df[col]):
+            result["date"].append(col); continue
+
+        # Step 2: numeric (check before date to avoid int being parsed as date)
         if pd.api.types.is_numeric_dtype(df[col]):
             is_id = (str(col).lower().strip() in id_names or
                      (df[col].nunique()==len(df) and str(col).lower().strip().endswith('id')))
             if not is_id: result["numeric"].append(col)
             continue
-        if pd.api.types.is_datetime64_any_dtype(df[col]):
-            result["date"].append(col); continue
-        if pd.api.types.is_object_dtype(df[col]):
-            try:
-                conv = pd.to_datetime(s, infer_datetime_format=True, errors='coerce')
-                if conv.notna().sum()/len(s) > 0.7:
-                    result["date"].append(col); continue
-            except: pass
-        if s.nunique() <= 30 or s.nunique()/len(s) <= 0.3:
+
+        # Step 3: try date detection on ALL non-numeric columns
+        # works for both object and StringDtype (pandas 3.x)
+        try:
+            s_str = s.astype(str)
+            conv = pd.to_datetime(s_str, errors='coerce')
+            if conv.notna().sum() / len(s_str) > 0.7:
+                result["date"].append(col); continue
+        except Exception:
+            pass
+
+        # Step 4: categorical vs text
+        if s.nunique() <= 30 or s.nunique() / len(s) <= 0.3:
             result["categorical"].append(col)
         else:
             result["text"].append(col)
