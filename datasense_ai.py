@@ -1224,61 +1224,67 @@ elif active_view == "agent":
     </div>
     ''', unsafe_allow_html=True)
 
-    # Sample questions based on dataset type
-    sample_qs = {
-        "sales": [
-            "Show me top 5 products by revenue",
-            "Which region has the lowest sales?",
-            "Filter rows where revenue > 10000",
-            "Show me sales trend by month",
-            "Who is the top salesperson?",
-            "Show all completed orders",
-        ],
-        "hr": [
-            "Show employees with salary > 80000",
-            "Which department has the highest average salary?",
-            "Show all employees with Excellent performance",
-            "Filter employees hired after 2020",
-            "What is the average bonus by department?",
-            "Show top 10 highest paid employees",
-        ],
-        "finance": [
-            "Show months where expense > budget",
-            "Which category has the highest total expense?",
-            "Show revenue vs profit by month",
-            "Filter rows where profit < 0",
-            "What is the total revenue vs total expense?",
-            "Show top 5 months by profit",
-        ],
-        "marketing": [
-            "Which channel has the best ROAS?",
-            "Show campaigns with CTR > 5%",
-            "Filter rows where spend > 3000",
-            "Which campaign drives the most conversions?",
-            "Show top 5 days by revenue",
-            "Compare channels by total spend",
-        ],
-        "generic": [
-            "Show me the top 10 rows by value",
-            "Filter data where column > average",
-            "Group by category and sum values",
-            "Show me summary statistics",
-            "Find rows with missing values",
-            "Show the distribution of values",
-        ],
-    }
+    # ── DYNAMIC quick queries based on ACTUAL columns in uploaded file ──────────
+    def build_quick_queries(df, col_analysis, dtype):
+        nums = col_analysis["numeric"]
+        cats = col_analysis["categorical"]
+        dates = col_analysis["date"]
+        qs = []
 
-    qs = sample_qs.get(dtype, sample_qs["generic"])
+        # Top N by first numeric
+        if nums and cats:
+            qs.append(f"Show top 10 rows by {nums[0]}")
+            qs.append(f"Group by {cats[0]} and sum {nums[0]}")
+            qs.append(f"Which {cats[0]} has the highest {nums[0]}?")
+            qs.append(f"Which {cats[0]} has the lowest {nums[0]}?")
 
-    # Quick question buttons
-    st.markdown('<div class="sec-head">Quick Queries</div>', unsafe_allow_html=True)
+        # Filter by numeric threshold
+        if nums:
+            avg_val = df[nums[0]].mean()
+            qs.append(f"Filter rows where {nums[0]} > {avg_val:.0f}")
+            qs.append(f"Show top 5 rows sorted by {nums[0]} descending")
+            qs.append(f"What is the average {nums[0]} by {cats[0]}?" if cats else f"Show summary stats for {nums[0]}")
+
+        # Date-based queries
+        if dates and nums:
+            qs.append(f"Show {nums[0]} trend over time")
+            qs.append(f"Which month has the highest {nums[0]}?")
+
+        # Second numeric column
+        if len(nums) >= 2:
+            qs.append(f"Compare {nums[0]} vs {nums[1]} by {cats[0]}" if cats else f"Show {nums[0]} vs {nums[1]}")
+            qs.append(f"Show correlation between {nums[0]} and {nums[1]}")
+
+        # Second categorical
+        if len(cats) >= 2 and nums:
+            qs.append(f"Group by {cats[1]} and sum {nums[0]}")
+
+        # Status/categorical filter
+        for cat in cats:
+            unique_vals = df[cat].dropna().unique()
+            if len(unique_vals) <= 6:
+                qs.append(f"Show rows where {cat} = {unique_vals[0]}")
+                break
+
+        # Always include these
+        qs.append("Show summary statistics for all columns")
+        qs.append("Find rows with missing values")
+        qs.append(f"Show first 20 rows")
+
+        return qs[:12]  # max 12 queries
+
+    qs = build_quick_queries(df, col_analysis, dtype)
+
+    # Quick question buttons - clicking sets pending and reruns
+    st.markdown('<div class="sec-head">Quick Queries — based on your data columns</div>', unsafe_allow_html=True)
     btn_cols = st.columns(3)
     for i, q_text in enumerate(qs):
         with btn_cols[i % 3]:
             if st.button(q_text, key=f"quick_{i}", use_container_width=True):
                 if "agent_messages" not in st.session_state:
                     st.session_state.agent_messages = []
-                st.session_state.agent_pending = q_text
+                st.session_state["agent_auto_q"] = q_text
+                st.rerun()
 
     st.markdown("<br>", unsafe_allow_html=True)
 
@@ -1310,21 +1316,21 @@ elif active_view == "agent":
             if "chart" in msg:
                 st.plotly_chart(msg["chart"], use_container_width=True)
 
-    # Input form
+    # Input form — handle quick query auto-submit
+    auto_q = st.session_state.pop("agent_auto_q", None)
+
     with st.form("agent_form", clear_on_submit=True):
         fc1, fc2 = st.columns([5, 1])
         with fc1:
-            agent_q = st.text_input(
-                "", placeholder=f"e.g. Show me top 10 {col_analysis['numeric'][0] if col_analysis['numeric'] else 'values'} by {col_analysis['categorical'][0] if col_analysis['categorical'] else 'category'}...",
-                label_visibility="collapsed",
-                value=st.session_state.get("agent_pending", ""))
+            ph = f"e.g. Show top 10 rows by {col_analysis['numeric'][0] if col_analysis['numeric'] else 'value'}..."
+            agent_q = st.text_input("", placeholder=ph, label_visibility="collapsed")
         with fc2:
             agent_sub = st.form_submit_button("Query →", use_container_width=True)
 
-    # Clear pending
-    if "agent_pending" in st.session_state:
-        del st.session_state["agent_pending"]
-        st.rerun()
+    # If quick button was clicked, use that as the query
+    if auto_q and not agent_sub:
+        agent_q  = auto_q
+        agent_sub = True
 
     if agent_sub and agent_q:
         st.session_state.agent_messages.append({"role": "user", "content": agent_q})
