@@ -665,7 +665,7 @@ with st.sidebar:
     st.markdown("<div style='padding:1rem 0 0.5rem'><span style='font-size:22px'>🧠</span>"
                 "<span style='color:#f1f5f9;font-size:17px;font-weight:800;margin-left:8px'>DataSense AI</span></div>",
                 unsafe_allow_html=True)
-    st.markdown("<p style='color:#475569;font-size:11px;margin-top:-4px;margin-bottom:1rem'>Instant Insights from Any Dataset</p>",
+    st.markdown("<p style='color:#475569;font-size:11px;margin-top:-4px;margin-bottom:1rem'>Insights That Drive Action</p>",
                 unsafe_allow_html=True)
     st.divider()
     st.markdown("<p style='color:#475569;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:8px'>Data Source</p>",
