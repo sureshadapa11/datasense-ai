@@ -21,23 +21,50 @@ st.markdown("""
 .stApp { background: #f1f5f9; }
 
 /* SIDEBAR */
-section[data-testid="stSidebar"] { background: #0f172a !important; }
+section[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #0a0f1e 0%, #0f172a 40%, #0d1b2a 100%) !important;
+    border-right: 1px solid #1e293b !important;
+}
 section[data-testid="stSidebar"] * { color: #94a3b8 !important; }
 section[data-testid="stSidebar"] .stSuccess p { color: #10b981 !important; }
 section[data-testid="stSidebar"] hr { border-color: #1e293b !important; }
+section[data-testid="stSidebar"] .stSuccess {
+    background: rgba(16,185,129,0.1) !important;
+    border: 1px solid rgba(16,185,129,0.25) !important;
+    border-radius: 8px !important;
+}
 
 /* BUTTONS */
 .stButton > button {
-    background: #1e293b; color: #e2e8f0; border: 1px solid #334155;
+    background: rgba(255,255,255,0.04);
+    color: #94a3b8 !important;
+    border: 1px solid #1e293b;
     border-radius: 8px; font-size: 12px; font-weight: 500;
-    transition: all 0.15s; width: 100%;
+    transition: all 0.2s; width: 100%;
+    text-align: left !important;
+    padding: 0.5rem 0.75rem !important;
 }
-.stButton > button:hover { background: #2563eb; border-color: #2563eb; color: #fff; }
+.stButton > button:hover {
+    background: rgba(37,99,235,0.15) !important;
+    border-color: #2563eb !important;
+    color: #60a5fa !important;
+    transform: translateX(2px);
+}
 
 /* FILE UPLOADER */
-div[data-testid="stFileUploader"] { background: #1e293b; border: 1.5px dashed #334155; border-radius: 10px; padding: 0.75rem; }
-div[data-testid="stFileUploader"] * { color: #94a3b8 !important; }
-div[data-testid="stFileUploader"] button { background: #2563eb !important; color: #fff !important; border: none !important; border-radius: 6px !important; }
+div[data-testid="stFileUploader"] {
+    background: rgba(255,255,255,0.03);
+    border: 1.5px dashed #2d3748;
+    border-radius: 10px; padding: 0.75rem;
+    transition: border-color 0.2s;
+}
+div[data-testid="stFileUploader"]:hover { border-color: #2563eb; }
+div[data-testid="stFileUploader"] * { color: #64748b !important; }
+div[data-testid="stFileUploader"] button {
+    background: #2563eb !important; color: #fff !important;
+    border: none !important; border-radius: 6px !important;
+    font-weight: 600 !important;
+}
 div[data-testid="stFileUploaderDropzoneInstructions"] span { color: #60a5fa !important; font-weight: 600; }
 
 /* TABS */
@@ -662,13 +689,28 @@ def ask_claude(question, df_info, dtype):
 # SIDEBAR
 # ══════════════════════════════════════════════════════════════════════════════
 with st.sidebar:
-    st.markdown("<div style='padding:1rem 0 0.5rem'><span style='font-size:22px'>🧠</span>"
-                "<span style='color:#f1f5f9;font-size:17px;font-weight:800;margin-left:8px'>DataSense AI</span></div>",
-                unsafe_allow_html=True)
-    st.markdown("<p style='color:#475569;font-size:11px;margin-top:-4px;margin-bottom:1rem'>Insights That Drive Action</p>",
-                unsafe_allow_html=True)
-    st.divider()
-    st.markdown("<p style='color:#475569;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:8px'>Data Source</p>",
+    # ── BRAND HEADER ─────────────────────────────────────────────────────────
+    st.markdown("""
+    <div style='padding:1.5rem 0.5rem 1rem'>
+      <div style='display:flex;align-items:center;gap:10px;margin-bottom:6px'>
+        <div style='background:linear-gradient(135deg,#2563eb,#3b82f6);
+          border-radius:10px;width:36px;height:36px;display:flex;
+          align-items:center;justify-content:center;font-size:18px;
+          box-shadow:0 4px 12px rgba(37,99,235,0.4)'>🧠</div>
+        <div>
+          <div style='font-size:20px;font-weight:800;color:#f1f5f9;
+            letter-spacing:-0.02em;line-height:1'>DataSense AI</div>
+          <div style='font-size:10px;color:#475569;font-weight:500;
+            letter-spacing:0.05em;margin-top:1px'>Insights That Drive Action</div>
+        </div>
+      </div>
+      <div style='height:1px;background:linear-gradient(90deg,#2563eb44,transparent);
+        margin-top:12px'></div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ── UPLOAD SECTION ────────────────────────────────────────────────────────
+    st.markdown("<p style='color:#334155;font-size:10px;text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:8px;padding-left:2px'>📂 Data Source</p>",
                 unsafe_allow_html=True)
     uploaded = st.file_uploader("", type=["csv","xlsx","xls"], label_visibility="collapsed")
     if uploaded:
@@ -745,10 +787,15 @@ smart_insights= compute_smart_insights(df, col_analysis, dtype)
 
 # ── SIDEBAR NAV ───────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.divider()
-    st.markdown(f"<p style='color:{cfg['color']};font-size:11px;font-weight:700;margin-bottom:8px'>{cfg['icon']} {cfg['label'].upper()}</p>",
-                unsafe_allow_html=True)
-    st.markdown("<p style='color:#475569;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:6px'>Pages</p>",
+    # Dataset badge
+    st.markdown(
+        f"<div style='background:rgba(37,99,235,0.1);border:1px solid rgba(37,99,235,0.2);"
+        f"border-radius:8px;padding:8px 12px;margin-bottom:12px'>"
+        f"<span style='font-size:14px'>{cfg['icon']}</span>"
+        f"<span style='color:#60a5fa;font-size:11px;font-weight:700;margin-left:6px'>{cfg['label']}</span>"
+        f"</div>",
+        unsafe_allow_html=True)
+    st.markdown("<p style='color:#334155;font-size:10px;text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:6px;padding-left:2px'>🗂 Navigation</p>",
                 unsafe_allow_html=True)
 
     pages = [("🏠  Overview","overview"),("💡  Smart Insights","smart"),
@@ -768,14 +815,27 @@ with st.sidebar:
         if st.button(label, key=f"pg_{key}", use_container_width=True):
             st.session_state["active_view"] = key
 
-    st.divider()
-    st.markdown(f"<p style='color:#334155;font-size:11px'>"
-                f"<b style='color:#64748b'>{df.shape[0]:,}</b> rows · "
-                f"<b style='color:#64748b'>{df.shape[1]}</b> cols<br>"
-                f"<b style='color:#64748b'>{len(col_analysis['numeric'])}</b> numeric · "
-                f"<b style='color:#64748b'>{len(col_analysis['categorical'])}</b> categorical · "
-                f"<b style='color:#64748b'>{len(col_analysis['date'])}</b> date</p>",
-                unsafe_allow_html=True)
+    # Footer stats
+    st.markdown(
+        f"<div style='margin-top:auto;padding:12px;background:rgba(255,255,255,0.02);"
+        f"border:1px solid #1e293b;border-radius:10px;margin-top:12px'>"
+        f"<div style='font-size:10px;color:#334155;font-weight:700;text-transform:uppercase;"
+        f"letter-spacing:0.1em;margin-bottom:8px'>Dataset Info</div>"
+        f"<div style='display:grid;grid-template-columns:1fr 1fr;gap:6px'>"
+        f"<div style='background:#0f172a;border-radius:6px;padding:6px 8px;text-align:center'>"
+        f"<div style='font-size:16px;font-weight:800;color:#60a5fa'>{df.shape[0]:,}</div>"
+        f"<div style='font-size:9px;color:#475569;text-transform:uppercase;letter-spacing:0.06em'>Rows</div></div>"
+        f"<div style='background:#0f172a;border-radius:6px;padding:6px 8px;text-align:center'>"
+        f"<div style='font-size:16px;font-weight:800;color:#34d399'>{df.shape[1]}</div>"
+        f"<div style='font-size:9px;color:#475569;text-transform:uppercase;letter-spacing:0.06em'>Columns</div></div>"
+        f"<div style='background:#0f172a;border-radius:6px;padding:6px 8px;text-align:center'>"
+        f"<div style='font-size:16px;font-weight:800;color:#a78bfa'>{len(col_analysis['numeric'])}</div>"
+        f"<div style='font-size:9px;color:#475569;text-transform:uppercase;letter-spacing:0.06em'>Numeric</div></div>"
+        f"<div style='background:#0f172a;border-radius:6px;padding:6px 8px;text-align:center'>"
+        f"<div style='font-size:16px;font-weight:800;color:#fb923c'>{len(col_analysis['categorical'])}</div>"
+        f"<div style='font-size:9px;color:#475569;text-transform:uppercase;letter-spacing:0.06em'>Category</div></div>"
+        f"</div></div>",
+        unsafe_allow_html=True)
 
 active_view = st.session_state.get("active_view", "overview")
 
