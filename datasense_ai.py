@@ -665,7 +665,7 @@ with st.sidebar:
     st.markdown("<div style='padding:1rem 0 0.5rem'><span style='font-size:22px'>🧠</span>"
                 "<span style='color:#f1f5f9;font-size:17px;font-weight:800;margin-left:8px'>DataSense AI</span></div>",
                 unsafe_allow_html=True)
-    st.markdown("<p style='color:#475569;font-size:11px;margin-top:-4px;margin-bottom:1rem'>Power BI Style Analytics</p>",
+    st.markdown("<p style='color:#475569;font-size:11px;margin-top:-4px;margin-bottom:1rem'>Instant Insights from Any Dataset</p>",
                 unsafe_allow_html=True)
     st.divider()
     st.markdown("<p style='color:#475569;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:8px'>Data Source</p>",
@@ -677,47 +677,115 @@ with st.sidebar:
 # ══════════════════════════════════════════════════════════════════════════════
 # WELCOME
 # ══════════════════════════════════════════════════════════════════════════════
+# Handle file uploaded from welcome page
+if "welcome_file" in st.session_state and st.session_state["welcome_file"] is not None:
+    uploaded = st.session_state.pop("welcome_file")
+
 if not uploaded:
     st.markdown("<br>", unsafe_allow_html=True)
+
+    # Hero
     st.markdown("""
-    <div style='max-width:680px'>
-      <h1 style='font-size:34px;font-weight:800;color:#0f172a;line-height:1.2;margin-bottom:12px'>
-        AI-Powered Analytics<br><span style='color:#2563eb'>for Any Dataset</span>
+    <div style='max-width:700px;margin-bottom:2rem'>
+      <div style='display:inline-block;background:#dbeafe;color:#1d4ed8;border-radius:20px;
+        padding:4px 14px;font-size:11px;font-weight:700;letter-spacing:0.08em;
+        text-transform:uppercase;margin-bottom:14px'>Intelligent Data Analysis</div>
+      <h1 style='font-size:36px;font-weight:800;color:#0f172a;line-height:1.2;margin-bottom:14px'>
+        Turn Raw Data into<br><span style='color:#2563eb'>Instant Intelligence</span>
       </h1>
-      <p style='font-size:16px;color:#64748b;margin-bottom:2rem'>
-        Upload any CSV or Excel file. DataSense AI automatically detects your data type,
-        generates custom KPIs, charts, and AI-written insights specific to your data.
+      <p style='font-size:15px;color:#64748b;line-height:1.7;margin-bottom:0'>
+        Upload any spreadsheet and get automated dashboards, smart KPIs, trend analysis,
+        anomaly detection and AI-written insights — all tailored to your specific data.
       </p>
     </div>
     """, unsafe_allow_html=True)
 
+    # Dataset type cards
+    st.markdown("<p style='font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px'>Works with any dataset type</p>", unsafe_allow_html=True)
     cards = [
-        ("🛒","Sales","Revenue, products, regions, orders","#dbeafe","#1d4ed8"),
-        ("💰","Finance","Budget, expenses, profit, cashflow","#dcfce7","#15803d"),
-        ("👥","HR","Employees, salary, performance","#ede9fe","#6d28d9"),
-        ("📣","Marketing","Campaigns, ROAS, CTR, conversions","#fce7f3","#9d174d"),
+        ("🛒","Sales Analytics","Revenue, products, regions, orders & discounts","#dbeafe","#1d4ed8"),
+        ("💰","Finance Analytics","Budget, expenses, profit margins & cashflow","#dcfce7","#15803d"),
+        ("👥","HR Analytics","Employees, salaries, performance & departments","#ede9fe","#6d28d9"),
+        ("📣","Marketing Analytics","Campaigns, ROAS, CTR, spend & conversions","#fce7f3","#9d174d"),
     ]
     c1,c2,c3,c4 = st.columns(4)
     for col_obj, (icon, title, desc, bg, tc) in zip([c1,c2,c3,c4], cards):
         with col_obj:
             st.markdown(f"""
-            <div style='background:{bg};border-radius:16px;padding:1.25rem 1.5rem;border:1px solid transparent'>
-              <div style='font-size:28px;margin-bottom:8px'>{icon}</div>
-              <div style='font-weight:700;color:{tc};font-size:15px;margin-bottom:4px'>{title}</div>
-              <div style='font-size:12px;color:#475569'>{desc}</div>
+            <div style='background:{bg};border-radius:14px;padding:1.1rem 1.25rem;
+              border:1px solid transparent;height:100%'>
+              <div style='font-size:26px;margin-bottom:8px'>{icon}</div>
+              <div style='font-weight:700;color:{tc};font-size:13px;margin-bottom:5px'>{title}</div>
+              <div style='font-size:12px;color:#64748b;line-height:1.5'>{desc}</div>
             </div>""", unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("""
-    <div style='background:#fff;border-radius:16px;padding:1.5rem 2rem;border:1px solid #e2e8f0;max-width:680px'>
-      <p style='font-weight:700;color:#0f172a;font-size:14px;margin-bottom:12px'>How it works</p>
-      <div style='display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;color:#475569'>
-        <div>📤 <b style='color:#0f172a'>Upload</b> any CSV or Excel</div>
-        <div>🔍 <b style='color:#0f172a'>Auto-detect</b> dataset type</div>
-        <div>📊 <b style='color:#0f172a'>Generate</b> custom KPIs & charts</div>
-        <div>🤖 <b style='color:#0f172a'>AI insights</b> specific to your data</div>
-      </div>
-    </div>""", unsafe_allow_html=True)
+
+    # How it works — with real upload button
+    hw1, hw2 = st.columns([1, 1])
+    with hw1:
+        st.markdown("""
+        <div style='background:#fff;border-radius:16px;padding:1.5rem;border:1px solid #e2e8f0;height:100%'>
+          <p style='font-weight:700;color:#0f172a;font-size:14px;margin-bottom:16px'>How it works</p>
+          <div style='display:flex;flex-direction:column;gap:14px'>
+            <div style='display:flex;align-items:flex-start;gap:12px'>
+              <div style='background:#dbeafe;border-radius:8px;padding:6px 10px;font-size:16px;flex-shrink:0'>📂</div>
+              <div><b style='color:#0f172a;font-size:13px'>Drop your file</b><br>
+              <span style='color:#64748b;font-size:12px'>CSV or Excel · Any size, any structure</span></div>
+            </div>
+            <div style='display:flex;align-items:flex-start;gap:12px'>
+              <div style='background:#dcfce7;border-radius:8px;padding:6px 10px;font-size:16px;flex-shrink:0'>🔍</div>
+              <div><b style='color:#0f172a;font-size:13px'>Automatic analysis</b><br>
+              <span style='color:#64748b;font-size:12px'>Column types, dataset category and patterns detected instantly</span></div>
+            </div>
+            <div style='display:flex;align-items:flex-start;gap:12px'>
+              <div style='background:#ede9fe;border-radius:8px;padding:6px 10px;font-size:16px;flex-shrink:0'>📊</div>
+              <div><b style='color:#0f172a;font-size:13px'>Dashboard built for you</b><br>
+              <span style='color:#64748b;font-size:12px'>KPIs, charts, trends and breakdowns — zero manual setup</span></div>
+            </div>
+            <div style='display:flex;align-items:flex-start;gap:12px'>
+              <div style='background:#fce7f3;border-radius:8px;padding:6px 10px;font-size:16px;flex-shrink:0'>🤖</div>
+              <div><b style='color:#0f172a;font-size:13px'>Ask your data anything</b><br>
+              <span style='color:#64748b;font-size:12px'>Natural language queries, filtered tables and instant charts</span></div>
+            </div>
+          </div>
+        </div>""", unsafe_allow_html=True)
+
+    with hw2:
+        st.markdown("""
+        <div style='background:#0f172a;border-radius:16px;padding:1.5rem;border:1px solid #1e293b;height:100%'>
+          <p style='font-weight:700;color:#f1f5f9;font-size:14px;margin-bottom:6px'>Get started in seconds</p>
+          <p style='color:#64748b;font-size:12px;margin-bottom:1.25rem'>Upload your CSV or Excel file to begin your analysis</p>
+        """, unsafe_allow_html=True)
+        # Real Streamlit upload button inside the card
+        welcome_upload = st.file_uploader(
+            "Drop your file here or click to browse",
+            type=["csv","xlsx","xls"],
+            key="welcome_uploader",
+            label_visibility="collapsed"
+        )
+        st.markdown("""
+          <p style='color:#334155;font-size:11px;margin-top:10px'>
+            Supports CSV, Excel (.xlsx, .xls) · Any size
+          </p>
+          <div style='margin-top:1rem;padding-top:1rem;border-top:1px solid #1e293b'>
+            <p style='color:#475569;font-size:12px;font-weight:600;margin-bottom:8px'>What you get:</p>
+            <div style='display:flex;flex-wrap:wrap;gap:6px'>
+              <span style='background:#1e293b;color:#94a3b8;border-radius:6px;padding:3px 10px;font-size:11px'>Smart KPIs</span>
+              <span style='background:#1e293b;color:#94a3b8;border-radius:6px;padding:3px 10px;font-size:11px'>Interactive Charts</span>
+              <span style='background:#1e293b;color:#94a3b8;border-radius:6px;padding:3px 10px;font-size:11px'>Trend Analysis</span>
+              <span style='background:#1e293b;color:#94a3b8;border-radius:6px;padding:3px 10px;font-size:11px'>AI Insights</span>
+              <span style='background:#1e293b;color:#94a3b8;border-radius:6px;padding:3px 10px;font-size:11px'>Data Agent Chat</span>
+              <span style='background:#1e293b;color:#94a3b8;border-radius:6px;padding:3px 10px;font-size:11px'>Anomaly Detection</span>
+            </div>
+          </div>
+        </div>""", unsafe_allow_html=True)
+
+        # If file uploaded here, carry it over
+        if welcome_upload is not None:
+            st.session_state["welcome_file"] = welcome_upload
+            st.rerun()
+
     st.stop()
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -850,7 +918,7 @@ if active_view == "overview":
     # Charts
     oc1, oc2 = st.columns([3, 2])
     with oc1:
-        st.markdown('<div class="sec-head">Primary Chart</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sec-head">Trend Overview — How Your Key Metrics Move</div>', unsafe_allow_html=True)
         try:
             if col_analysis["date"] and col_analysis["numeric"]:
                 st.plotly_chart(plot_trend(df, col_analysis), use_container_width=True)
@@ -863,7 +931,7 @@ if active_view == "overview":
             st.error(f"Chart error: {e}")
 
     with oc2:
-        st.markdown('<div class="sec-head">Distribution</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sec-head">Breakdown — What Drives the Numbers</div>', unsafe_allow_html=True)
         try:
             if col_analysis["categorical"] and col_analysis["numeric"]:
                 cat = col_analysis["categorical"][0]; num = col_analysis["numeric"][0]
@@ -872,7 +940,7 @@ if active_view == "overview":
             st.error(f"Chart error: {e}")
 
     # AI Summary
-    st.markdown('<div class="sec-head">AI Executive Summary</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sec-head">Executive Summary — Highlights, Risks & Actions</div>', unsafe_allow_html=True)
     if "ai_exec" not in st.session_state:
         with st.spinner("Generating AI insights..."):
             st.session_state["ai_exec"] = get_ai_analysis(df_info, dtype)
@@ -885,7 +953,7 @@ if active_view == "overview":
 # ══════════════════════════════════════════════════════════════════════════════
 elif active_view == "smart":
     st.markdown(f'<div class="sec-head">{cfg["icon"]} Smart Insights — {cfg["label"]}</div>', unsafe_allow_html=True)
-    st.markdown(f"<p style='color:#64748b;font-size:13px;margin-bottom:1.5rem'>Auto-generated insights specific to your {dtype} dataset based on actual column values.</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color:#64748b;font-size:13px;margin-bottom:1.5rem'>Smart insights built from your actual {dtype} dataset based on actual column values.</p>", unsafe_allow_html=True)
 
     if smart_insights:
         for ins in smart_insights:
@@ -908,7 +976,7 @@ elif active_view == "smart":
 
     # Second row: charts that match the dataset type
     if col_analysis["categorical"] and col_analysis["numeric"]:
-        st.markdown('<div class="sec-head">Category Deep Dive</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sec-head">Segment Analysis — Performance by Every Category</div>', unsafe_allow_html=True)
         cats = col_analysis["categorical"][:4]
         num  = col_analysis["numeric"][0]
         for i in range(0, len(cats), 2):
@@ -927,7 +995,7 @@ elif active_view == "smart":
 # PAGE: KPI REPORT
 # ══════════════════════════════════════════════════════════════════════════════
 elif active_view == "kpis":
-    st.markdown('<div class="sec-head">KPI Report — All Numeric Columns</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sec-head">KPI Scorecard — Full Stats for Every Metric</div>', unsafe_allow_html=True)
     if not col_analysis["numeric"]:
         st.info("No numeric columns detected.")
     else:
@@ -949,7 +1017,7 @@ elif active_view == "kpis":
                         f'Std Dev: <b>{fmt_plain(s.std())}</b> · Missing: <b>{int(df[nc].isna().sum())}</b>'
                         f'</div></div>', unsafe_allow_html=True)
 
-        st.markdown('<div class="sec-head">Distributions</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sec-head">Value Distributions — Spread, Skew & Frequency</div>', unsafe_allow_html=True)
         for batch_start in range(0, len(col_analysis["numeric"]), 3):
             batch = col_analysis["numeric"][batch_start:batch_start+3]
             cols  = st.columns(len(batch))
@@ -987,7 +1055,7 @@ elif active_view == "trends":
         except Exception as e: st.error(f"Error: {e}")
 
         if col_analysis["categorical"]:
-            st.markdown('<div class="sec-head">Heatmap by Period & Category</div>', unsafe_allow_html=True)
+            st.markdown('<div class="sec-head">Heatmap — Monthly Performance by Segment</div>', unsafe_allow_html=True)
             try: st.plotly_chart(plot_heatmap(df, col_analysis), use_container_width=True)
             except Exception as e: st.error(f"Heatmap error: {e}")
 
@@ -1002,7 +1070,7 @@ elif active_view == "trends":
 # PAGE: CATEGORIES
 # ══════════════════════════════════════════════════════════════════════════════
 elif active_view == "categories":
-    st.markdown('<div class="sec-head">Category Analysis</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sec-head">Segment Performance — Winners, Laggards & Risk</div>', unsafe_allow_html=True)
     if not col_analysis["categorical"] or not col_analysis["numeric"]:
         st.info("Category analysis requires categorical and numeric columns.")
     else:
@@ -1046,7 +1114,7 @@ elif active_view == "categories":
 # PAGE: CORRELATIONS
 # ══════════════════════════════════════════════════════════════════════════════
 elif active_view == "correlations":
-    st.markdown('<div class="sec-head">Correlation Analysis</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sec-head">Correlation Analysis — Which Metrics Move Together</div>', unsafe_allow_html=True)
     if len(col_analysis["numeric"]) < 2:
         st.info("Correlation analysis requires at least 2 numeric columns.")
     else:
@@ -1069,7 +1137,7 @@ elif active_view == "correlations":
                     f'<div style="width:{int(abs(r)*100)}%;background:{bar_c};height:5px;border-radius:4px"></div>'
                     f'</div></div>', unsafe_allow_html=True)
 
-        st.markdown('<div class="sec-head">Scatter Plots</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sec-head">Scatter Plots — Visualising Metric Relationships</div>', unsafe_allow_html=True)
         nums = col_analysis["numeric"]
         pairs_to_plot = [(nums[i],nums[j]) for i in range(min(3,len(nums))) for j in range(i+1,min(4,len(nums)))]
         if pairs_to_plot:
@@ -1080,7 +1148,7 @@ elif active_view == "correlations":
                     try: st.plotly_chart(plot_scatter(df, c1, c2), use_container_width=True)
                     except Exception as e: st.error(str(e))
 
-        st.markdown('<div class="sec-head">Correlation Matrix</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sec-head">Full Correlation Matrix — Every Pair at a Glance</div>', unsafe_allow_html=True)
         corr_df = df[col_analysis["numeric"]].corr().round(3)
         def color_corr(val):
             try:
@@ -1097,7 +1165,7 @@ elif active_view == "correlations":
 # PAGE: ANOMALIES
 # ══════════════════════════════════════════════════════════════════════════════
 elif active_view == "anomalies":
-    st.markdown('<div class="sec-head">Data Quality & Anomaly Detection</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sec-head">Data Health Report — Quality, Gaps & Anomalies</div>', unsafe_allow_html=True)
     total_missing  = int(df.isnull().sum().sum())
     total_outliers = sum(s.get("outliers",0) for s in adv_stats.values())
     dupes = int(df.duplicated().sum())
@@ -1109,7 +1177,7 @@ elif active_view == "anomalies":
     with mc3: st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#f59e0b"></div><div class="kpi-label">Outliers (IQR)</div><div class="kpi-value">{total_outliers:,}</div></div>', unsafe_allow_html=True)
     with mc4: st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:{"#ef4444" if dupes>0 else "#10b981"}"></div><div class="kpi-label">Duplicate Rows</div><div class="kpi-value">{dupes:,}</div></div>', unsafe_allow_html=True)
 
-    st.markdown('<div class="sec-head">Column Quality Report</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sec-head">Column Summary — Types, Completeness & Uniqueness</div>', unsafe_allow_html=True)
     qual_data = []
     for col in df.columns:
         miss = int(df[col].isna().sum())
@@ -1123,7 +1191,7 @@ elif active_view == "anomalies":
         })
     st.dataframe(pd.DataFrame(qual_data), use_container_width=True, hide_index=True)
 
-    st.markdown('<div class="sec-head">Outlier Details</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sec-head">Outliers — Values Outside the Expected Range</div>', unsafe_allow_html=True)
     has_outliers = False
     for nc, s in adv_stats.items():
         if s["outliers"] > 0:
@@ -1168,7 +1236,7 @@ elif active_view == "ai":
             if st.button(f"↻ Regenerate", key=f"regen_{key}"):
                 del st.session_state[key]; st.rerun()
 
-    st.markdown('<div class="sec-head">Ask a Question</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sec-head">Data Chat — Ask a Question, Get an Answer</div>', unsafe_allow_html=True)
     if "messages" not in st.session_state:
         st.session_state.messages = []
     for msg in st.session_state.messages:
@@ -1287,7 +1355,7 @@ elif active_view == "agent":
     qs = build_quick_queries(df, col_analysis, dtype)
 
     # Quick question buttons - clicking sets pending and reruns
-    st.markdown('<div class="sec-head">Quick Queries — based on your data columns</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sec-head">Quick Queries — Tailored to Your Data</div>', unsafe_allow_html=True)
     btn_cols = st.columns(3)
     for i, q_text in enumerate(qs):
         with btn_cols[i % 3]:
