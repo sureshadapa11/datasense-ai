@@ -861,89 +861,113 @@ with st.sidebar:
 # WELCOME
 # ══════════════════════════════════════════════════════════════════════════════
 if not uploaded:
-    st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
+    # ── SVG icon definitions ──────────────────────────────────────────────────
+    ICONS = {
+        "cart":    '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
+        "trend":   '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
+        "wallet":  '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V22H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"/><path d="M22 12h-4a2 2 0 0 0 0 4h4v-4z"/><circle cx="18" cy="14" r="1" fill="currentColor" stroke="none"/></svg>',
+        "barchart":'<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>',
+        "users":   '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+        "handshk": '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+        "megaph":  '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>',
+        "target":  '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+        "package": '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+        "boxes":   '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"/><path d="m7 16.5-4.74-2.85"/><path d="m7 16.5 5-3"/><path d="M7 16.5v5.17"/><path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"/><path d="m17 16.5-5-3"/><path d="m17 16.5 4.74-2.85"/><path d="M17 16.5v5.17"/><path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"/><path d="M12 8 7.26 5.15"/><path d="m12 8 4.74-2.85"/><path d="M12 13.5V8"/></svg>',
+        "grid":    '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>',
+        "linechart":'<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+    }
+
+    def card(icon1_key, icon2_key, title, desc, bg, title_color, icon_color):
+        i1 = ICONS[icon1_key].replace('stroke="currentColor"', f'stroke="{icon_color}"')
+        i2 = ICONS[icon2_key].replace('stroke="currentColor"', f'stroke="{icon_color}"').replace('fill="currentColor"', f'fill="{icon_color}"')
+        return f"""
+        <div style='background:{bg};border-radius:16px;padding:1.4rem 1.5rem 1.3rem;
+          border:1px solid rgba(0,0,0,0.06);height:190px;position:relative;overflow:hidden;
+          display:flex;flex-direction:column;justify-content:flex-end;margin-bottom:14px;
+          box-shadow:0 1px 3px rgba(0,0,0,0.04)'>
+          <div style='position:absolute;top:14px;right:14px;opacity:0.55'>{i2}</div>
+          <div style='margin-bottom:10px;opacity:0.85'>{i1}</div>
+          <div style='font-size:17px;font-weight:700;color:{title_color};margin-bottom:5px;letter-spacing:-0.01em'>{title}</div>
+          <div style='font-size:12px;color:#64748b;line-height:1.55'>{desc}</div>
+        </div>"""
+
+    st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
+
+    # Hero
     st.markdown("""
-    <div style='max-width:720px;margin-bottom:2rem'>
-      <div style='display:inline-flex;align-items:center;gap:8px;background:#eff6ff;
-        border:1px solid #bfdbfe;border-radius:100px;padding:4px 14px;
-        font-size:11px;font-weight:600;color:#1d4ed8;margin-bottom:16px;letter-spacing:0.04em'>
-        ✦ POWERED BY CLAUDE SONNET 4.6
-      </div>
-      <h1 style='font-size:38px;font-weight:800;color:#0f172a;line-height:1.15;
-        margin:0 0 14px;letter-spacing:-0.02em'>
-        Turn any spreadsheet into<br><span style='color:#2563eb'>AI-powered insights</span>
-      </h1>
-      <p style='font-size:15px;color:#64748b;line-height:1.7;margin:0'>
-        Upload any CSV or Excel file. DataSense AI auto-detects your data type and instantly
-        builds a full analytics dashboard — KPIs, charts, trends, anomalies, and AI insights
-        written specifically for your data.
-      </p>
-    </div>
+    <h1 style='font-size:52px;font-weight:800;color:#0f172a;line-height:1.08;
+      margin:0 0 18px;letter-spacing:-0.03em;max-width:760px'>
+      Turn any spreadsheet into<br>AI&#8209;powered insights
+    </h1>
+    <p style='font-size:15px;color:#64748b;line-height:1.75;margin:0 0 2rem;max-width:680px'>
+      Upload any CSV or Excel file. DataSense AI auto-detects your data type and instantly
+      builds a full analytics dashboard &mdash; KPIs, charts, trends, anomalies, and AI insights
+      written specifically for your data.
+    </p>
     """, unsafe_allow_html=True)
 
-    cards = [
-        ("🛒", "Sales", "Revenue, products, regions, salesperson performance", "#eff6ff", "#1d4ed8", "#dbeafe"),
-        ("💰", "Finance", "Budget vs actual, P&L, expense categories, margins", "#f0fdf4", "#166534", "#dcfce7"),
-        ("👥", "HR", "Headcount, salary bands, performance, leave analysis", "#faf5ff", "#6d28d9", "#ede9fe"),
-        ("📣", "Marketing", "ROAS, CTR, CPA, channel performance, conversions", "#fff1f2", "#9f1239", "#ffe4e6"),
-        ("📦", "Inventory", "Stock levels, suppliers, reorder alerts, utilization", "#fff7ed", "#c2410c", "#ffedd5"),
-        ("📊", "Generic", "Works with any tabular dataset automatically", "#f8fafc", "#334155", "#e2e8f0"),
-    ]
-    cols = st.columns(3)
-    for i, (icon, title, desc, bg, tc, border) in enumerate(cards):
-        with cols[i % 3]:
-            st.markdown(f"""
-            <div style='background:{bg};border-radius:14px;padding:1.25rem 1.5rem;
-              border:1px solid {border};margin-bottom:12px;height:130px;
-              display:flex;flex-direction:column;justify-content:space-between'>
-              <div style='font-size:26px'>{icon}</div>
-              <div>
-                <div style='font-weight:700;color:{tc};font-size:14px;margin-bottom:4px'>{title}</div>
-                <div style='font-size:12px;color:#64748b;line-height:1.5'>{desc}</div>
-              </div>
-            </div>""", unsafe_allow_html=True)
+    # 3×2 card grid
+    r1c1, r1c2, r1c3 = st.columns(3)
+    r2c1, r2c2, r2c3 = st.columns(3)
 
-    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+    with r1c1:
+        st.markdown(card("cart",   "trend",   "Sales",   "Revenue, products, regions, salesperson performance", "#eef3fc", "#1e3a8a", "#3b5bdb"), unsafe_allow_html=True)
+    with r1c2:
+        st.markdown(card("wallet", "barchart","Finance", "Budget vs actual, P&L, expense categories, margins",  "#edfaf3", "#14532d", "#16a34a"), unsafe_allow_html=True)
+    with r1c3:
+        st.markdown(card("users",  "handshk", "HR",      "Headcount, salary bands, performance, leave analysis","#f3eeff", "#4c1d95", "#7c3aed"), unsafe_allow_html=True)
+    with r2c1:
+        st.markdown(card("megaph", "target",  "Marketing","ROAS, CTR, CPA, channel performance, conversions",   "#fff0eb", "#7c2d12", "#ea580c"), unsafe_allow_html=True)
+    with r2c2:
+        st.markdown(card("package","boxes",   "Inventory","Stock levels, suppliers, reorder alerts, utilization","#fef9eb", "#78350f", "#d97706"), unsafe_allow_html=True)
+    with r2c3:
+        st.markdown(card("linechart","grid",  "Generic", "Works with any tabular dataset automatically",        "#f3f4f6", "#1f2937", "#6b7280"), unsafe_allow_html=True)
 
-    hw1, hw2 = st.columns([2, 1])
-    with hw1:
+    # Bottom row
+    st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
+    bw1, bw2 = st.columns([3, 2])
+    with bw1:
         st.markdown("""
         <div style='background:#fff;border-radius:14px;padding:1.5rem 2rem;
-          border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.04)'>
-          <p style='font-weight:700;color:#0f172a;font-size:13px;margin:0 0 14px'>How it works</p>
-          <div style='display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px;color:#475569'>
-            <div style='display:flex;gap:8px;align-items:flex-start'>
-              <span style='color:#2563eb;font-weight:700;flex-shrink:0'>01</span>
-              <span><b style='color:#0f172a'>Upload</b> any CSV or Excel file</span>
+          border:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,0.04)'>
+          <p style='font-weight:700;color:#0f172a;font-size:14px;margin:0 0 16px'>How it works</p>
+          <div style='display:grid;grid-template-columns:1fr 1fr;gap:12px'>
+            <div style='display:flex;gap:10px;align-items:flex-start'>
+              <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
+                padding:2px 7px;border-radius:6px;flex-shrink:0;margin-top:1px'>01</span>
+              <span style='font-size:13px;color:#475569;line-height:1.5'><b style='color:#0f172a'>Upload</b> any CSV or Excel file</span>
             </div>
-            <div style='display:flex;gap:8px;align-items:flex-start'>
-              <span style='color:#2563eb;font-weight:700;flex-shrink:0'>02</span>
-              <span><b style='color:#0f172a'>Auto-detect</b> dataset type instantly</span>
+            <div style='display:flex;gap:10px;align-items:flex-start'>
+              <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
+                padding:2px 7px;border-radius:6px;flex-shrink:0;margin-top:1px'>02</span>
+              <span style='font-size:13px;color:#475569;line-height:1.5'><b style='color:#0f172a'>Auto-detect</b> dataset type instantly</span>
             </div>
-            <div style='display:flex;gap:8px;align-items:flex-start'>
-              <span style='color:#2563eb;font-weight:700;flex-shrink:0'>03</span>
-              <span><b style='color:#0f172a'>Explore</b> KPIs, charts & trends</span>
+            <div style='display:flex;gap:10px;align-items:flex-start'>
+              <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
+                padding:2px 7px;border-radius:6px;flex-shrink:0;margin-top:1px'>03</span>
+              <span style='font-size:13px;color:#475569;line-height:1.5'><b style='color:#0f172a'>Explore</b> KPIs, charts &amp; trends</span>
             </div>
-            <div style='display:flex;gap:8px;align-items:flex-start'>
-              <span style='color:#2563eb;font-weight:700;flex-shrink:0'>04</span>
-              <span><b style='color:#0f172a'>Ask</b> any question via Data Agent</span>
+            <div style='display:flex;gap:10px;align-items:flex-start'>
+              <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
+                padding:2px 7px;border-radius:6px;flex-shrink:0;margin-top:1px'>04</span>
+              <span style='font-size:13px;color:#475569;line-height:1.5'><b style='color:#0f172a'>Ask</b> any question via Data Agent</span>
             </div>
           </div>
         </div>""", unsafe_allow_html=True)
-    with hw2:
+    with bw2:
         st.markdown("""
-        <div style='background:#0f172a;border-radius:14px;padding:1.5rem;
-          border:1px solid #1e293b;height:100%;display:flex;flex-direction:column;justify-content:space-between'>
-          <p style='font-weight:600;color:#e2e8f0;font-size:13px;margin:0 0 12px'>Try with sample data</p>
-          <p style='font-size:12px;color:#64748b;margin:0 0 16px;line-height:1.6'>
-            Download our sample sales dataset to explore all features instantly.
+        <div style='background:#0f172a;border-radius:14px;padding:1.5rem 1.75rem;
+          border:1px solid #1e293b;box-shadow:0 1px 3px rgba(0,0,0,0.1)'>
+          <p style='font-weight:700;color:#f1f5f9;font-size:14px;margin:0 0 8px'>Try with sample data</p>
+          <p style='font-size:12.5px;color:#64748b;margin:0 0 18px;line-height:1.65'>
+            Download our sample sales dataset and upload it to explore every feature instantly.
           </p>
         </div>""", unsafe_allow_html=True)
         _HERE = os.path.dirname(os.path.abspath(__file__))
         sample_path = os.path.join(_HERE, "sample_sales_data.csv")
         if os.path.exists(sample_path):
             with open(sample_path, "rb") as f:
-                st.download_button("⬇ Download sample data", f, "sample_sales_data.csv", "text/csv", use_container_width=True)
+                st.download_button("⬇ Download sample_sales_data.csv", f, "sample_sales_data.csv", "text/csv", use_container_width=True)
     st.stop()
 
 # ══════════════════════════════════════════════════════════════════════════════
