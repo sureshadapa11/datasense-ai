@@ -48,9 +48,12 @@ section[data-testid="stSidebar"] .stSuccess p { color: #059669 !important; font-
 
 /* ── NAV BUTTONS (horizontal bar) ── */
 .stButton > button[kind="secondary"] {
-    font-size: 11.5px !important;
-    padding: 0.4rem 0.3rem !important;
+    font-size: 11px !important;
+    padding: 0.38rem 0.25rem !important;
     white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    min-width: 0 !important;
 }
 
 /* ── MAIN AREA BUTTONS ── */
@@ -61,15 +64,22 @@ section[data-testid="stSidebar"] .stSuccess p { color: #059669 !important; font-
     border-radius: 8px !important;
     font-size: 13px !important;
     font-weight: 500 !important;
-    padding: 0.45rem 1rem !important;
+    padding: 0.45rem 0.75rem !important;
     transition: all 0.15s ease !important;
     box-shadow: 0 1px 2px rgba(0,0,0,0.04) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 .stButton > button:hover {
     background: #f8fafc !important;
     border-color: #cbd5e1 !important;
     box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important;
 }
+
+/* ── TOP BAR — prevent overflow ── */
+[data-testid="stColumns"] > div { min-width: 0 !important; }
+[data-testid="stColumn"] { min-width: 0 !important; overflow: hidden !important; }
 
 /* ── FILE UPLOADER — full card restyle ── */
 div[data-testid="stFileUploader"] {
@@ -260,6 +270,8 @@ div[data-testid="stFileUploaderDropzoneInstructions"] {
     background: #fff !important; color: #334155 !important;
     border: 1px solid #e2e8f0 !important; border-radius: 8px !important;
     font-size: 13px !important; font-weight: 500 !important;
+    white-space: nowrap !important; overflow: hidden !important;
+    text-overflow: ellipsis !important; min-width: 0 !important;
 }
 .stDownloadButton > button:hover {
     background: #f8fafc !important; border-color: #cbd5e1 !important;
@@ -1887,7 +1899,7 @@ smart_insights= compute_smart_insights(df, col_analysis, dtype)
 file_title = (_stored["name"].replace(".csv","").replace(".xlsx","").replace(".xls","")
               .replace("_"," ").replace("-"," ").title())
 
-tb1, tb2, tb3, tb4, tb5 = st.columns([3.5, 1, 1, 1, 1])
+tb1, tb2, tb3, tb4, tb5 = st.columns([4, 0.85, 0.95, 0.95, 0.8])
 with tb1:
     _modified_badge = (' <span style="background:#fef3c7;border:1px solid #fde68a;color:#92400e;'
                        'border-radius:6px;padding:1px 7px;font-size:10px;font-weight:700">✏ Cleaned</span>'
@@ -1905,17 +1917,19 @@ with tb1:
         unsafe_allow_html=True)
 with tb2:
     csv = df.to_csv(index=False).encode('utf-8')
-    st.download_button("⬇ CSV", csv, f"{file_title}.csv", "text/csv", use_container_width=True)
+    st.download_button("⬇ CSV", csv, f"{file_title}.csv", "text/csv",
+                       use_container_width=True, help="Download dataset as CSV")
 with tb3:
     _report_bytes = generate_html_report(file_title, dtype, cfg, df, col_analysis, adv_stats, st.session_state)
-    st.download_button("📄 Report", _report_bytes, f"{file_title}_report.html", "text/html", use_container_width=True)
+    st.download_button("📄 Report", _report_bytes, f"{file_title}_report.html", "text/html",
+                       use_container_width=True, help="Download full HTML report")
 with tb4:
-    if st.button("🔄 Refresh AI", use_container_width=True):
+    if st.button("🔄 Refresh", use_container_width=True, help="Regenerate all AI insights"):
         for k in list(st.session_state.keys()):
             if k.startswith("ai_"): del st.session_state[k]
         st.rerun()
 with tb5:
-    if st.button("↩ Home", use_container_width=True):
+    if st.button("↩ Home", use_container_width=True, help="Back to home"):
         st.session_state["stored_file"] = None
         for k in list(st.session_state.keys()):
             if k.startswith(("df_","ai_","last_","messages","active_","df_modified")): del st.session_state[k]
@@ -1942,21 +1956,27 @@ active_view_check = st.session_state.get("active_view", "overview")
 if active_view_check not in _valid_keys:
     st.session_state["active_view"] = "overview"
     active_view_check = "overview"
-nav_cols = st.columns(len(pages))
-for (label, key), col in zip(pages, nav_cols):
-    with col:
-        if active_view_check == key:
-            st.markdown(
-                f'<div style="background:#f0eeff;border-bottom:2px solid #5b4bff;border-radius:8px 8px 0 0;'
-                f'padding:0.4rem 0.2rem;text-align:center;font-size:11.5px;font-weight:700;color:#5b4bff;'
-                f'white-space:nowrap">{label}</div>',
-                unsafe_allow_html=True)
-        else:
-            if st.button(label, key=f"pg_{key}", use_container_width=True):
-                st.session_state["active_view"] = key
-                st.rerun()
 
-st.markdown("<hr style='border:none;border-top:1px solid #e2e8f0;margin:4px 0 12px'>", unsafe_allow_html=True)
+# Split nav into rows of max 6 so labels never clip
+_ROW_SIZE = 6
+_nav_rows = [pages[i:i+_ROW_SIZE] for i in range(0, len(pages), _ROW_SIZE)]
+for _nav_row in _nav_rows:
+    _nav_cols = st.columns(len(_nav_row))
+    for (label, key), col in zip(_nav_row, _nav_cols):
+        with col:
+            if active_view_check == key:
+                st.markdown(
+                    f'<div style="background:#f0eeff;border-bottom:2px solid #5b4bff;'
+                    f'border-radius:8px 8px 0 0;padding:0.42rem 0.3rem;text-align:center;'
+                    f'font-size:11.5px;font-weight:700;color:#5b4bff;white-space:nowrap;'
+                    f'overflow:hidden;text-overflow:ellipsis">{label}</div>',
+                    unsafe_allow_html=True)
+            else:
+                if st.button(label, key=f"pg_{key}", use_container_width=True):
+                    st.session_state["active_view"] = key
+                    st.rerun()
+
+st.markdown("<hr style='border:none;border-top:1px solid #e2e8f0;margin:2px 0 12px'>", unsafe_allow_html=True)
 
 active_view = st.session_state.get("active_view", "overview")
 
