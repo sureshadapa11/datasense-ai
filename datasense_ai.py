@@ -334,7 +334,22 @@ section[data-testid="stSidebar"] { display:none !important; }
     box-shadow: 0 4px 16px rgba(91,75,255,0.25) !important;
 }
 
-/* ── NAV ANCHOR LINKS ── */
+/* ── FIXED SECTION NAV BAR ── */
+#ds-nav-fixed {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 99999 !important;
+    background: #ffffff !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07) !important;
+    padding: 8px 2.5rem 9px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    align-items: center !important;
+}
 a.nav-link-btn {
     font-size:11.5px; font-weight:600; color:#475569;
     background:#fff; border:1px solid #e2e8f0; border-radius:8px;
@@ -2186,35 +2201,33 @@ if col_analysis["date"] and col_analysis["numeric"]:
 _nav_items += [("🤖 AI Analysis","ai"),("🧹 Clean","clean")]
 # Data Agent is accessed via floating chat button — not in nav
 
-_nav_html = (
-    '<div style="position:sticky;top:0;z-index:999;background:#ffffff;'
-    'padding:8px 0 10px;border-bottom:1px solid #e2e8f0;'
-    'display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px">'
-)
+_nav_links = ""
 for _lbl, _k in _nav_items:
-    _nav_html += (
+    _nav_links += (
         f'<a class="nav-link-btn" href="javascript:void(0)" '
         f'onclick="(function(){{var el=document.getElementById(\'sec-{_k}\');'
-        f'if(el)el.scrollIntoView({{behavior:\'smooth\',block:\'start\'}});}})();return false;">'
+        f'if(el){{el.scrollIntoView({{behavior:\'smooth\',block:\'start\'}});}}}})()">'
         f'{_lbl}</a>'
     )
-_nav_html += '</div>'
-st.markdown(_nav_html, unsafe_allow_html=True)
+
+# Fixed nav bar — rendered at fixed top:0 regardless of scroll position
+st.markdown(f'<div id="ds-nav-fixed">{_nav_links}</div>', unsafe_allow_html=True)
+# Spacer to stop content hiding behind the fixed nav (~46px nav height)
+st.markdown("<div style='height:52px'></div>", unsafe_allow_html=True)
 
 # ── FLOATING CHAT BUTTON — opens Data Agent section ───────────────────────────
 st.markdown("""
-<a href="javascript:void(0)"
-  onclick="(function(){var el=document.getElementById('sec-agent');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});})();return false;"
-  style="position:fixed;bottom:28px;right:28px;z-index:9999;
-  width:54px;height:54px;border-radius:50%;
-  background:linear-gradient(135deg,#5b4bff,#7c3aed);
-  color:#fff;font-size:22px;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 4px 20px rgba(91,75,255,0.45);
-  text-decoration:none;transition:transform 0.2s;cursor:pointer"
-  title="Open Data Agent">
-  🤖
-</a>
+<div style="position:fixed;bottom:28px;right:28px;z-index:99999">
+  <a href="javascript:void(0)"
+    onclick="(function(){var el=document.getElementById('sec-agent');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});})()"
+    style="width:54px;height:54px;border-radius:50%;
+    background:linear-gradient(135deg,#5b4bff,#7c3aed);
+    color:#fff;font-size:22px;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 4px 20px rgba(91,75,255,0.45);
+    text-decoration:none;cursor:pointer"
+    title="Open Data Agent">🤖</a>
+</div>
 """, unsafe_allow_html=True)
 
 def _sec_anchor(key):
