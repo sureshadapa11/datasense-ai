@@ -77,9 +77,9 @@ section[data-testid="stSidebar"] .stSuccess p { color: #059669 !important; font-
     box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important;
 }
 
-/* ── TOP BAR — prevent overflow ── */
+/* ── COLUMNS — allow flex shrink without clipping content ── */
 [data-testid="stColumns"] > div { min-width: 0 !important; }
-[data-testid="stColumn"] { min-width: 0 !important; overflow: hidden !important; }
+[data-testid="stColumn"] { min-width: 0 !important; }
 
 /* ── FILE UPLOADER — full card restyle ── */
 div[data-testid="stFileUploader"] {
@@ -207,6 +207,7 @@ div[data-testid="stFileUploaderDropzoneInstructions"] {
     text-transform: uppercase; letter-spacing: 0.1em;
     margin: 1.75rem 0 1rem;
     display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap; overflow-wrap: break-word; word-break: break-word;
 }
 .sec-head::before {
     content: ''; display: block; width: 3px; height: 14px;
@@ -300,6 +301,16 @@ h1, h2, h3, h4 { color: #0d1f3c !important; }
 
 /* ── INFO/SUCCESS/ERROR ── */
 .stAlert { border-radius: 10px !important; }
+
+/* ── PREVENT HORIZONTAL TEXT CLIP — global wrap rule ── */
+p, li, span, label,
+.sec-head, .insight-text, .insight-title, .insight-tag,
+.ai-box-text, .kpi-sub, .kpi-label, .kpi-value,
+.stat-pill, .slabel {
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    max-width: 100% !important;
+}
 
 /* ── HIDE SIDEBAR ── */
 section[data-testid="stSidebar"] { display:none !important; }
@@ -1905,13 +1916,16 @@ with tb1:
                        'border-radius:6px;padding:1px 7px;font-size:10px;font-weight:700">✏ Cleaned</span>'
                        if st.session_state.get("df_modified_for") == _stored["name"] else "")
     st.markdown(
-        f'<div style="display:flex;align-items:center;gap:10px;padding:6px 0 2px">'
-        f'<div style="background:#f0eeff;border:1px solid #c4b5fd;border-radius:8px;padding:4px 12px;display:flex;align-items:center;gap:6px">'
-        f'<span style="font-size:14px">{cfg["icon"]}</span>'
-        f'<span style="color:#5b4bff;font-size:11px;font-weight:700">{cfg["label"]}</span>'
+        f'<div style="display:flex;align-items:center;gap:8px;padding:6px 0 2px;flex-wrap:wrap;min-width:0;overflow:hidden">'
+        f'<div style="background:#f0eeff;border:1px solid #c4b5fd;border-radius:8px;padding:4px 10px;'
+        f'display:flex;align-items:center;gap:5px;flex-shrink:0">'
+        f'<span style="font-size:13px">{cfg["icon"]}</span>'
+        f'<span style="color:#5b4bff;font-size:11px;font-weight:700;white-space:nowrap">{cfg["label"]}</span>'
         f'</div>'
-        f'<span style="font-size:16px;font-weight:700;color:#0d1f3c">{file_title}</span>'
-        f'<span style="font-size:12px;color:#94a3b8">{df.shape[0]:,} rows · {df.shape[1]} cols</span>'
+        f'<span style="font-size:15px;font-weight:700;color:#0d1f3c;white-space:nowrap;overflow:hidden;'
+        f'text-overflow:ellipsis;max-width:220px">{file_title}</span>'
+        f'<span style="font-size:11.5px;color:#94a3b8;white-space:nowrap;flex-shrink:0">'
+        f'{df.shape[0]:,} rows · {df.shape[1]} cols</span>'
         f'{_modified_badge}'
         f'</div>',
         unsafe_allow_html=True)
