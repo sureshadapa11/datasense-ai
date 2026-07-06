@@ -98,32 +98,29 @@ section[data-testid="stFileUploaderDropzone"]:hover {
     box-shadow: 0 12px 40px rgba(79,70,229,0.38) !important;
 }
 section[data-testid="stFileUploaderDropzone"] > div {
-    display: flex !important; flex-direction: row !important;
-    align-items: center !important; justify-content: space-between !important;
-    gap: 16px !important; padding: 0 !important;
+    display: flex !important; flex-direction: column !important;
+    align-items: center !important; justify-content: center !important;
+    gap: 10px !important; padding: 0.5rem 0 !important;
 }
+/* Hide the native instruction text — our HTML card already shows context */
+div[data-testid="stFileUploaderDropzoneInstructions"] { display: none !important; }
+/* Style the single browse/upload button */
 section[data-testid="stFileUploaderDropzone"] button {
     background: rgba(255,255,255,0.22) !important; color: #fff !important;
-    border: 1px solid rgba(255,255,255,0.35) !important; border-radius: 12px !important;
-    font-size: 13px !important; font-weight: 700 !important;
-    padding: 0.55rem 1.4rem !important; white-space: nowrap !important;
-    backdrop-filter: blur(8px) !important; min-width: auto !important;
-    box-shadow: none !important; transition: background 0.18s !important;
-    flex-shrink: 0 !important;
+    border: 1px solid rgba(255,255,255,0.4) !important; border-radius: 12px !important;
+    font-size: 0 !important; padding: 0.6rem 2rem !important;
+    min-width: 180px !important; box-shadow: none !important;
+    transition: background 0.18s !important;
+}
+/* Replace button text with clean label via pseudo-element */
+section[data-testid="stFileUploaderDropzone"] button::after {
+    content: "📂  Browse & Upload" !important;
+    font-size: 14px !important; font-weight: 700 !important;
+    color: #fff !important; letter-spacing: 0.01em !important;
 }
 section[data-testid="stFileUploaderDropzone"] button:hover {
     background: rgba(255,255,255,0.32) !important;
     transform: none !important; box-shadow: none !important;
-}
-div[data-testid="stFileUploaderDropzoneInstructions"] {
-    flex: 1 !important; text-align: left !important;
-}
-div[data-testid="stFileUploaderDropzoneInstructions"] span {
-    color: rgba(255,255,255,0.9) !important; font-size: 14px !important;
-    font-weight: 500 !important;
-}
-div[data-testid="stFileUploaderDropzoneInstructions"] small {
-    color: rgba(255,255,255,0.6) !important; font-size: 12px !important;
 }
 
 /* ── TABS ── */
@@ -1823,6 +1820,18 @@ if not st.session_state["stored_file"]:
 
     # ── UPLOADER REVEAL ───────────────────────────────────────────────────────
     if st.session_state.get("show_uploader"):
+        # Auto-scroll to this section
+        st.markdown("""<div id="upload-anchor"></div>
+        <script>
+        setTimeout(function(){
+            var anchor = window.parent.document.getElementById('upload-anchor');
+            if(anchor) anchor.scrollIntoView({behavior:'smooth',block:'start'});
+            else {
+                var main = window.parent.document.querySelector('[data-testid="stMain"]');
+                if(main) main.scrollTop = main.scrollHeight;
+            }
+        }, 120);
+        </script>""", unsafe_allow_html=True)
         st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
         _ul, _uc, _ur = st.columns([0.6, 2.8, 0.6])
         with _uc:
@@ -1977,8 +1986,13 @@ if st.session_state.get("last_file") != _stored["name"]:
 # Scroll to top of page whenever dashboard renders
 st.markdown("""<script>
 (function() {
-    var main = window.parent.document.querySelector('[data-testid="stMain"]');
-    if (main) main.scrollTop = 0;
+    var selectors = ['[data-testid="stMain"]', '.main', '#root > div:first-child'];
+    for (var i = 0; i < selectors.length; i++) {
+        var el = window.parent.document.querySelector(selectors[i]);
+        if (el) el.scrollTop = 0;
+    }
+    window.parent.scrollTo(0, 0);
+    window.scrollTo(0, 0);
 })();
 </script>""", unsafe_allow_html=True)
 
