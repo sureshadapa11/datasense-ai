@@ -128,11 +128,8 @@ section[data-testid="stFileUploaderDropzone"] button:hover {
     box-shadow: 0 6px 20px rgba(91,75,255,0.38) !important;
     transform: translateY(-1px) !important;
 }
-/* File uploader label — make it visible as a proper heading */
-div[data-testid="stFileUploader"] label {
-    font-size: 13px !important; font-weight: 600 !important;
-    color: #334155 !important; margin-bottom: 6px !important;
-}
+/* Hide the collapsed uploader label entirely */
+div[data-testid="stFileUploader"] label { display: none !important; }
 
 /* ── TABS ── */
 .stTabs [data-baseweb="tab-list"] {
@@ -1834,27 +1831,28 @@ if not st.session_state["stored_file"]:
         st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
         _ul, _uc, _ur = st.columns([0.8, 2.4, 0.8])
         with _uc:
+            # Header only — no merging with native dropzone
             st.markdown("""
-            <div style='text-align:center;padding:1.2rem 0 0.75rem'>
-              <div style='font-size:36px;margin-bottom:8px'>☁️</div>
-              <div style='font-size:16px;font-weight:700;color:#0d1f3c;margin-bottom:4px'>
+            <div style='text-align:center;padding:0.5rem 0 1rem'>
+              <div style='font-size:38px;line-height:1;margin-bottom:10px'>☁️</div>
+              <div style='font-size:17px;font-weight:700;color:#0d1f3c;margin-bottom:4px'>
                 Upload your data file
               </div>
-              <div style='font-size:13px;color:#94a3b8'>
-                CSV &nbsp;·&nbsp; XLSX &nbsp;·&nbsp; XLS
+              <div style='font-size:12.5px;color:#94a3b8;letter-spacing:0.04em'>
+                CSV &nbsp;·&nbsp; XLSX &nbsp;·&nbsp; XLS &nbsp;·&nbsp; up to 200 MB
               </div>
             </div>""", unsafe_allow_html=True)
+            # Native uploader with collapsed label — no custom text that overlaps button
             _new_file = st.file_uploader(
-                "Drop file here or click Browse",
-                type=["csv", "xlsx", "xls"],
-                key="cta_uploader",
-                help="Supports CSV, XLSX, XLS up to 200 MB"
+                "upload", type=["csv", "xlsx", "xls"],
+                label_visibility="collapsed", key="cta_uploader"
             )
             if _new_file:
                 _data = _new_file.read()
                 st.session_state["stored_file"] = {"bytes": _data, "name": _new_file.name}
                 st.session_state.pop("show_uploader", None)
                 st.rerun()
+            st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
             _xl, _xc, _xr = st.columns([1, 1.4, 1])
             with _xc:
                 if st.button("✕  Close", use_container_width=True, key="hide_uploader"):
