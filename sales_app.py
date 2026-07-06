@@ -141,7 +141,7 @@ def ask_claude(question, df_info):
     system = f"You are an expert data analyst.\nDataset:\n{df_info}\nBe concise. Use real numbers. Format nicely with bullet points."
     try:
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-sonnet-4-6",
             max_tokens=1000,
             system=system,
             messages=[{"role": "user", "content": question}]

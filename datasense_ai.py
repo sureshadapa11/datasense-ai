@@ -12,6 +12,8 @@ try:
 except Exception:
     pass
 
+MODEL = "claude-sonnet-4-6"
+
 st.set_page_config(page_title="DataSense AI", page_icon="🧠", layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
@@ -261,6 +263,7 @@ def load_dataframe(f):
     st.session_state[key] = df
     return df
 
+@st.cache_data
 def analyze_columns(df):
     result = {"numeric": [], "categorical": [], "date": [], "text": []}
     id_names = {'id','index','no','num','number','#','sr','sr.','row','seq','employee_id'}
@@ -285,6 +288,7 @@ def analyze_columns(df):
             result["text"].append(col)
     return result
 
+@st.cache_data
 def detect_type(df):
     cols = ' '.join(df.columns.tolist()).lower()
     scores = {k: sum(1 for w in v["keywords"] if w in cols)
@@ -314,6 +318,7 @@ def fmt_plain(v):
     except: return "—"
 
 # ── DATASET-SPECIFIC SMART INSIGHTS ──────────────────────────────────────────
+@st.cache_data
 def compute_smart_insights(df, col_analysis, dtype):
     """Generate dataset-specific insight cards based on actual column names and values."""
     insights = []
@@ -511,6 +516,7 @@ def compute_smart_insights(df, col_analysis, dtype):
 
     return insights
 
+@st.cache_data
 def compute_time_insights(df, col_analysis):
     if not col_analysis["date"] or not col_analysis["numeric"]: return {}
     date_col = col_analysis["date"][0]
@@ -532,6 +538,7 @@ def compute_time_insights(df, col_analysis):
         "num_col": num_col, "date_col": date_col,
     }
 
+@st.cache_data
 def compute_advanced_stats(df, col_analysis):
     stats = {}
     for nc in col_analysis["numeric"]:
@@ -548,6 +555,7 @@ def compute_advanced_stats(df, col_analysis):
         }
     return stats
 
+@st.cache_data
 def compute_correlations(df, col_analysis):
     nums = col_analysis["numeric"]
     if len(nums) < 2: return []
@@ -659,31 +667,33 @@ def get_ai_analysis(df_info, dtype):
     try:
         client = anthropic.Anthropic()
         prompt = DATASET_CONFIG[dtype]["insights_prompt"]
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514", max_tokens=800,
+        with client.messages.stream(
+            model=MODEL, max_tokens=800,
             system=prompt,
-            messages=[{"role":"user","content":f"Dataset:\n{df_info}"}]
-        )
-        return response.content[0].text
+            messages=[{"role": "user", "content": f"Dataset:\n{df_info}"}]
+        ) as stream:
+            for text in stream.text_stream:
+                yield text
     except anthropic.AuthenticationError:
-        return "Auth error — check your API key."
+        yield "Auth error — check your API key."
     except Exception as e:
-        return f"Error: {e}"
+        yield f"Error: {e}"
 
 def ask_claude(question, df_info, dtype):
     try:
         client = anthropic.Anthropic()
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514", max_tokens=800,
+        with client.messages.stream(
+            model=MODEL, max_tokens=800,
             system=(f"You are an expert {dtype} data analyst.\nDataset:\n{df_info}\n"
                     f"Give precise, specific answers using actual numbers from the data. Use bullet points."),
-            messages=[{"role":"user","content":question}]
-        )
-        return response.content[0].text
+            messages=[{"role": "user", "content": question}]
+        ) as stream:
+            for text in stream.text_stream:
+                yield text
     except anthropic.AuthenticationError:
-        return "Auth error — check your API key."
+        yield "Auth error — check your API key."
     except Exception as e:
-        return f"Error: {e}"
+        yield f"Error: {e}"
 
 # ══════════════════════════════════════════════════════════════════════════════
 # SIDEBAR
@@ -760,6 +770,12 @@ if not uploaded:
         <div>🤖 <b style='color:#0f172a'>AI insights</b> specific to your data</div>
       </div>
     </div>""", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+    with open("sample_sales_data.csv", "rb") as f:
+        st.download_button(
+            "⬇ Download sample_sales_data.csv to try the app",
+            f, "sample_sales_data.csv", "text/csv"
+        )
     st.stop()
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -934,11 +950,12 @@ if active_view == "overview":
     # AI Summary
     st.markdown('<div class="sec-head">Executive Summary — Highlights, Risks & Actions</div>', unsafe_allow_html=True)
     if "ai_exec" not in st.session_state:
-        with st.spinner("Generating AI insights..."):
-            st.session_state["ai_exec"] = get_ai_analysis(df_info, dtype)
-    st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 {cfg["label"]} — Executive Summary</div>'
-                f'<div class="ai-box-text">{st.session_state["ai_exec"].replace(chr(10),"<br>")}</div></div>',
-                unsafe_allow_html=True)
+        st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#1d4ed8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Executive Summary</div>', unsafe_allow_html=True)
+        st.session_state["ai_exec"] = st.write_stream(get_ai_analysis(df_info, dtype))
+    else:
+        st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 {cfg["label"]} — Executive Summary</div>'
+                    f'<div class="ai-box-text">{st.session_state["ai_exec"].replace(chr(10),"<br>")}</div></div>',
+                    unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: SMART INSIGHTS (dataset-specific)
@@ -1052,11 +1069,12 @@ elif active_view == "trends":
             except Exception as e: st.error(f"Heatmap error: {e}")
 
         if "ai_trends" not in st.session_state:
-            with st.spinner("AI trend analysis..."):
-                st.session_state["ai_trends"] = get_ai_analysis(df_info, dtype)
-        st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 Trend Analysis</div>'
-                    f'<div class="ai-box-text">{st.session_state["ai_trends"].replace(chr(10),"<br>")}</div></div>',
-                    unsafe_allow_html=True)
+            st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#1d4ed8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Trend Analysis</div>', unsafe_allow_html=True)
+            st.session_state["ai_trends"] = st.write_stream(get_ai_analysis(df_info, dtype))
+        else:
+            st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 Trend Analysis</div>'
+                        f'<div class="ai-box-text">{st.session_state["ai_trends"].replace(chr(10),"<br>")}</div></div>',
+                        unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: CATEGORIES
@@ -1096,11 +1114,12 @@ elif active_view == "categories":
                 except Exception as e: st.error(str(e))
 
         if "ai_cat" not in st.session_state:
-            with st.spinner("AI category analysis..."):
-                st.session_state["ai_cat"] = get_ai_analysis(df_info, dtype)
-        st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 Category Analysis</div>'
-                    f'<div class="ai-box-text">{st.session_state["ai_cat"].replace(chr(10),"<br>")}</div></div>',
-                    unsafe_allow_html=True)
+            st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#1d4ed8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Category Analysis</div>', unsafe_allow_html=True)
+            st.session_state["ai_cat"] = st.write_stream(get_ai_analysis(df_info, dtype))
+        else:
+            st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 Category Analysis</div>'
+                        f'<div class="ai-box-text">{st.session_state["ai_cat"].replace(chr(10),"<br>")}</div></div>',
+                        unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: CORRELATIONS
@@ -1197,11 +1216,12 @@ elif active_view == "anomalies":
         st.success("✅ No significant outliers detected in numeric columns.")
 
     if "ai_anomaly" not in st.session_state:
-        with st.spinner("AI anomaly analysis..."):
-            st.session_state["ai_anomaly"] = get_ai_analysis(df_info, dtype)
-    st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 AI Data Quality Analysis</div>'
-                f'<div class="ai-box-text">{st.session_state["ai_anomaly"].replace(chr(10),"<br>")}</div></div>',
-                unsafe_allow_html=True)
+        st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#1d4ed8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 AI Data Quality Analysis</div>', unsafe_allow_html=True)
+        st.session_state["ai_anomaly"] = st.write_stream(get_ai_analysis(df_info, dtype))
+    else:
+        st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 AI Data Quality Analysis</div>'
+                    f'<div class="ai-box-text">{st.session_state["ai_anomaly"].replace(chr(10),"<br>")}</div></div>',
+                    unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: AI ANALYSIS
@@ -1219,12 +1239,12 @@ elif active_view == "ai":
     for key, title, desc in ai_sections:
         with st.expander(f"{title} — {desc}", expanded=(key=="ai_exec")):
             if key not in st.session_state:
-                with st.spinner(f"Generating {title}..."):
-                    st.session_state[key] = get_ai_analysis(df_info, dtype)
-            st.markdown(
-                f'<div class="ai-box"><div class="ai-box-title">{title}</div>'
-                f'<div class="ai-box-text">{st.session_state[key].replace(chr(10),"<br>")}</div></div>',
-                unsafe_allow_html=True)
+                st.session_state[key] = st.write_stream(get_ai_analysis(df_info, dtype))
+            else:
+                st.markdown(
+                    f'<div class="ai-box"><div class="ai-box-title">{title}</div>'
+                    f'<div class="ai-box-text">{st.session_state[key].replace(chr(10),"<br>")}</div></div>',
+                    unsafe_allow_html=True)
             if st.button(f"↻ Regenerate", key=f"regen_{key}"):
                 del st.session_state[key]; st.rerun()
 
@@ -1244,9 +1264,8 @@ elif active_view == "ai":
             sub = st.form_submit_button("Ask →", use_container_width=True)
     if sub and q:
         st.session_state.messages.append({"role":"user","content":q})
-        with st.spinner("Thinking..."):
-            a = ask_claude(q, df_info, dtype)
-        st.session_state.messages.append({"role":"assistant","content":a})
+        answer = st.write_stream(ask_claude(q, df_info, dtype))
+        st.session_state.messages.append({"role":"assistant","content":answer})
         st.rerun()
     if st.session_state.get("messages"):
         if st.button("Clear chat"):
@@ -1386,6 +1405,9 @@ elif active_view == "agent":
                                    key=f"dl_{msg.get('id',0)}")
             if "chart" in msg:
                 st.plotly_chart(msg["chart"], use_container_width=True)
+            if "code" in msg:
+                with st.expander("📝 View generated code"):
+                    st.code(msg["code"], language="python")
 
     # Input form — handle quick query auto-submit
     auto_q = st.session_state.pop("agent_auto_q", None)
@@ -1439,7 +1461,7 @@ Rules:
 - Output ONLY the Python code, no explanation, no markdown, no backticks"""
 
                 response = client.messages.create(
-                    model="claude-sonnet-4-20250514",
+                    model=MODEL,
                     max_tokens=1000,
                     system=system,
                     messages=[{"role": "user", "content": agent_q}]
@@ -1461,7 +1483,7 @@ Rules:
                     answer_text = exec_globals.get("answer_text", "")
 
                     msg = {"role": "assistant", "id": len(st.session_state.agent_messages),
-                           "content": answer_text or "Here are the results:"}
+                           "content": answer_text or "Here are the results:", "code": code}
 
                     if isinstance(result, pd.DataFrame):
                         msg["dataframe"] = result
@@ -1508,15 +1530,16 @@ Rules:
 
                 except Exception as exec_err:
                     # Fallback: ask Claude to just answer in plain text
-                    fallback = client.messages.create(
-                        model="claude-sonnet-4-20250514",
-                        max_tokens=400,
+                    fallback_text = ""
+                    with client.messages.stream(
+                        model=MODEL, max_tokens=400,
                         system="You are a data analyst. Dataset:\n" + df_info + "\nAnswer concisely with numbers.",
                         messages=[{"role": "user", "content": agent_q}]
-                    )
+                    ) as stream:
+                        fallback_text = stream.get_final_text()
                     st.session_state.agent_messages.append({
                         "role": "assistant",
-                        "content": fallback.content[0].text,
+                        "content": fallback_text,
                         "id": len(st.session_state.agent_messages)
                     })
 
