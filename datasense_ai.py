@@ -801,6 +801,8 @@ def plot_scatter(df, col1, col2):
     return fig
 
 def plot_heatmap(df, col_analysis):
+    if not col_analysis["date"] or not col_analysis["categorical"] or not col_analysis["numeric"]:
+        return None
     dc = col_analysis["date"][0]
     cat = col_analysis["categorical"][0]
     num = col_analysis["numeric"][0]
@@ -1277,7 +1279,12 @@ if not col_analysis["categorical"]:
 if len(col_analysis["numeric"]) < 2:
     pages = [p for p in pages if p[1] != "correlations"]
 
+# If the stored active_view was removed (e.g. data has no dates), reset to overview
+_valid_keys = {key for _, key in pages}
 active_view_check = st.session_state.get("active_view", "overview")
+if active_view_check not in _valid_keys:
+    st.session_state["active_view"] = "overview"
+    active_view_check = "overview"
 nav_cols = st.columns(len(pages))
 for (label, key), col in zip(pages, nav_cols):
     with col:
@@ -1351,7 +1358,7 @@ if active_view == "overview":
     # AI Summary
     st.markdown('<div class="sec-head">Executive Summary — Highlights, Risks & Actions</div>', unsafe_allow_html=True)
     if "ai_exec" not in st.session_state:
-        st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Executive Summary</div>', unsafe_allow_html=True)
+        st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#5b4bff;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Executive Summary</div>', unsafe_allow_html=True)
         st.session_state["ai_exec"] = st.write_stream(get_ai_analysis(df_info, dtype, "exec"))
     else:
         st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 {cfg["label"]} — Executive Summary</div>'
@@ -1466,11 +1473,13 @@ elif active_view == "trends":
 
         if col_analysis["categorical"]:
             st.markdown('<div class="sec-head">Heatmap — Monthly Performance by Segment</div>', unsafe_allow_html=True)
-            try: st.plotly_chart(plot_heatmap(df, col_analysis), use_container_width=True)
+            try:
+                _hm = plot_heatmap(df, col_analysis)
+                if _hm: st.plotly_chart(_hm, use_container_width=True)
             except Exception as e: st.error(f"Heatmap error: {e}")
 
         if "ai_trends" not in st.session_state:
-            st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Trend Analysis</div>', unsafe_allow_html=True)
+            st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#5b4bff;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Trend Analysis</div>', unsafe_allow_html=True)
             st.session_state["ai_trends"] = st.write_stream(get_ai_analysis(df_info, dtype, "trends"))
         else:
             st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 Trend Analysis</div>'
@@ -1515,7 +1524,7 @@ elif active_view == "categories":
                 except Exception as e: st.error(str(e))
 
         if "ai_cat" not in st.session_state:
-            st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Category Analysis</div>', unsafe_allow_html=True)
+            st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#5b4bff;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Category Analysis</div>', unsafe_allow_html=True)
             st.session_state["ai_cat"] = st.write_stream(get_ai_analysis(df_info, dtype, "categories"))
         else:
             st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 Category Analysis</div>'
@@ -1620,7 +1629,7 @@ elif active_view == "anomalies":
         st.success("✅ No significant outliers detected in numeric columns.")
 
     if "ai_anomaly" not in st.session_state:
-        st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 AI Data Quality Analysis</div>', unsafe_allow_html=True)
+        st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#5b4bff;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 AI Data Quality Analysis</div>', unsafe_allow_html=True)
         st.session_state["ai_anomaly"] = st.write_stream(get_ai_analysis(df_info, dtype, "anomalies"))
     else:
         st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 AI Data Quality Analysis</div>'
@@ -1683,7 +1692,9 @@ elif active_view == "table":
     search = st.text_input("", placeholder="🔍 Search / filter rows...", label_visibility="collapsed")
     display_df = df
     if search:
-        mask = df.apply(lambda row: row.astype(str).str.contains(search, case=False, na=False).any(), axis=1)
+        import re as _re
+        _safe = _re.escape(search)
+        mask = df.apply(lambda row: row.astype(str).str.contains(_safe, case=False, na=False, regex=True).any(), axis=1)
         display_df = df[mask]
         st.caption(f"{len(display_df):,} rows matching '{search}'")
     st.dataframe(display_df, use_container_width=True, height=520)
@@ -1863,11 +1874,14 @@ Rules:
                 )
 
                 code = response.content[0].text.strip()
-                # Remove any accidental markdown
+                # Remove any accidental markdown fences
                 if "```" in code:
-                    code = code.split("```python")[-1].split("```")[0].strip()
-                    if not code:
-                        code = code.split("```")[-2].strip()
+                    import re as _re
+                    m = _re.search(r"```(?:python)?\n?(.*?)```", code, _re.DOTALL)
+                    if m:
+                        code = m.group(1).strip()
+                    else:
+                        code = code.replace("```python", "").replace("```", "").strip()
 
                 # Execute the code
                 exec_globals = {"df": df.copy(), "pd": pd, "np": np,
@@ -1931,10 +1945,11 @@ Rules:
                         system="You are a data analyst. Dataset:\n" + df_info + "\nAnswer concisely with numbers.",
                         messages=[{"role": "user", "content": agent_q}]
                     ) as stream:
-                        fallback_text = stream.get_final_text()
+                        for chunk in stream.text_stream:
+                            fallback_text += chunk
                     st.session_state.agent_messages.append({
                         "role": "assistant",
-                        "content": fallback_text,
+                        "content": fallback_text or "I couldn't compute that. Please try rephrasing.",
                         "id": len(st.session_state.agent_messages)
                     })
 
