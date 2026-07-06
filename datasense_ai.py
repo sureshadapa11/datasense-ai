@@ -18,124 +18,240 @@ st.set_page_config(page_title="DataSense AI", page_icon="🧠", layout="wide", i
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-*, html, body, [class*="css"] { font-family: 'Plus Jakarta Sans', sans-serif; }
-.stApp { background: #f1f5f9; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..900;1,14..32,300..900&display=swap');
 
-/* SIDEBAR */
+*, html, body, [class*="css"] { font-family: 'Inter', sans-serif !important; }
+
+/* ── MAIN BACKGROUND ── */
+.stApp { background: #f8fafc; }
+.block-container { padding: 1.5rem 2rem 3rem !important; max-width: 1400px !important; }
+
+/* ── SIDEBAR ── */
 section[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0a0f1e 0%, #0f172a 40%, #0d1b2a 100%) !important;
-    border-right: 1px solid #1e293b !important;
+    background: #0c1220 !important;
+    border-right: 1px solid #1a2540 !important;
+    min-width: 240px !important;
 }
-section[data-testid="stSidebar"] * { color: #94a3b8 !important; }
-section[data-testid="stSidebar"] .stSuccess p { color: #10b981 !important; }
-section[data-testid="stSidebar"] hr { border-color: #1e293b !important; }
+section[data-testid="stSidebar"] > div { padding-top: 0 !important; }
+section[data-testid="stSidebar"] * { color: #8b9ab0 !important; }
+section[data-testid="stSidebar"] hr { border-color: #1a2540 !important; margin: 8px 0 !important; }
 section[data-testid="stSidebar"] .stSuccess {
-    background: rgba(16,185,129,0.1) !important;
-    border: 1px solid rgba(16,185,129,0.25) !important;
+    background: rgba(16,185,129,0.08) !important;
+    border: 1px solid rgba(16,185,129,0.2) !important;
     border-radius: 8px !important;
 }
+section[data-testid="stSidebar"] .stSuccess p { color: #34d399 !important; font-size: 12px !important; }
 
-/* BUTTONS */
-.stButton > button {
-    background: rgba(255,255,255,0.04);
-    color: #94a3b8 !important;
-    border: 1px solid #1e293b;
-    border-radius: 8px; font-size: 12px; font-weight: 500;
-    transition: all 0.2s; width: 100%;
+/* ── SIDEBAR NAV BUTTONS ── */
+section[data-testid="stSidebar"] .stButton > button {
+    background: transparent !important;
+    color: #8b9ab0 !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
     text-align: left !important;
-    padding: 0.5rem 0.75rem !important;
+    padding: 0.45rem 0.85rem !important;
+    margin-bottom: 2px !important;
+    width: 100% !important;
+    transition: all 0.15s ease !important;
+}
+section[data-testid="stSidebar"] .stButton > button:hover {
+    background: rgba(59,130,246,0.1) !important;
+    color: #93c5fd !important;
+}
+
+/* ── MAIN AREA BUTTONS ── */
+.stButton > button {
+    background: #fff !important;
+    color: #334155 !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    padding: 0.45rem 1rem !important;
+    transition: all 0.15s ease !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04) !important;
 }
 .stButton > button:hover {
-    background: rgba(37,99,235,0.15) !important;
-    border-color: #2563eb !important;
-    color: #60a5fa !important;
-    transform: translateX(2px);
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important;
 }
 
-/* FILE UPLOADER */
+/* ── FILE UPLOADER ── */
 div[data-testid="stFileUploader"] {
-    background: rgba(255,255,255,0.03);
-    border: 1.5px dashed #2d3748;
-    border-radius: 10px; padding: 0.75rem;
-    transition: border-color 0.2s;
+    background: rgba(255,255,255,0.04) !important;
+    border: 1.5px dashed #253552 !important;
+    border-radius: 10px !important;
+    padding: 0.5rem !important;
 }
-div[data-testid="stFileUploader"]:hover { border-color: #2563eb; }
-div[data-testid="stFileUploader"] * { color: #64748b !important; }
+div[data-testid="stFileUploader"]:hover { border-color: #3b82f6 !important; }
+div[data-testid="stFileUploader"] * { color: #4a5568 !important; }
 div[data-testid="stFileUploader"] button {
     background: #2563eb !important; color: #fff !important;
     border: none !important; border-radius: 6px !important;
-    font-weight: 600 !important;
+    font-size: 12px !important; font-weight: 600 !important;
 }
-div[data-testid="stFileUploaderDropzoneInstructions"] span { color: #60a5fa !important; font-weight: 600; }
+div[data-testid="stFileUploaderDropzoneInstructions"] span { color: #60a5fa !important; font-weight: 600 !important; }
 
-/* TABS */
-.stTabs [data-baseweb="tab-list"] { background: #fff; border-radius: 10px; padding: 3px; border: 1px solid #e2e8f0; gap: 2px; }
-.stTabs [data-baseweb="tab"] { color: #64748b; border-radius: 8px; font-size: 13px; font-weight: 500; padding: 6px 14px; }
+/* ── TABS ── */
+.stTabs [data-baseweb="tab-list"] {
+    background: #fff !important; border-radius: 10px !important;
+    padding: 3px !important; border: 1px solid #e2e8f0 !important;
+    gap: 2px !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+}
+.stTabs [data-baseweb="tab"] { color: #64748b !important; border-radius: 8px !important; font-size: 13px !important; font-weight: 500 !important; padding: 6px 14px !important; }
 .stTabs [aria-selected="true"] { background: #0f172a !important; color: #fff !important; }
 
-/* KPI CARDS */
+/* ── KPI CARDS ── */
 .kpi-card {
-    background: #fff; border-radius: 14px; padding: 1.25rem 1.5rem;
-    border: 1px solid #e2e8f0; position: relative; overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.1rem 1.4rem;
+    border: 1px solid #edf0f7;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(15,23,42,0.05);
+    transition: box-shadow 0.2s;
+    height: 100%;
 }
-.kpi-bar { position: absolute; top: 0; left: 0; width: 4px; height: 100%; border-radius: 14px 0 0 14px; }
-.kpi-label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
-.kpi-value { font-size: 28px; font-weight: 800; color: #0f172a; line-height: 1; margin-bottom: 6px; }
-.kpi-sub { font-size: 12px; color: #64748b; }
-.kpi-up { color: #10b981; font-weight: 700; }
-.kpi-dn { color: #ef4444; font-weight: 700; }
+.kpi-card:hover { box-shadow: 0 4px 16px rgba(15,23,42,0.08); }
+.kpi-bar {
+    position: absolute; top: 0; left: 0;
+    width: 3px; height: 100%;
+    border-radius: 12px 0 0 12px;
+}
+.kpi-label {
+    font-size: 10.5px; font-weight: 600; color: #94a3b8;
+    text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px;
+}
+.kpi-value { font-size: 26px; font-weight: 700; color: #0f172a; line-height: 1.1; margin-bottom: 4px; }
+.kpi-sub { font-size: 12px; color: #94a3b8; }
+.kpi-up { color: #10b981 !important; font-weight: 600; }
+.kpi-dn { color: #ef4444 !important; font-weight: 600; }
 
-/* INSIGHT CARDS */
+/* ── INSIGHT CARDS ── */
 .insight-card {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-    border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 0.75rem;
-    border: 1px solid #334155;
+    background: linear-gradient(135deg, #111827 0%, #0f172a 100%);
+    border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 0.75rem;
+    border: 1px solid #1e2d45;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 .insight-tag {
     display: inline-block; border-radius: 20px; padding: 2px 10px;
     font-size: 10px; font-weight: 700; text-transform: uppercase;
     letter-spacing: 0.07em; margin-bottom: 10px;
 }
-.insight-title { font-size: 14px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
-.insight-text { font-size: 13px; line-height: 1.7; color: #94a3b8; }
-.insight-number { font-size: 24px; font-weight: 800; margin-top: 8px; }
+.insight-title { font-size: 15px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
+.insight-text { font-size: 13px; line-height: 1.75; color: #94a3b8; }
 
-/* AI BOX */
+/* ── AI BOX ── */
 .ai-box {
-    background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
-    border: 1px solid #bfdbfe; border-radius: 14px;
-    padding: 1.25rem 1.5rem; margin-bottom: 0.75rem;
+    background: #fff;
+    border: 1px solid #e0e7ff;
+    border-left: 3px solid #6366f1;
+    border-radius: 0 12px 12px 0;
+    padding: 1.1rem 1.4rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 1px 4px rgba(99,102,241,0.06);
 }
-.ai-box-title { font-size: 11px; font-weight: 700; color: #1d4ed8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
-.ai-box-text { font-size: 13px; color: #1e293b; line-height: 1.75; }
+.ai-box-title {
+    font-size: 10.5px; font-weight: 700; color: #6366f1;
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
+}
+.ai-box-text { font-size: 13.5px; color: #1e293b; line-height: 1.8; }
 
-/* SECTION HEADER */
+/* ── SECTION HEADERS ── */
 .sec-head {
-    font-size: 12px; font-weight: 700; color: #475569;
-    text-transform: uppercase; letter-spacing: 0.08em;
-    margin: 1.5rem 0 0.75rem; padding-left: 12px;
-    border-left: 3px solid #2563eb;
+    font-size: 11px; font-weight: 700; color: #64748b;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    margin: 1.75rem 0 1rem;
+    display: flex; align-items: center; gap: 8px;
+}
+.sec-head::before {
+    content: ''; display: block; width: 3px; height: 14px;
+    background: linear-gradient(180deg, #3b82f6, #6366f1);
+    border-radius: 2px; flex-shrink: 0;
 }
 
-/* BADGES */
-.badge { display: inline-block; border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
-.badge-green { background: #dcfce7; color: #15803d; }
-.badge-amber { background: #fef9c3; color: #a16207; }
-.badge-red   { background: #fee2e2; color: #b91c1c; }
-.badge-blue  { background: #dbeafe; color: #1d4ed8; }
+/* ── BADGES ── */
+.badge { display: inline-block; border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 600; }
+.badge-green { background: #dcfce7; color: #166534; }
+.badge-amber { background: #fef3c7; color: #92400e; }
+.badge-red   { background: #fee2e2; color: #991b1b; }
+.badge-blue  { background: #dbeafe; color: #1e40af; }
 
-/* STAT ROW */
-.stat-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 0.5rem; }
+/* ── STAT ROW ── */
+.stat-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 0.5rem; align-items: center; }
 .stat-pill {
-    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
-    padding: 4px 12px; font-size: 12px; color: #475569;
+    background: #f1f5f9; border: 1px solid #e2e8f0;
+    border-radius: 100px; padding: 3px 10px;
+    font-size: 11.5px; color: #64748b;
 }
-.stat-pill b { color: #0f172a; }
+.stat-pill b { color: #334155; font-weight: 600; }
 
-h1,h2,h3,h4 { color: #0f172a !important; }
-.stTextInput > div > div > input { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; color: #0f172a; }
+/* ── PAGE HEADER ── */
+.page-header {
+    background: #fff; border-radius: 12px; padding: 1.1rem 1.5rem;
+    border: 1px solid #edf0f7; margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    display: flex; align-items: center; justify-content: space-between;
+}
+
+/* ── CHAT BUBBLES ── */
+.chat-user {
+    background: linear-gradient(135deg, #1e40af, #2563eb);
+    color: #fff; border-radius: 16px 16px 4px 16px;
+    padding: 0.75rem 1rem; margin: 0.5rem 0;
+    font-size: 13.5px; line-height: 1.6; max-width: 85%; margin-left: auto;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.25);
+}
+.chat-ai {
+    background: #fff; border: 1px solid #e2e8f0;
+    color: #1e293b; border-radius: 4px 16px 16px 16px;
+    padding: 0.75rem 1rem; margin: 0.5rem 0;
+    font-size: 13.5px; line-height: 1.75; max-width: 92%;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+/* ── FORM INPUTS ── */
+.stTextInput > div > div > input {
+    background: #fff !important; border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important; color: #0f172a !important;
+    font-size: 13px !important; padding: 0.5rem 0.75rem !important;
+}
+.stTextInput > div > div > input:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.1) !important;
+}
+
+/* ── DOWNLOAD BUTTON ── */
+.stDownloadButton > button {
+    background: #fff !important; color: #334155 !important;
+    border: 1px solid #e2e8f0 !important; border-radius: 8px !important;
+    font-size: 13px !important; font-weight: 500 !important;
+}
+.stDownloadButton > button:hover {
+    background: #f8fafc !important; border-color: #cbd5e1 !important;
+}
+
+/* ── EXPANDERS ── */
+.streamlit-expanderHeader {
+    background: #f8fafc !important; border-radius: 8px !important;
+    font-size: 13px !important; font-weight: 600 !important; color: #334155 !important;
+}
+details { border: 1px solid #e2e8f0 !important; border-radius: 10px !important; margin-bottom: 8px !important; }
+
+/* ── DATAFRAME ── */
+.stDataFrame { border-radius: 10px !important; overflow: hidden !important; }
+
+/* ── HEADINGS ── */
+h1, h2, h3, h4 { color: #0f172a !important; }
+
+/* ── INFO/SUCCESS/ERROR ── */
+.stAlert { border-radius: 10px !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -236,6 +352,13 @@ DATASET_CONFIG = {
     },
 }
 
+AI_PAGE_PROMPTS = {
+    "exec": "You are a senior analyst. Write an executive summary with: (1) top 3 headline metrics with exact values, (2) biggest risk or issue, (3) top opportunity, (4) three specific action recommendations. Use EXACT numbers. Be crisp and direct.",
+    "trends": "You are a trend analyst. Analyze time patterns: (1) overall growth rate first to last period, (2) best and worst months with exact values, (3) MoM acceleration or deceleration, (4) seasonality patterns if visible, (5) forecast for next period. Use EXACT numbers from the data.",
+    "categories": "You are a segmentation analyst. Analyze categories/segments: (1) which segment dominates and by how much, (2) which is underperforming and why, (3) concentration risk — is too much dependent on one segment, (4) quick wins to improve bottom segments. Use EXACT numbers.",
+    "anomalies": "You are a data quality analyst. Identify: (1) any suspicious values or outliers with exact values, (2) missing data patterns, (3) data integrity issues, (4) whether the data looks reliable, (5) recommendations to improve data quality. Use EXACT numbers.",
+}
+
 # ── DATA LOADING ──────────────────────────────────────────────────────────────
 def load_dataframe(f):
     key = f"df_{f.name}"
@@ -300,9 +423,9 @@ def fmt(v):
     try:
         if pd.isna(v): return "—"
         v = float(v)
-        if abs(v) >= 1e9:  return f"£{v/1e9:.1f}B"
-        if abs(v) >= 1e6:  return f"£{v/1e6:.1f}M"
-        if abs(v) >= 1000: return f"£{v:,.0f}"
+        if abs(v) >= 1e9:  return f"{v/1e9:.1f}B"
+        if abs(v) >= 1e6:  return f"{v/1e6:.1f}M"
+        if abs(v) >= 1000: return f"{v:,.0f}"
         if abs(v) >= 1:    return f"{v:,.1f}"
         return f"{v:.3f}"
     except: return "—"
@@ -319,7 +442,8 @@ def fmt_plain(v):
 
 # ── DATASET-SPECIFIC SMART INSIGHTS ──────────────────────────────────────────
 @st.cache_data
-def compute_smart_insights(df, col_analysis, dtype):
+def compute_smart_insights(df, _col_analysis, dtype):
+    col_analysis = _col_analysis
     """Generate dataset-specific insight cards based on actual column names and values."""
     insights = []
     nums = col_analysis["numeric"]
@@ -471,7 +595,7 @@ def compute_smart_insights(df, col_analysis, dtype):
             insights.append({
                 "tag": "📈 ROAS", "color": "#db2777",
                 "title": f"Average ROAS: {avg_roas:.2f}x",
-                "text": f"For every £1 spent, you earn £{avg_roas:.2f} back. Range: {df[roas_col].min():.2f}x — {df[roas_col].max():.2f}x.",
+                "text": f"For every 1 unit spent, you earn {avg_roas:.2f} back. Range: {df[roas_col].min():.2f}x — {df[roas_col].max():.2f}x.",
                 "number": f"{avg_roas:.2f}x", "number_color": "#db2777" if avg_roas >= 3 else "#ef4444"
             })
         if chan_col and roas_col:
@@ -495,11 +619,16 @@ def compute_smart_insights(df, col_analysis, dtype):
                 "number": fmt_plain(cpa), "number_color": "#f59e0b"
             })
         if ctr_col:
-            avg_ctr = df[ctr_col].mean() * 100
+            raw_ctr = df[ctr_col].mean()
+            avg_ctr = raw_ctr if raw_ctr > 1 else raw_ctr * 100
+            min_ctr = df[ctr_col].min()
+            max_ctr = df[ctr_col].max()
+            min_display = min_ctr if min_ctr > 1 else min_ctr * 100
+            max_display = max_ctr if max_ctr > 1 else max_ctr * 100
             insights.append({
                 "tag": "👆 CTR", "color": "#8b5cf6",
                 "title": f"Average CTR: {avg_ctr:.2f}%",
-                "text": f"Click-through rate ranges from {df[ctr_col].min()*100:.2f}% to {df[ctr_col].max()*100:.2f}%. Industry avg is 2-5%.",
+                "text": f"Click-through rate ranges from {min_display:.2f}% to {max_display:.2f}%. Industry avg is 2-5%.",
                 "number": f"{avg_ctr:.2f}%", "number_color": "#8b5cf6"
             })
 
@@ -517,7 +646,8 @@ def compute_smart_insights(df, col_analysis, dtype):
     return insights
 
 @st.cache_data
-def compute_time_insights(df, col_analysis):
+def compute_time_insights(df, _col_analysis):
+    col_analysis = _col_analysis
     if not col_analysis["date"] or not col_analysis["numeric"]: return {}
     date_col = col_analysis["date"][0]
     num_col  = col_analysis["numeric"][0]
@@ -539,7 +669,8 @@ def compute_time_insights(df, col_analysis):
     }
 
 @st.cache_data
-def compute_advanced_stats(df, col_analysis):
+def compute_advanced_stats(df, _col_analysis):
+    col_analysis = _col_analysis
     stats = {}
     for nc in col_analysis["numeric"]:
         s = df[nc].dropna()
@@ -556,7 +687,8 @@ def compute_advanced_stats(df, col_analysis):
     return stats
 
 @st.cache_data
-def compute_correlations(df, col_analysis):
+def compute_correlations(df, _col_analysis):
+    col_analysis = _col_analysis
     nums = col_analysis["numeric"]
     if len(nums) < 2: return []
     corr = df[nums].corr()
@@ -571,7 +703,7 @@ def compute_correlations(df, col_analysis):
 
 # ── PLOTLY CHARTS ─────────────────────────────────────────────────────────────
 BASE = dict(paper_bgcolor='white', plot_bgcolor='white',
-            font=dict(family='Plus Jakarta Sans, sans-serif', size=12, color='#475569'),
+            font=dict(family='Inter, sans-serif', size=12, color='#475569'),
             margin=dict(l=10, r=10, t=30, b=10))
 
 def mk_layout(**kwargs):
@@ -663,13 +795,15 @@ def plot_heatmap(df, col_analysis):
     return fig
 
 # ── AI ────────────────────────────────────────────────────────────────────────
-def get_ai_analysis(df_info, dtype):
+def get_ai_analysis(df_info, dtype, page_key="exec"):
     try:
         client = anthropic.Anthropic()
-        prompt = DATASET_CONFIG[dtype]["insights_prompt"]
+        base_prompt = DATASET_CONFIG[dtype]["insights_prompt"]
+        page_prompt = AI_PAGE_PROMPTS.get(page_key, "")
+        system = f"{base_prompt}\n\nAdditional focus: {page_prompt}" if page_prompt else base_prompt
         with client.messages.stream(
-            model=MODEL, max_tokens=800,
-            system=prompt,
+            model=MODEL, max_tokens=900,
+            system=system,
             messages=[{"role": "user", "content": f"Dataset:\n{df_info}"}]
         ) as stream:
             for text in stream.text_stream:
@@ -701,26 +835,23 @@ def ask_claude(question, df_info, dtype):
 with st.sidebar:
     # ── BRAND HEADER ─────────────────────────────────────────────────────────
     st.markdown("""
-    <div style='padding:1.5rem 0.5rem 1rem'>
-      <div style='display:flex;align-items:center;gap:10px;margin-bottom:6px'>
-        <div style='background:linear-gradient(135deg,#2563eb,#3b82f6);
-          border-radius:10px;width:36px;height:36px;display:flex;
-          align-items:center;justify-content:center;font-size:18px;
-          box-shadow:0 4px 12px rgba(37,99,235,0.4)'>🧠</div>
-        <div>
-          <div style='font-size:20px;font-weight:800;color:#f1f5f9;
-            letter-spacing:-0.02em;line-height:1'>DataSense AI</div>
-          <div style='font-size:10px;color:#475569;font-weight:500;
-            letter-spacing:0.05em;margin-top:1px'>Insights That Drive Action</div>
-        </div>
-      </div>
-      <div style='height:1px;background:linear-gradient(90deg,#2563eb44,transparent);
-        margin-top:12px'></div>
+<div style='padding:1.25rem 0.75rem 0.75rem'>
+  <div style='display:flex;align-items:center;gap:10px'>
+    <div style='background:linear-gradient(135deg,#2563eb,#4f46e5);
+      border-radius:10px;width:34px;height:34px;display:flex;flex-shrink:0;
+      align-items:center;justify-content:center;font-size:17px;
+      box-shadow:0 4px 12px rgba(79,70,229,0.4)'>🧠</div>
+    <div>
+      <div style='font-size:15px;font-weight:700;color:#e2e8f0;letter-spacing:-0.01em;line-height:1.2'>DataSense AI</div>
+      <div style='font-size:10px;color:#475569;font-weight:500;letter-spacing:0.04em'>Insights That Drive Action</div>
     </div>
-    """, unsafe_allow_html=True)
+  </div>
+  <div style='height:1px;background:linear-gradient(90deg,rgba(59,130,246,0.4),transparent);margin-top:14px'></div>
+</div>
+""", unsafe_allow_html=True)
 
     # ── UPLOAD SECTION ────────────────────────────────────────────────────────
-    st.markdown("<p style='color:#334155;font-size:10px;text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:8px;padding-left:2px'>📂 Data Source</p>",
+    st.markdown("<p style='color:#3b5275;font-size:10px;text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:8px;padding-left:2px'>📂 Data Source</p>",
                 unsafe_allow_html=True)
     uploaded = st.file_uploader("", type=["csv","xlsx","xls"], label_visibility="collapsed")
     if uploaded:
@@ -730,52 +861,89 @@ with st.sidebar:
 # WELCOME
 # ══════════════════════════════════════════════════════════════════════════════
 if not uploaded:
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
     st.markdown("""
-    <div style='max-width:680px'>
-      <h1 style='font-size:34px;font-weight:800;color:#0f172a;line-height:1.2;margin-bottom:12px'>
-        AI-Powered Analytics<br><span style='color:#2563eb'>for Any Dataset</span>
+    <div style='max-width:720px;margin-bottom:2rem'>
+      <div style='display:inline-flex;align-items:center;gap:8px;background:#eff6ff;
+        border:1px solid #bfdbfe;border-radius:100px;padding:4px 14px;
+        font-size:11px;font-weight:600;color:#1d4ed8;margin-bottom:16px;letter-spacing:0.04em'>
+        ✦ POWERED BY CLAUDE SONNET 4.6
+      </div>
+      <h1 style='font-size:38px;font-weight:800;color:#0f172a;line-height:1.15;
+        margin:0 0 14px;letter-spacing:-0.02em'>
+        Turn any spreadsheet into<br><span style='color:#2563eb'>AI-powered insights</span>
       </h1>
-      <p style='font-size:16px;color:#64748b;margin-bottom:2rem'>
-        Upload any CSV or Excel file. DataSense AI automatically detects your data type,
-        generates custom KPIs, charts, and AI-written insights specific to your data.
+      <p style='font-size:15px;color:#64748b;line-height:1.7;margin:0'>
+        Upload any CSV or Excel file. DataSense AI auto-detects your data type and instantly
+        builds a full analytics dashboard — KPIs, charts, trends, anomalies, and AI insights
+        written specifically for your data.
       </p>
     </div>
     """, unsafe_allow_html=True)
 
     cards = [
-        ("🛒","Sales","Revenue, products, regions, orders","#dbeafe","#1d4ed8"),
-        ("💰","Finance","Budget, expenses, profit, cashflow","#dcfce7","#15803d"),
-        ("👥","HR","Employees, salary, performance","#ede9fe","#6d28d9"),
-        ("📣","Marketing","Campaigns, ROAS, CTR, conversions","#fce7f3","#9d174d"),
+        ("🛒", "Sales", "Revenue, products, regions, salesperson performance", "#eff6ff", "#1d4ed8", "#dbeafe"),
+        ("💰", "Finance", "Budget vs actual, P&L, expense categories, margins", "#f0fdf4", "#166534", "#dcfce7"),
+        ("👥", "HR", "Headcount, salary bands, performance, leave analysis", "#faf5ff", "#6d28d9", "#ede9fe"),
+        ("📣", "Marketing", "ROAS, CTR, CPA, channel performance, conversions", "#fff1f2", "#9f1239", "#ffe4e6"),
+        ("📦", "Inventory", "Stock levels, suppliers, reorder alerts, utilization", "#fff7ed", "#c2410c", "#ffedd5"),
+        ("📊", "Generic", "Works with any tabular dataset automatically", "#f8fafc", "#334155", "#e2e8f0"),
     ]
-    c1,c2,c3,c4 = st.columns(4)
-    for col_obj, (icon, title, desc, bg, tc) in zip([c1,c2,c3,c4], cards):
-        with col_obj:
+    cols = st.columns(3)
+    for i, (icon, title, desc, bg, tc, border) in enumerate(cards):
+        with cols[i % 3]:
             st.markdown(f"""
-            <div style='background:{bg};border-radius:16px;padding:1.25rem 1.5rem;border:1px solid transparent'>
-              <div style='font-size:28px;margin-bottom:8px'>{icon}</div>
-              <div style='font-weight:700;color:{tc};font-size:15px;margin-bottom:4px'>{title}</div>
-              <div style='font-size:12px;color:#475569'>{desc}</div>
+            <div style='background:{bg};border-radius:14px;padding:1.25rem 1.5rem;
+              border:1px solid {border};margin-bottom:12px;height:130px;
+              display:flex;flex-direction:column;justify-content:space-between'>
+              <div style='font-size:26px'>{icon}</div>
+              <div>
+                <div style='font-weight:700;color:{tc};font-size:14px;margin-bottom:4px'>{title}</div>
+                <div style='font-size:12px;color:#64748b;line-height:1.5'>{desc}</div>
+              </div>
             </div>""", unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("""
-    <div style='background:#fff;border-radius:16px;padding:1.5rem 2rem;border:1px solid #e2e8f0;max-width:680px'>
-      <p style='font-weight:700;color:#0f172a;font-size:14px;margin-bottom:12px'>How it works</p>
-      <div style='display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;color:#475569'>
-        <div>📤 <b style='color:#0f172a'>Upload</b> any CSV or Excel</div>
-        <div>🔍 <b style='color:#0f172a'>Auto-detect</b> dataset type</div>
-        <div>📊 <b style='color:#0f172a'>Generate</b> custom KPIs & charts</div>
-        <div>🤖 <b style='color:#0f172a'>AI insights</b> specific to your data</div>
-      </div>
-    </div>""", unsafe_allow_html=True)
-    st.markdown("<br>", unsafe_allow_html=True)
-    with open("sample_sales_data.csv", "rb") as f:
-        st.download_button(
-            "⬇ Download sample_sales_data.csv to try the app",
-            f, "sample_sales_data.csv", "text/csv"
-        )
+    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+
+    hw1, hw2 = st.columns([2, 1])
+    with hw1:
+        st.markdown("""
+        <div style='background:#fff;border-radius:14px;padding:1.5rem 2rem;
+          border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.04)'>
+          <p style='font-weight:700;color:#0f172a;font-size:13px;margin:0 0 14px'>How it works</p>
+          <div style='display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px;color:#475569'>
+            <div style='display:flex;gap:8px;align-items:flex-start'>
+              <span style='color:#2563eb;font-weight:700;flex-shrink:0'>01</span>
+              <span><b style='color:#0f172a'>Upload</b> any CSV or Excel file</span>
+            </div>
+            <div style='display:flex;gap:8px;align-items:flex-start'>
+              <span style='color:#2563eb;font-weight:700;flex-shrink:0'>02</span>
+              <span><b style='color:#0f172a'>Auto-detect</b> dataset type instantly</span>
+            </div>
+            <div style='display:flex;gap:8px;align-items:flex-start'>
+              <span style='color:#2563eb;font-weight:700;flex-shrink:0'>03</span>
+              <span><b style='color:#0f172a'>Explore</b> KPIs, charts & trends</span>
+            </div>
+            <div style='display:flex;gap:8px;align-items:flex-start'>
+              <span style='color:#2563eb;font-weight:700;flex-shrink:0'>04</span>
+              <span><b style='color:#0f172a'>Ask</b> any question via Data Agent</span>
+            </div>
+          </div>
+        </div>""", unsafe_allow_html=True)
+    with hw2:
+        st.markdown("""
+        <div style='background:#0f172a;border-radius:14px;padding:1.5rem;
+          border:1px solid #1e293b;height:100%;display:flex;flex-direction:column;justify-content:space-between'>
+          <p style='font-weight:600;color:#e2e8f0;font-size:13px;margin:0 0 12px'>Try with sample data</p>
+          <p style='font-size:12px;color:#64748b;margin:0 0 16px;line-height:1.6'>
+            Download our sample sales dataset to explore all features instantly.
+          </p>
+        </div>""", unsafe_allow_html=True)
+        _HERE = os.path.dirname(os.path.abspath(__file__))
+        sample_path = os.path.join(_HERE, "sample_sales_data.csv")
+        if os.path.exists(sample_path):
+            with open(sample_path, "rb") as f:
+                st.download_button("⬇ Download sample data", f, "sample_sales_data.csv", "text/csv", use_container_width=True)
     st.stop()
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -811,14 +979,14 @@ with st.sidebar:
         f"<span style='color:#60a5fa;font-size:11px;font-weight:700;margin-left:6px'>{cfg['label']}</span>"
         f"</div>",
         unsafe_allow_html=True)
-    st.markdown("<p style='color:#334155;font-size:10px;text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:6px;padding-left:2px'>🗂 Navigation</p>",
+    st.markdown("<p style='color:#3b5275;font-size:10px;text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:6px;padding-left:2px'>🗂 Navigation</p>",
                 unsafe_allow_html=True)
 
     pages = [("🏠  Overview","overview"),("💡  Smart Insights","smart"),
              ("📊  KPI Report","kpis"),("📈  Trends","trends"),
              ("📦  Categories","categories"),("🔗  Correlations","correlations"),
              ("🔍  Anomalies","anomalies"),("🤖  AI Analysis","ai"),
-             ("📋  Data Table","table")]
+             ("📋  Data Table","table"),("🤖  Data Agent","agent")]
 
     if not col_analysis["date"] or not col_analysis["numeric"]:
         pages = [p for p in pages if p[1] != "trends"]
@@ -827,9 +995,20 @@ with st.sidebar:
     if len(col_analysis["numeric"]) < 2:
         pages = [p for p in pages if p[1] != "correlations"]
 
+    active_view_check = st.session_state.get("active_view", "overview")
+
     for label, key in pages:
-        if st.button(label, key=f"pg_{key}", use_container_width=True):
-            st.session_state["active_view"] = key
+        is_active = (active_view_check == key)
+        if is_active:
+            st.markdown(
+                f'<div style="background:rgba(59,130,246,0.12);border-left:2px solid #3b82f6;'
+                f'border-radius:0 8px 8px 0;padding:0.45rem 0.85rem;margin-bottom:2px;'
+                f'font-size:13px;font-weight:600;color:#93c5fd">{label}</div>',
+                unsafe_allow_html=True
+            )
+        else:
+            if st.button(label, key=f"pg_{key}", use_container_width=True):
+                st.session_state["active_view"] = key
 
     # Footer stats
     st.markdown(
@@ -859,41 +1038,29 @@ active_view = st.session_state.get("active_view", "overview")
 file_title = (uploaded.name.replace(".csv","").replace(".xlsx","").replace(".xls","")
               .replace("_"," ").replace("-"," ").title())
 
-hc1, hc2, hc3 = st.columns([3, 1, 1])
-with hc1:
-    st.markdown(f"<h3 style='margin-bottom:2px;font-weight:800'>{cfg['icon']} {file_title}</h3>",
-                unsafe_allow_html=True)
-    st.markdown(f"<div class='stat-row'>"
-                f"<span class='stat-pill'>{dtype.title()} Dataset</span>"
-                f"<span class='stat-pill'><b>{df.shape[0]:,}</b> rows</span>"
-                f"<span class='stat-pill'><b>{df.shape[1]}</b> columns</span>"
-                f"<span class='stat-pill'>{datetime.now().strftime('%d %b %Y')}</span>"
-                f"</div>", unsafe_allow_html=True)
-with hc2:
+ph1, ph2, ph3 = st.columns([3, 1, 1])
+with ph1:
+    st.markdown(
+        f'<div style="margin-bottom:0.25rem">'
+        f'<span style="font-size:22px;font-weight:700;color:#0f172a">{cfg["icon"]} {file_title}</span>'
+        f'</div>'
+        f'<div class="stat-row">'
+        f'<span class="stat-pill" style="background:rgba(37,99,235,0.08);border-color:rgba(37,99,235,0.2);color:#1d4ed8;font-weight:600">{dtype.title()}</span>'
+        f'<span class="stat-pill"><b>{df.shape[0]:,}</b> rows</span>'
+        f'<span class="stat-pill"><b>{df.shape[1]}</b> cols</span>'
+        f'<span class="stat-pill">{datetime.now().strftime("%d %b %Y")}</span>'
+        f'</div>',
+        unsafe_allow_html=True
+    )
+with ph2:
     csv = df.to_csv(index=False).encode('utf-8')
     st.download_button("⬇ Export CSV", csv, f"{file_title}.csv", "text/csv", use_container_width=True)
-with hc3:
+with ph3:
     if st.button("🔄 Refresh AI", use_container_width=True):
         for k in list(st.session_state.keys()):
             if k.startswith("ai_"): del st.session_state[k]
         st.rerun()
-
-# ── DATA AGENT button — full width below title ────────────────────────────────
-st.markdown(
-    f'''<div style="margin-bottom:1rem">
-    <button onclick="window.location.href=\'#\';" style="
-        width:100%; padding:10px 20px; background:linear-gradient(135deg,#0f172a,#1e3a5f);
-        color:#e2e8f0; border:1px solid #334155; border-radius:10px;
-        font-size:13px; font-weight:600; cursor:pointer; text-align:left;
-        display:flex; align-items:center; gap:8px;">
-        🔎 Data Agent — Ask questions about your {file_title} data in plain English
-    </button></div>''', unsafe_allow_html=True)
-
-if st.button("🔎 Open Data Agent — Ask questions, filter data, get charts", use_container_width=True):
-    st.session_state["active_view"] = "agent"
-    st.rerun()
-
-st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
 df_info = (f"Dataset: {uploaded.name} | Type: {dtype} | {df.shape[0]} rows x {df.shape[1]} cols\n"
            f"Columns: {', '.join(df.columns.tolist())}\n"
@@ -950,8 +1117,8 @@ if active_view == "overview":
     # AI Summary
     st.markdown('<div class="sec-head">Executive Summary — Highlights, Risks & Actions</div>', unsafe_allow_html=True)
     if "ai_exec" not in st.session_state:
-        st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#1d4ed8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Executive Summary</div>', unsafe_allow_html=True)
-        st.session_state["ai_exec"] = st.write_stream(get_ai_analysis(df_info, dtype))
+        st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Executive Summary</div>', unsafe_allow_html=True)
+        st.session_state["ai_exec"] = st.write_stream(get_ai_analysis(df_info, dtype, "exec"))
     else:
         st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 {cfg["label"]} — Executive Summary</div>'
                     f'<div class="ai-box-text">{st.session_state["ai_exec"].replace(chr(10),"<br>")}</div></div>',
@@ -1069,8 +1236,8 @@ elif active_view == "trends":
             except Exception as e: st.error(f"Heatmap error: {e}")
 
         if "ai_trends" not in st.session_state:
-            st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#1d4ed8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Trend Analysis</div>', unsafe_allow_html=True)
-            st.session_state["ai_trends"] = st.write_stream(get_ai_analysis(df_info, dtype))
+            st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Trend Analysis</div>', unsafe_allow_html=True)
+            st.session_state["ai_trends"] = st.write_stream(get_ai_analysis(df_info, dtype, "trends"))
         else:
             st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 Trend Analysis</div>'
                         f'<div class="ai-box-text">{st.session_state["ai_trends"].replace(chr(10),"<br>")}</div></div>',
@@ -1114,8 +1281,8 @@ elif active_view == "categories":
                 except Exception as e: st.error(str(e))
 
         if "ai_cat" not in st.session_state:
-            st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#1d4ed8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Category Analysis</div>', unsafe_allow_html=True)
-            st.session_state["ai_cat"] = st.write_stream(get_ai_analysis(df_info, dtype))
+            st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Category Analysis</div>', unsafe_allow_html=True)
+            st.session_state["ai_cat"] = st.write_stream(get_ai_analysis(df_info, dtype, "categories"))
         else:
             st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 Category Analysis</div>'
                         f'<div class="ai-box-text">{st.session_state["ai_cat"].replace(chr(10),"<br>")}</div></div>',
@@ -1170,7 +1337,10 @@ elif active_view == "correlations":
                 if v < -0.4: return "background-color:#fee2e2;color:#991b1b"
                 return "background-color:#f8fafc;color:#475569"
             except: return ""
-        st.dataframe(corr_df.style.applymap(color_corr), use_container_width=True)
+        try:
+            st.dataframe(corr_df.style.map(color_corr), use_container_width=True)
+        except AttributeError:
+            st.dataframe(corr_df.style.applymap(color_corr), use_container_width=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: ANOMALIES
@@ -1216,8 +1386,8 @@ elif active_view == "anomalies":
         st.success("✅ No significant outliers detected in numeric columns.")
 
     if "ai_anomaly" not in st.session_state:
-        st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#1d4ed8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 AI Data Quality Analysis</div>', unsafe_allow_html=True)
-        st.session_state["ai_anomaly"] = st.write_stream(get_ai_analysis(df_info, dtype))
+        st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 AI Data Quality Analysis</div>', unsafe_allow_html=True)
+        st.session_state["ai_anomaly"] = st.write_stream(get_ai_analysis(df_info, dtype, "anomalies"))
     else:
         st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 AI Data Quality Analysis</div>'
                     f'<div class="ai-box-text">{st.session_state["ai_anomaly"].replace(chr(10),"<br>")}</div></div>',
@@ -1231,15 +1401,15 @@ elif active_view == "ai":
     st.markdown(f"<p style='color:#64748b;font-size:13px;margin-bottom:1.5rem'>Deep AI analysis tailored specifically for your {dtype} dataset. All insights use actual numbers from your data.</p>", unsafe_allow_html=True)
 
     ai_sections = [
-        ("ai_exec",   "🏢 Executive Summary",  "Key findings, risks and recommendations"),
-        ("ai_trends", "📈 Trend Analysis",      "Time patterns, growth rates, forecasting"),
-        ("ai_cat",    "📦 Category Insights",   "Segment performance and quick wins"),
-        ("ai_anomaly","🔍 Data Quality Report", "Outliers, anomalies and data issues"),
+        ("ai_exec",   "exec",       "🏢 Executive Summary",  "Key findings, risks and recommendations"),
+        ("ai_trends", "trends",     "📈 Trend Analysis",      "Time patterns, growth rates, forecasting"),
+        ("ai_cat",    "categories", "📦 Category Insights",   "Segment performance and quick wins"),
+        ("ai_anomaly","anomalies",  "🔍 Data Quality Report", "Outliers, anomalies and data issues"),
     ]
-    for key, title, desc in ai_sections:
+    for key, page_key, title, desc in ai_sections:
         with st.expander(f"{title} — {desc}", expanded=(key=="ai_exec")):
             if key not in st.session_state:
-                st.session_state[key] = st.write_stream(get_ai_analysis(df_info, dtype))
+                st.session_state[key] = st.write_stream(get_ai_analysis(df_info, dtype, page_key))
             else:
                 st.markdown(
                     f'<div class="ai-box"><div class="ai-box-title">{title}</div>'
@@ -1253,9 +1423,9 @@ elif active_view == "ai":
         st.session_state.messages = []
     for msg in st.session_state.messages:
         if msg["role"] == "user":
-            st.markdown(f'<div style="background:#0f172a;border-radius:12px 12px 4px 12px;padding:0.75rem 1rem;margin:0.5rem 0;color:#e2e8f0;font-size:13px">🧑 {msg["content"]}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="chat-user">🧑 {msg["content"]}</div>', unsafe_allow_html=True)
         else:
-            st.markdown(f'<div class="ai-box" style="margin:0.5rem 0"><div class="ai-box-text">🤖 {msg["content"].replace(chr(10),"<br>")}</div></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="chat-ai">🤖 {msg["content"].replace(chr(10), "<br>")}</div>', unsafe_allow_html=True)
     with st.form("chat", clear_on_submit=True):
         qc1, qc2 = st.columns([5,1])
         with qc1:
@@ -1385,18 +1555,9 @@ elif active_view == "agent":
     # Display chat history
     for msg in st.session_state.agent_messages:
         if msg["role"] == "user":
-            st.markdown(
-                f'''<div style="background:#0f172a;border-radius:12px 12px 4px 12px;
-                padding:0.75rem 1rem;margin:0.5rem 0;color:#e2e8f0;font-size:13px;
-                border:1px solid #1e293b">🧑 {msg["content"]}</div>''',
-                unsafe_allow_html=True)
+            st.markdown(f'<div class="chat-user">🧑 {msg["content"]}</div>', unsafe_allow_html=True)
         else:
-            st.markdown(
-                f'''<div style="background:#fff;border:1px solid #e2e8f0;
-                border-radius:12px 12px 12px 4px;padding:0.75rem 1rem;
-                margin:0.5rem 0;font-size:13px;color:#1e293b">
-                🤖 {msg["content"]}</div>''',
-                unsafe_allow_html=True)
+            st.markdown(f'<div class="chat-ai">🤖 {msg["content"].replace(chr(10), "<br>")}</div>', unsafe_allow_html=True)
             if "dataframe" in msg:
                 st.dataframe(msg["dataframe"], use_container_width=True)
                 csv_out = msg["dataframe"].to_csv(index=False).encode("utf-8")
