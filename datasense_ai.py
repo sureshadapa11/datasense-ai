@@ -333,6 +333,17 @@ section[data-testid="stSidebar"] { display:none !important; }
     color: #ffffff !important;
     box-shadow: 0 4px 16px rgba(91,75,255,0.25) !important;
 }
+
+/* ── NAV ANCHOR LINKS ── */
+a.nav-link-btn {
+    font-size:11.5px; font-weight:600; color:#475569;
+    background:#fff; border:1px solid #e2e8f0; border-radius:8px;
+    padding:6px 12px; text-decoration:none; white-space:nowrap;
+    transition:all 0.15s; cursor:pointer; display:inline-block;
+}
+a.nav-link-btn:hover {
+    background:#f0eeff; color:#5b4bff; border-color:#c4b5fd;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -1975,7 +1986,6 @@ if (st.session_state.get("df_modified_for") == _stored["name"]
     df = st.session_state["df_modified"]
 
 if st.session_state.get("last_file") != _stored["name"]:
-    st.session_state["active_view"] = "overview"
     st.session_state["last_file"]   = _stored["name"]
     st.session_state["messages"]    = []
     st.session_state["df_modified"] = None
@@ -2047,50 +2057,36 @@ with tb5:
             if k.startswith(("df_","ai_","last_","messages","active_","df_modified")): del st.session_state[k]
         st.rerun()
 
-# ── HORIZONTAL NAV ───────────────────────────────────────────────────────────
-pages = [("🏠 Overview","overview"),("💡 Insights","smart"),
-         ("📊 KPIs","kpis"),("📈 Trends","trends"),
-         ("📦 Categories","categories"),("🔗 Correlations","correlations"),
-         ("🔍 Anomalies","anomalies"),("🤖 AI Analysis","ai"),
-         ("📋 Data Table","table"),("🤖 Data Agent","agent"),
-         ("🧹 Clean","clean"),("🔮 Forecast","forecast")]
+# ── HORIZONTAL NAV (anchor links — no rerun on click) ────────────────────────
+_nav_items = [("🏠 Overview","overview"),("💡 Insights","smart"),("📊 KPIs","kpis")]
+if col_analysis["date"] and col_analysis["numeric"]:
+    _nav_items.append(("📈 Trends","trends"))
+if col_analysis["categorical"] and col_analysis["numeric"]:
+    _nav_items.append(("📦 Categories","categories"))
+if len(col_analysis["numeric"]) >= 2:
+    _nav_items.append(("🔗 Correlations","correlations"))
+_nav_items.append(("🔍 Anomalies","anomalies"))
+if col_analysis["date"] and col_analysis["numeric"]:
+    _nav_items.append(("🔮 Forecast","forecast"))
+_nav_items += [("🤖 AI Analysis","ai"),("🧹 Clean","clean"),("🤖 Data Agent","agent")]
 
-if not col_analysis["date"] or not col_analysis["numeric"]:
-    pages = [p for p in pages if p[1] not in ("trends", "forecast")]
-if not col_analysis["categorical"]:
-    pages = [p for p in pages if p[1] != "categories"]
-if len(col_analysis["numeric"]) < 2:
-    pages = [p for p in pages if p[1] != "correlations"]
+_nav_html = '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px">'
+for _lbl, _k in _nav_items:
+    _nav_html += (
+        f'<a class="nav-link-btn" href="javascript:void(0)" '
+        f'onclick="(function(){{var el=document.getElementById(\'sec-{_k}\');'
+        f'if(el)el.scrollIntoView({{behavior:\'smooth\',block:\'start\'}});}})();return false;">'
+        f'{_lbl}</a>'
+    )
+_nav_html += '</div>'
+st.markdown(_nav_html, unsafe_allow_html=True)
+st.markdown("<hr style='border:none;border-top:1px solid #e2e8f0;margin:4px 0 16px'>", unsafe_allow_html=True)
 
-# If the stored active_view was removed (e.g. data has no dates), reset to overview
-_valid_keys = {key for _, key in pages}
-active_view_check = st.session_state.get("active_view", "overview")
-if active_view_check not in _valid_keys:
-    st.session_state["active_view"] = "overview"
-    active_view_check = "overview"
+def _sec_anchor(key):
+    st.markdown(f'<div id="sec-{key}" style="scroll-margin-top:60px"></div>', unsafe_allow_html=True)
 
-# Split nav into rows of max 6 so labels never clip
-_ROW_SIZE = 6
-_nav_rows = [pages[i:i+_ROW_SIZE] for i in range(0, len(pages), _ROW_SIZE)]
-for _nav_row in _nav_rows:
-    _nav_cols = st.columns(len(_nav_row))
-    for (label, key), col in zip(_nav_row, _nav_cols):
-        with col:
-            if active_view_check == key:
-                st.markdown(
-                    f'<div style="background:#f0eeff;border-bottom:2px solid #5b4bff;'
-                    f'border-radius:8px 8px 0 0;padding:0.42rem 0.3rem;text-align:center;'
-                    f'font-size:11.5px;font-weight:700;color:#5b4bff;white-space:nowrap;'
-                    f'overflow:hidden;text-overflow:ellipsis">{label}</div>',
-                    unsafe_allow_html=True)
-            else:
-                if st.button(label, key=f"pg_{key}", use_container_width=True):
-                    st.session_state["active_view"] = key
-                    st.rerun()
-
-st.markdown("<hr style='border:none;border-top:1px solid #e2e8f0;margin:2px 0 12px'>", unsafe_allow_html=True)
-
-active_view = st.session_state.get("active_view", "overview")
+def _sec_divider():
+    st.markdown("<div style='height:1.5rem'></div><hr style='border:none;border-top:2px solid #f1f5f9;margin:0 0 2rem'>", unsafe_allow_html=True)
 
 df_info = (f"Dataset: {_stored['name']} | Type: {dtype} | {df.shape[0]} rows x {df.shape[1]} cols\n"
            f"Columns: {', '.join(df.columns.tolist())}\n"
@@ -2103,535 +2099,781 @@ df_info = (f"Dataset: {_stored['name']} | Type: {dtype} | {df.shape[0]} rows x {
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: OVERVIEW
 # ══════════════════════════════════════════════════════════════════════════════
-if active_view == "overview":
-    # Top KPIs
-    if col_analysis["numeric"]:
-        accent = [cfg["color"],"#10b981","#f59e0b","#8b5cf6"]
-        kcols  = st.columns(min(len(col_analysis["numeric"]), 4))
-        for i, nc in enumerate(col_analysis["numeric"][:4]):
-            s = df[nc].dropna()
-            with kcols[i]:
-                st.markdown(
-                    f'<div class="kpi-card">'
-                    f'<div class="kpi-bar" style="background:{accent[i%4]}"></div>'
-                    f'<div class="kpi-label">{nc.replace("_"," ").title()}</div>'
-                    f'<div class="kpi-value">{fmt_plain(s.sum())}</div>'
-                    f'<div class="kpi-sub">Avg {fmt_plain(s.mean())} · Max {fmt_plain(s.max())}</div>'
-                    f'</div>', unsafe_allow_html=True)
-        st.markdown("<br>", unsafe_allow_html=True)
+_sec_anchor("overview")
+# Top KPIs
+if col_analysis["numeric"]:
+    accent = [cfg["color"],"#10b981","#f59e0b","#8b5cf6"]
+    kcols  = st.columns(min(len(col_analysis["numeric"]), 4))
+    for i, nc in enumerate(col_analysis["numeric"][:4]):
+        s = df[nc].dropna()
+        with kcols[i]:
+            st.markdown(
+                f'<div class="kpi-card">'
+                f'<div class="kpi-bar" style="background:{accent[i%4]}"></div>'
+                f'<div class="kpi-label">{nc.replace("_"," ").title()}</div>'
+                f'<div class="kpi-value">{fmt_plain(s.sum())}</div>'
+                f'<div class="kpi-sub">Avg {fmt_plain(s.mean())} · Max {fmt_plain(s.max())}</div>'
+                f'</div>', unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
 
-    # Charts
-    oc1, oc2 = st.columns([3, 2])
-    with oc1:
-        st.markdown('<div class="sec-head">Trend Overview — How Your Key Metrics Move</div>', unsafe_allow_html=True)
-        try:
-            if col_analysis["date"] and col_analysis["numeric"]:
-                st.plotly_chart(plot_trend(df, col_analysis), use_container_width=True)
-            elif col_analysis["categorical"] and col_analysis["numeric"]:
-                cat = col_analysis["categorical"][0]; num = col_analysis["numeric"][0]
-                st.plotly_chart(plot_bar(df, cat, num, horizontal=df[cat].nunique()>6), use_container_width=True)
-            else:
-                st.info("Upload data with numeric columns to see charts.")
-        except Exception as e:
-            st.error(f"Chart error: {e}")
+# Charts
+oc1, oc2 = st.columns([3, 2])
+with oc1:
+    st.markdown('<div class="sec-head">Trend Overview — How Your Key Metrics Move</div>', unsafe_allow_html=True)
+    try:
+        if col_analysis["date"] and col_analysis["numeric"]:
+            st.plotly_chart(plot_trend(df, col_analysis), use_container_width=True)
+        elif col_analysis["categorical"] and col_analysis["numeric"]:
+            cat = col_analysis["categorical"][0]; num = col_analysis["numeric"][0]
+            st.plotly_chart(plot_bar(df, cat, num, horizontal=df[cat].nunique()>6), use_container_width=True)
+        else:
+            st.info("Upload data with numeric columns to see charts.")
+    except Exception as e:
+        st.error(f"Chart error: {e}")
 
-    with oc2:
-        st.markdown('<div class="sec-head">Breakdown — What Drives the Numbers</div>', unsafe_allow_html=True)
-        try:
-            if col_analysis["categorical"] and col_analysis["numeric"]:
-                cat = col_analysis["categorical"][0]; num = col_analysis["numeric"][0]
-                st.plotly_chart(plot_pie(df, cat, num), use_container_width=True)
-        except Exception as e:
-            st.error(f"Chart error: {e}")
+with oc2:
+    st.markdown('<div class="sec-head">Breakdown — What Drives the Numbers</div>', unsafe_allow_html=True)
+    try:
+        if col_analysis["categorical"] and col_analysis["numeric"]:
+            cat = col_analysis["categorical"][0]; num = col_analysis["numeric"][0]
+            st.plotly_chart(plot_pie(df, cat, num), use_container_width=True)
+    except Exception as e:
+        st.error(f"Chart error: {e}")
 
-    # AI Summary
-    st.markdown('<div class="sec-head">Executive Summary — Highlights, Risks & Actions</div>', unsafe_allow_html=True)
-    if "ai_exec" not in st.session_state:
-        st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#5b4bff;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Executive Summary</div>', unsafe_allow_html=True)
-        st.session_state["ai_exec"] = st.write_stream(get_ai_analysis(df_info, dtype, "exec"))
-    else:
-        st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 {cfg["label"]} — Executive Summary</div>'
-                    f'<div class="ai-box-text">{st.session_state["ai_exec"].replace(chr(10),"<br>")}</div></div>',
-                    unsafe_allow_html=True)
+# AI Summary
+st.markdown('<div class="sec-head">Executive Summary — Highlights, Risks & Actions</div>', unsafe_allow_html=True)
+if "ai_exec" not in st.session_state:
+    st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#5b4bff;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Executive Summary</div>', unsafe_allow_html=True)
+    st.session_state["ai_exec"] = st.write_stream(get_ai_analysis(df_info, dtype, "exec"))
+else:
+    st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 {cfg["label"]} — Executive Summary</div>'
+                f'<div class="ai-box-text">{st.session_state["ai_exec"].replace(chr(10),"<br>")}</div></div>',
+                unsafe_allow_html=True)
+_sec_divider()
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: SMART INSIGHTS (dataset-specific)
 # ══════════════════════════════════════════════════════════════════════════════
-elif active_view == "smart":
-    st.markdown(f'<div class="sec-head">{cfg["icon"]} Smart Insights — {cfg["label"]}</div>', unsafe_allow_html=True)
-    st.markdown(
-        f"<p style='color:#64748b;font-size:13px;margin-bottom:1.5rem;"
-        f"white-space:normal;overflow:visible;display:block;width:100%;max-width:100%'>"
-        f"Generate dataset-specific insight cards based on actual column names and values — "
-        f"tailored to your <b style='color:#334155'>{dtype}</b> dataset.</p>",
-        unsafe_allow_html=True)
+_sec_anchor("smart")
+st.markdown(f'<div class="sec-head">{cfg["icon"]} Smart Insights — {cfg["label"]}</div>', unsafe_allow_html=True)
+st.markdown(
+    f"<p style='color:#64748b;font-size:13px;margin-bottom:1.5rem;"
+    f"white-space:normal;overflow:visible;display:block;width:100%;max-width:100%'>"
+    f"Generate dataset-specific insight cards based on actual column names and values — "
+    f"tailored to your <b style='color:#334155'>{dtype}</b> dataset.</p>",
+    unsafe_allow_html=True)
 
-    if smart_insights:
-        for ins in smart_insights:
-            c1, c2 = st.columns([3, 1])
-            with c1:
-                st.markdown(
-                    f'<div class="insight-card">'
-                    f'<span class="insight-tag" style="background:rgba(255,255,255,0.12);color:#e2e8f0">{ins["tag"]}</span>'
-                    f'<div class="insight-title">{ins["title"]}</div>'
-                    f'<div class="insight-text">{ins["text"]}</div>'
-                    f'</div>', unsafe_allow_html=True)
-            with c2:
-                st.markdown(
-                    f'<div class="kpi-card" style="text-align:center;height:100%">'
-                    f'<div class="kpi-bar" style="background:{ins["color"]}"></div>'
-                    f'<div style="font-size:28px;font-weight:800;color:{ins["color"]};margin-top:12px">{ins["number"]}</div>'
-                    f'<div class="kpi-sub">{ins["tag"]}</div>'
-                    f'</div>', unsafe_allow_html=True)
-            st.markdown("<br>", unsafe_allow_html=True)
+if smart_insights:
+    for ins in smart_insights:
+        c1, c2 = st.columns([3, 1])
+        with c1:
+            st.markdown(
+                f'<div class="insight-card">'
+                f'<span class="insight-tag" style="background:rgba(255,255,255,0.12);color:#e2e8f0">{ins["tag"]}</span>'
+                f'<div class="insight-title">{ins["title"]}</div>'
+                f'<div class="insight-text">{ins["text"]}</div>'
+                f'</div>', unsafe_allow_html=True)
+        with c2:
+            st.markdown(
+                f'<div class="kpi-card" style="text-align:center;height:100%">'
+                f'<div class="kpi-bar" style="background:{ins["color"]}"></div>'
+                f'<div style="font-size:28px;font-weight:800;color:{ins["color"]};margin-top:12px">{ins["number"]}</div>'
+                f'<div class="kpi-sub">{ins["tag"]}</div>'
+                f'</div>', unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
 
-    # Second row: charts that match the dataset type
-    if col_analysis["categorical"] and col_analysis["numeric"]:
-        st.markdown('<div class="sec-head">Segment Analysis — Performance by Every Category</div>', unsafe_allow_html=True)
-        cats = col_analysis["categorical"][:4]
-        num  = col_analysis["numeric"][0]
-        for i in range(0, len(cats), 2):
-            batch = cats[i:i+2]
-            cols  = st.columns(len(batch))
-            for j, cat in enumerate(batch):
-                with cols[j]:
-                    st.markdown(f"**{cat.replace('_',' ').title()} by {num.replace('_',' ').title()}**")
-                    try:
-                        n = df[cat].nunique()
-                        st.plotly_chart(plot_bar(df, cat, num, horizontal=n>5), use_container_width=True)
-                    except Exception as e:
-                        st.error(str(e))
+# Second row: charts that match the dataset type
+if col_analysis["categorical"] and col_analysis["numeric"]:
+    st.markdown('<div class="sec-head">Segment Analysis — Performance by Every Category</div>', unsafe_allow_html=True)
+    cats = col_analysis["categorical"][:4]
+    num  = col_analysis["numeric"][0]
+    for i in range(0, len(cats), 2):
+        batch = cats[i:i+2]
+        cols  = st.columns(len(batch))
+        for j, cat in enumerate(batch):
+            with cols[j]:
+                st.markdown(f"**{cat.replace('_',' ').title()} by {num.replace('_',' ').title()}**")
+                try:
+                    n = df[cat].nunique()
+                    st.plotly_chart(plot_bar(df, cat, num, horizontal=n>5), use_container_width=True)
+                except Exception as e:
+                    st.error(str(e))
+_sec_divider()
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: KPI REPORT
 # ══════════════════════════════════════════════════════════════════════════════
-elif active_view == "kpis":
-    st.markdown('<div class="sec-head">KPI Scorecard — Full Stats for Every Metric</div>', unsafe_allow_html=True)
-    if not col_analysis["numeric"]:
-        st.info("No numeric columns detected.")
-    else:
-        for batch_start in range(0, len(col_analysis["numeric"]), 4):
-            batch = col_analysis["numeric"][batch_start:batch_start+4]
-            cols  = st.columns(len(batch))
-            for j, nc in enumerate(batch):
-                s = df[nc].dropna()
-                with cols[j]:
-                    st.markdown(
-                        f'<div class="kpi-card">'
-                        f'<div class="kpi-bar" style="background:{COLORS[j%len(COLORS)]}"></div>'
-                        f'<div class="kpi-label">{nc.replace("_"," ").title()}</div>'
-                        f'<div class="kpi-value" style="font-size:22px">{fmt_plain(s.sum())}</div>'
-                        f'<div class="kpi-sub" style="margin-top:10px">'
-                        f'Avg: <b>{fmt_plain(s.mean())}</b><br>'
-                        f'Median: <b>{fmt_plain(s.median())}</b><br>'
-                        f'Min: <b>{fmt_plain(s.min())}</b> · Max: <b>{fmt_plain(s.max())}</b><br>'
-                        f'Std Dev: <b>{fmt_plain(s.std())}</b> · Missing: <b>{int(df[nc].isna().sum())}</b>'
-                        f'</div></div>', unsafe_allow_html=True)
+_sec_anchor("kpis")
+st.markdown('<div class="sec-head">KPI Scorecard — Full Stats for Every Metric</div>', unsafe_allow_html=True)
+if not col_analysis["numeric"]:
+    st.info("No numeric columns detected.")
+else:
+    for batch_start in range(0, len(col_analysis["numeric"]), 4):
+        batch = col_analysis["numeric"][batch_start:batch_start+4]
+        cols  = st.columns(len(batch))
+        for j, nc in enumerate(batch):
+            s = df[nc].dropna()
+            with cols[j]:
+                st.markdown(
+                    f'<div class="kpi-card">'
+                    f'<div class="kpi-bar" style="background:{COLORS[j%len(COLORS)]}"></div>'
+                    f'<div class="kpi-label">{nc.replace("_"," ").title()}</div>'
+                    f'<div class="kpi-value" style="font-size:22px">{fmt_plain(s.sum())}</div>'
+                    f'<div class="kpi-sub" style="margin-top:10px">'
+                    f'Avg: <b>{fmt_plain(s.mean())}</b><br>'
+                    f'Median: <b>{fmt_plain(s.median())}</b><br>'
+                    f'Min: <b>{fmt_plain(s.min())}</b> · Max: <b>{fmt_plain(s.max())}</b><br>'
+                    f'Std Dev: <b>{fmt_plain(s.std())}</b> · Missing: <b>{int(df[nc].isna().sum())}</b>'
+                    f'</div></div>', unsafe_allow_html=True)
 
-        st.markdown('<div class="sec-head">Value Distributions — Spread, Skew & Frequency</div>', unsafe_allow_html=True)
-        for batch_start in range(0, len(col_analysis["numeric"]), 3):
-            batch = col_analysis["numeric"][batch_start:batch_start+3]
-            cols  = st.columns(len(batch))
-            for j, nc in enumerate(batch):
-                with cols[j]:
-                    st.markdown(f"**{nc.replace('_',' ').title()}**")
-                    try: st.plotly_chart(plot_histogram(df, nc), use_container_width=True)
-                    except Exception as e: st.error(str(e))
+    st.markdown('<div class="sec-head">Value Distributions — Spread, Skew & Frequency</div>', unsafe_allow_html=True)
+    for batch_start in range(0, len(col_analysis["numeric"]), 3):
+        batch = col_analysis["numeric"][batch_start:batch_start+3]
+        cols  = st.columns(len(batch))
+        for j, nc in enumerate(batch):
+            with cols[j]:
+                st.markdown(f"**{nc.replace('_',' ').title()}**")
+                try: st.plotly_chart(plot_histogram(df, nc), use_container_width=True)
+                except Exception as e: st.error(str(e))
+_sec_divider()
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: TRENDS
 # ══════════════════════════════════════════════════════════════════════════════
-elif active_view == "trends":
-    st.markdown('<div class="sec-head">Time Series Analysis</div>', unsafe_allow_html=True)
-    if not col_analysis["date"] or not col_analysis["numeric"]:
-        st.info("Trend analysis requires at least one date and one numeric column.")
+_sec_anchor("trends")
+st.markdown('<div class="sec-head">Time Series Analysis</div>', unsafe_allow_html=True)
+if not col_analysis["date"] or not col_analysis["numeric"]:
+    st.info("Trend analysis requires at least one date and one numeric column.")
+else:
+    if time_insights:
+        ti = time_insights
+        nc_label = ti["num_col"].replace("_"," ").title()
+        t1,t2,t3,t4 = st.columns(4)
+        tup = "▲" if ti["growth"]>0 else "▼"
+        tcls = "kpi-up" if ti["growth"]>0 else "kpi-dn"
+        with t1:
+            st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:{cfg["color"]}"></div><div class="kpi-label">Overall Growth</div><div class="kpi-value"><span class="{tcls}">{tup} {ti["growth"]:+.1f}%</span></div><div class="kpi-sub">First to last period</div></div>', unsafe_allow_html=True)
+        with t2:
+            st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#10b981"></div><div class="kpi-label">Best Period</div><div class="kpi-value" style="font-size:18px">{ti["best_period"]}</div><div class="kpi-sub">{fmt_plain(ti["best_val"])} {nc_label}</div></div>', unsafe_allow_html=True)
+        with t3:
+            st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#ef4444"></div><div class="kpi-label">Worst Period</div><div class="kpi-value" style="font-size:18px">{ti["worst_period"]}</div><div class="kpi-sub">{fmt_plain(ti["worst_val"])} {nc_label}</div></div>', unsafe_allow_html=True)
+        with t4:
+            st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#f59e0b"></div><div class="kpi-label">Periods</div><div class="kpi-value">{ti["periods"]}</div><div class="kpi-sub">Monthly periods</div></div>', unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+
+    try: st.plotly_chart(plot_trend(df, col_analysis), use_container_width=True)
+    except Exception as e: st.error(f"Error: {e}")
+
+    if col_analysis["categorical"]:
+        st.markdown('<div class="sec-head">Heatmap — Monthly Performance by Segment</div>', unsafe_allow_html=True)
+        try:
+            _hm = plot_heatmap(df, col_analysis)
+            if _hm: st.plotly_chart(_hm, use_container_width=True)
+        except Exception as e: st.error(f"Heatmap error: {e}")
+
+    if "ai_trends" not in st.session_state:
+        st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#5b4bff;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Trend Analysis</div>', unsafe_allow_html=True)
+        st.session_state["ai_trends"] = st.write_stream(get_ai_analysis(df_info, dtype, "trends"))
     else:
-        if time_insights:
-            ti = time_insights
-            nc_label = ti["num_col"].replace("_"," ").title()
-            t1,t2,t3,t4 = st.columns(4)
-            tup = "▲" if ti["growth"]>0 else "▼"
-            tcls = "kpi-up" if ti["growth"]>0 else "kpi-dn"
-            with t1:
-                st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:{cfg["color"]}"></div><div class="kpi-label">Overall Growth</div><div class="kpi-value"><span class="{tcls}">{tup} {ti["growth"]:+.1f}%</span></div><div class="kpi-sub">First to last period</div></div>', unsafe_allow_html=True)
-            with t2:
-                st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#10b981"></div><div class="kpi-label">Best Period</div><div class="kpi-value" style="font-size:18px">{ti["best_period"]}</div><div class="kpi-sub">{fmt_plain(ti["best_val"])} {nc_label}</div></div>', unsafe_allow_html=True)
-            with t3:
-                st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#ef4444"></div><div class="kpi-label">Worst Period</div><div class="kpi-value" style="font-size:18px">{ti["worst_period"]}</div><div class="kpi-sub">{fmt_plain(ti["worst_val"])} {nc_label}</div></div>', unsafe_allow_html=True)
-            with t4:
-                st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#f59e0b"></div><div class="kpi-label">Periods</div><div class="kpi-value">{ti["periods"]}</div><div class="kpi-sub">Monthly periods</div></div>', unsafe_allow_html=True)
-            st.markdown("<br>", unsafe_allow_html=True)
-
-        try: st.plotly_chart(plot_trend(df, col_analysis), use_container_width=True)
-        except Exception as e: st.error(f"Error: {e}")
-
-        if col_analysis["categorical"]:
-            st.markdown('<div class="sec-head">Heatmap — Monthly Performance by Segment</div>', unsafe_allow_html=True)
-            try:
-                _hm = plot_heatmap(df, col_analysis)
-                if _hm: st.plotly_chart(_hm, use_container_width=True)
-            except Exception as e: st.error(f"Heatmap error: {e}")
-
-        if "ai_trends" not in st.session_state:
-            st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#5b4bff;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Trend Analysis</div>', unsafe_allow_html=True)
-            st.session_state["ai_trends"] = st.write_stream(get_ai_analysis(df_info, dtype, "trends"))
-        else:
-            st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 Trend Analysis</div>'
-                        f'<div class="ai-box-text">{st.session_state["ai_trends"].replace(chr(10),"<br>")}</div></div>',
-                        unsafe_allow_html=True)
+        st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 Trend Analysis</div>'
+                    f'<div class="ai-box-text">{st.session_state["ai_trends"].replace(chr(10),"<br>")}</div></div>',
+                    unsafe_allow_html=True)
+_sec_divider()
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: CATEGORIES
 # ══════════════════════════════════════════════════════════════════════════════
-elif active_view == "categories":
-    st.markdown('<div class="sec-head">Segment Performance — Winners, Laggards & Risk</div>', unsafe_allow_html=True)
-    if not col_analysis["categorical"] or not col_analysis["numeric"]:
-        st.info("Category analysis requires categorical and numeric columns.")
+_sec_anchor("categories")
+st.markdown('<div class="sec-head">Segment Performance — Winners, Laggards & Risk</div>', unsafe_allow_html=True)
+if not col_analysis["categorical"] or not col_analysis["numeric"]:
+    st.info("Category analysis requires categorical and numeric columns.")
+else:
+    for cat in col_analysis["categorical"][:4]:
+        num_col = col_analysis["numeric"][0]
+        grp = df.groupby(cat)[num_col].sum().sort_values(ascending=False)
+        total = grp.sum()
+        top3_share = grp.head(3).sum() / total * 100 if total > 0 else 0
+        risk = "High" if top3_share>70 else "Medium" if top3_share>50 else "Low"
+        badge = "badge-red" if risk=="High" else "badge-amber" if risk=="Medium" else "badge-green"
+
+        st.markdown(f'<div class="sec-head">{cat.replace("_"," ").title()} — {df[cat].nunique()} unique values</div>', unsafe_allow_html=True)
+        cc1,cc2,cc3,cc4 = st.columns(4)
+        with cc1:
+            st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#10b981"></div><div class="kpi-label">Top Performer</div><div class="kpi-value" style="font-size:16px">{grp.index[0]}</div><div class="kpi-sub">{fmt_plain(grp.iloc[0])}</div></div>', unsafe_allow_html=True)
+        with cc2:
+            st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#ef4444"></div><div class="kpi-label">Lowest</div><div class="kpi-value" style="font-size:16px">{grp.index[-1]}</div><div class="kpi-sub">{fmt_plain(grp.iloc[-1])}</div></div>', unsafe_allow_html=True)
+        with cc3:
+            st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#f59e0b"></div><div class="kpi-label">Top 3 Share</div><div class="kpi-value">{top3_share:.1f}%</div><div class="kpi-sub">of total</div></div>', unsafe_allow_html=True)
+        with cc4:
+            st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#8b5cf6"></div><div class="kpi-label">Concentration Risk</div><div class="kpi-value" style="font-size:18px"><span class="badge {badge}">{risk}</span></div></div>', unsafe_allow_html=True)
+
+        bc1, bc2 = st.columns([3,2])
+        with bc1:
+            try:
+                n = df[cat].nunique()
+                st.plotly_chart(plot_bar(df, cat, num_col, horizontal=n>6), use_container_width=True)
+            except Exception as e: st.error(str(e))
+        with bc2:
+            try: st.plotly_chart(plot_pie(df, cat, num_col), use_container_width=True)
+            except Exception as e: st.error(str(e))
+
+    if "ai_cat" not in st.session_state:
+        st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#5b4bff;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Category Analysis</div>', unsafe_allow_html=True)
+        st.session_state["ai_cat"] = st.write_stream(get_ai_analysis(df_info, dtype, "categories"))
     else:
-        for cat in col_analysis["categorical"][:4]:
-            num_col = col_analysis["numeric"][0]
-            grp = df.groupby(cat)[num_col].sum().sort_values(ascending=False)
-            total = grp.sum()
-            top3_share = grp.head(3).sum() / total * 100 if total > 0 else 0
-            risk = "High" if top3_share>70 else "Medium" if top3_share>50 else "Low"
-            badge = "badge-red" if risk=="High" else "badge-amber" if risk=="Medium" else "badge-green"
-
-            st.markdown(f'<div class="sec-head">{cat.replace("_"," ").title()} — {df[cat].nunique()} unique values</div>', unsafe_allow_html=True)
-            cc1,cc2,cc3,cc4 = st.columns(4)
-            with cc1:
-                st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#10b981"></div><div class="kpi-label">Top Performer</div><div class="kpi-value" style="font-size:16px">{grp.index[0]}</div><div class="kpi-sub">{fmt_plain(grp.iloc[0])}</div></div>', unsafe_allow_html=True)
-            with cc2:
-                st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#ef4444"></div><div class="kpi-label">Lowest</div><div class="kpi-value" style="font-size:16px">{grp.index[-1]}</div><div class="kpi-sub">{fmt_plain(grp.iloc[-1])}</div></div>', unsafe_allow_html=True)
-            with cc3:
-                st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#f59e0b"></div><div class="kpi-label">Top 3 Share</div><div class="kpi-value">{top3_share:.1f}%</div><div class="kpi-sub">of total</div></div>', unsafe_allow_html=True)
-            with cc4:
-                st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#8b5cf6"></div><div class="kpi-label">Concentration Risk</div><div class="kpi-value" style="font-size:18px"><span class="badge {badge}">{risk}</span></div></div>', unsafe_allow_html=True)
-
-            bc1, bc2 = st.columns([3,2])
-            with bc1:
-                try:
-                    n = df[cat].nunique()
-                    st.plotly_chart(plot_bar(df, cat, num_col, horizontal=n>6), use_container_width=True)
-                except Exception as e: st.error(str(e))
-            with bc2:
-                try: st.plotly_chart(plot_pie(df, cat, num_col), use_container_width=True)
-                except Exception as e: st.error(str(e))
-
-        if "ai_cat" not in st.session_state:
-            st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#5b4bff;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Category Analysis</div>', unsafe_allow_html=True)
-            st.session_state["ai_cat"] = st.write_stream(get_ai_analysis(df_info, dtype, "categories"))
-        else:
-            st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 Category Analysis</div>'
-                        f'<div class="ai-box-text">{st.session_state["ai_cat"].replace(chr(10),"<br>")}</div></div>',
-                        unsafe_allow_html=True)
+        st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 Category Analysis</div>'
+                    f'<div class="ai-box-text">{st.session_state["ai_cat"].replace(chr(10),"<br>")}</div></div>',
+                    unsafe_allow_html=True)
+_sec_divider()
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: CORRELATIONS
 # ══════════════════════════════════════════════════════════════════════════════
-elif active_view == "correlations":
-    st.markdown('<div class="sec-head">Correlation Analysis — Which Metrics Move Together</div>', unsafe_allow_html=True)
-    if len(col_analysis["numeric"]) < 2:
-        st.info("Correlation analysis requires at least 2 numeric columns.")
-    else:
-        if correlations:
-            for pair in correlations[:6]:
-                r = pair["r"]
-                strength = "Strong" if abs(r)>0.7 else "Moderate" if abs(r)>0.4 else "Weak"
-                direction = "Positive" if r>0 else "Negative"
-                badge_cls = "badge-green" if abs(r)>0.7 else "badge-amber" if abs(r)>0.4 else "badge-red"
-                bar_c = "#10b981" if r>0 else "#ef4444"
-                st.markdown(
-                    f'<div class="kpi-card" style="margin-bottom:8px">'
-                    f'<div style="display:flex;justify-content:space-between;align-items:center">'
-                    f'<div><b style="color:#0d1f3c">{pair["col1"].replace("_"," ").title()}</b>'
-                    f' <span style="color:#94a3b8">↔</span> '
-                    f'<b style="color:#0d1f3c">{pair["col2"].replace("_"," ").title()}</b></div>'
-                    f'<div><span class="badge {badge_cls}">{strength} {direction}</span>'
-                    f' <b style="color:#0d1f3c;font-size:16px;margin-left:10px">r = {r}</b></div>'
-                    f'</div><div style="margin-top:10px;background:#f1f5f9;border-radius:4px;height:5px">'
-                    f'<div style="width:{int(abs(r)*100)}%;background:{bar_c};height:5px;border-radius:4px"></div>'
-                    f'</div></div>', unsafe_allow_html=True)
+_sec_anchor("correlations")
+st.markdown('<div class="sec-head">Correlation Analysis — Which Metrics Move Together</div>', unsafe_allow_html=True)
+if len(col_analysis["numeric"]) < 2:
+    st.info("Correlation analysis requires at least 2 numeric columns.")
+else:
+    if correlations:
+        for pair in correlations[:6]:
+            r = pair["r"]
+            strength = "Strong" if abs(r)>0.7 else "Moderate" if abs(r)>0.4 else "Weak"
+            direction = "Positive" if r>0 else "Negative"
+            badge_cls = "badge-green" if abs(r)>0.7 else "badge-amber" if abs(r)>0.4 else "badge-red"
+            bar_c = "#10b981" if r>0 else "#ef4444"
+            st.markdown(
+                f'<div class="kpi-card" style="margin-bottom:8px">'
+                f'<div style="display:flex;justify-content:space-between;align-items:center">'
+                f'<div><b style="color:#0d1f3c">{pair["col1"].replace("_"," ").title()}</b>'
+                f' <span style="color:#94a3b8">↔</span> '
+                f'<b style="color:#0d1f3c">{pair["col2"].replace("_"," ").title()}</b></div>'
+                f'<div><span class="badge {badge_cls}">{strength} {direction}</span>'
+                f' <b style="color:#0d1f3c;font-size:16px;margin-left:10px">r = {r}</b></div>'
+                f'</div><div style="margin-top:10px;background:#f1f5f9;border-radius:4px;height:5px">'
+                f'<div style="width:{int(abs(r)*100)}%;background:{bar_c};height:5px;border-radius:4px"></div>'
+                f'</div></div>', unsafe_allow_html=True)
 
-        st.markdown('<div class="sec-head">Scatter Plots — Visualising Metric Relationships</div>', unsafe_allow_html=True)
-        nums = col_analysis["numeric"]
-        pairs_to_plot = [(nums[i],nums[j]) for i in range(min(3,len(nums))) for j in range(i+1,min(4,len(nums)))]
-        if pairs_to_plot:
-            sc_cols = st.columns(min(len(pairs_to_plot), 3))
-            for idx, (c1, c2) in enumerate(pairs_to_plot[:3]):
-                with sc_cols[idx]:
-                    st.markdown(f"**{c1.replace('_',' ').title()} vs {c2.replace('_',' ').title()}**")
-                    try: st.plotly_chart(plot_scatter(df, c1, c2), use_container_width=True)
-                    except Exception as e: st.error(str(e))
+    st.markdown('<div class="sec-head">Scatter Plots — Visualising Metric Relationships</div>', unsafe_allow_html=True)
+    nums = col_analysis["numeric"]
+    pairs_to_plot = [(nums[i],nums[j]) for i in range(min(3,len(nums))) for j in range(i+1,min(4,len(nums)))]
+    if pairs_to_plot:
+        sc_cols = st.columns(min(len(pairs_to_plot), 3))
+        for idx, (c1, c2) in enumerate(pairs_to_plot[:3]):
+            with sc_cols[idx]:
+                st.markdown(f"**{c1.replace('_',' ').title()} vs {c2.replace('_',' ').title()}**")
+                try: st.plotly_chart(plot_scatter(df, c1, c2), use_container_width=True)
+                except Exception as e: st.error(str(e))
 
-        st.markdown('<div class="sec-head">Full Correlation Matrix — Every Pair at a Glance</div>', unsafe_allow_html=True)
-        corr_df = df[col_analysis["numeric"]].corr().round(3)
-        def color_corr(val):
-            try:
-                v = float(val)
-                if v > 0.7:  return "background-color:#bbf7d0;color:#14532d"
-                if v > 0.4:  return "background-color:#d1fae5;color:#166534"
-                if v < -0.7: return "background-color:#fecaca;color:#7f1d1d"
-                if v < -0.4: return "background-color:#fee2e2;color:#991b1b"
-                return "background-color:#f8fafc;color:#475569"
-            except: return ""
+    st.markdown('<div class="sec-head">Full Correlation Matrix — Every Pair at a Glance</div>', unsafe_allow_html=True)
+    corr_df = df[col_analysis["numeric"]].corr().round(3)
+    def color_corr(val):
         try:
-            st.dataframe(corr_df.style.map(color_corr), use_container_width=True)
-        except AttributeError:
-            st.dataframe(corr_df.style.applymap(color_corr), use_container_width=True)
+            v = float(val)
+            if v > 0.7:  return "background-color:#bbf7d0;color:#14532d"
+            if v > 0.4:  return "background-color:#d1fae5;color:#166534"
+            if v < -0.7: return "background-color:#fecaca;color:#7f1d1d"
+            if v < -0.4: return "background-color:#fee2e2;color:#991b1b"
+            return "background-color:#f8fafc;color:#475569"
+        except: return ""
+    try:
+        st.dataframe(corr_df.style.map(color_corr), use_container_width=True)
+    except AttributeError:
+        st.dataframe(corr_df.style.applymap(color_corr), use_container_width=True)
+_sec_divider()
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: ANOMALIES
 # ══════════════════════════════════════════════════════════════════════════════
-elif active_view == "anomalies":
-    st.markdown('<div class="sec-head">Data Health Report — Quality, Gaps & Anomalies</div>', unsafe_allow_html=True)
-    total_missing  = int(df.isnull().sum().sum())
-    total_outliers = sum(s.get("outliers",0) for s in adv_stats.values())
-    dupes = int(df.duplicated().sum())
-    completeness = round((1 - df.isnull().sum().sum() / (df.shape[0]*df.shape[1])) * 100, 1)
+_sec_anchor("anomalies")
+st.markdown('<div class="sec-head">Data Health Report — Quality, Gaps & Anomalies</div>', unsafe_allow_html=True)
+total_missing  = int(df.isnull().sum().sum())
+total_outliers = sum(s.get("outliers",0) for s in adv_stats.values())
+dupes = int(df.duplicated().sum())
+completeness = round((1 - df.isnull().sum().sum() / (df.shape[0]*df.shape[1])) * 100, 1)
 
-    mc1,mc2,mc3,mc4 = st.columns(4)
-    with mc1: st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#2563eb"></div><div class="kpi-label">Data Completeness</div><div class="kpi-value">{completeness}%</div></div>', unsafe_allow_html=True)
-    with mc2: st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:{"#ef4444" if total_missing>0 else "#10b981"}"></div><div class="kpi-label">Missing Values</div><div class="kpi-value">{total_missing:,}</div><div class="kpi-sub">Across all columns</div></div>', unsafe_allow_html=True)
-    with mc3: st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#f59e0b"></div><div class="kpi-label">Outliers (IQR)</div><div class="kpi-value">{total_outliers:,}</div></div>', unsafe_allow_html=True)
-    with mc4: st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:{"#ef4444" if dupes>0 else "#10b981"}"></div><div class="kpi-label">Duplicate Rows</div><div class="kpi-value">{dupes:,}</div></div>', unsafe_allow_html=True)
+mc1,mc2,mc3,mc4 = st.columns(4)
+with mc1: st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#2563eb"></div><div class="kpi-label">Data Completeness</div><div class="kpi-value">{completeness}%</div></div>', unsafe_allow_html=True)
+with mc2: st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:{"#ef4444" if total_missing>0 else "#10b981"}"></div><div class="kpi-label">Missing Values</div><div class="kpi-value">{total_missing:,}</div><div class="kpi-sub">Across all columns</div></div>', unsafe_allow_html=True)
+with mc3: st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#f59e0b"></div><div class="kpi-label">Outliers (IQR)</div><div class="kpi-value">{total_outliers:,}</div></div>', unsafe_allow_html=True)
+with mc4: st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:{"#ef4444" if dupes>0 else "#10b981"}"></div><div class="kpi-label">Duplicate Rows</div><div class="kpi-value">{dupes:,}</div></div>', unsafe_allow_html=True)
 
-    st.markdown('<div class="sec-head">Column Summary — Types, Completeness & Uniqueness</div>', unsafe_allow_html=True)
-    qual_data = []
-    for col in df.columns:
-        miss = int(df[col].isna().sum())
-        miss_p = round(miss/len(df)*100,1)
-        qual_data.append({
-            "Column": col, "Type": str(df[col].dtype),
-            "Missing": miss, "Missing %": f"{miss_p}%",
-            "Unique": int(df[col].nunique()),
-            "Outliers": adv_stats.get(col,{}).get("outliers",0),
-            "Status": "⚠️ Check" if miss_p>10 or adv_stats.get(col,{}).get("outliers",0)>5 else "✅ OK"
-        })
-    st.dataframe(pd.DataFrame(qual_data), use_container_width=True, hide_index=True)
+st.markdown('<div class="sec-head">Column Summary — Types, Completeness & Uniqueness</div>', unsafe_allow_html=True)
+qual_data = []
+for col in df.columns:
+    miss = int(df[col].isna().sum())
+    miss_p = round(miss/len(df)*100,1)
+    qual_data.append({
+        "Column": col, "Type": str(df[col].dtype),
+        "Missing": miss, "Missing %": f"{miss_p}%",
+        "Unique": int(df[col].nunique()),
+        "Outliers": adv_stats.get(col,{}).get("outliers",0),
+        "Status": "⚠️ Check" if miss_p>10 or adv_stats.get(col,{}).get("outliers",0)>5 else "✅ OK"
+    })
+st.dataframe(pd.DataFrame(qual_data), use_container_width=True, hide_index=True)
 
-    st.markdown('<div class="sec-head">Outliers — Values Outside the Expected Range</div>', unsafe_allow_html=True)
-    has_outliers = False
-    for nc, s in adv_stats.items():
-        if s["outliers"] > 0:
-            has_outliers = True
-            st.markdown(
-                f'<div class="insight-card"><span class="insight-tag" style="background:rgba(239,68,68,0.2);color:#fca5a5">⚠️ Outliers Detected</span>'
-                f'<div class="insight-title">{nc.replace("_"," ").title()}</div>'
-                f'<div class="insight-text">{s["outliers"]} outlier(s) · IQR: [{fmt_plain(s["q1"])} — {fmt_plain(s["q3"])}] · Range: [{fmt_plain(s["min"])} — {fmt_plain(s["max"])}]</div>'
-                f'</div>', unsafe_allow_html=True)
-    if not has_outliers:
-        st.success("✅ No significant outliers detected in numeric columns.")
+st.markdown('<div class="sec-head">Outliers — Values Outside the Expected Range</div>', unsafe_allow_html=True)
+has_outliers = False
+for nc, s in adv_stats.items():
+    if s["outliers"] > 0:
+        has_outliers = True
+        st.markdown(
+            f'<div class="insight-card"><span class="insight-tag" style="background:rgba(239,68,68,0.2);color:#fca5a5">⚠️ Outliers Detected</span>'
+            f'<div class="insight-title">{nc.replace("_"," ").title()}</div>'
+            f'<div class="insight-text">{s["outliers"]} outlier(s) · IQR: [{fmt_plain(s["q1"])} — {fmt_plain(s["q3"])}] · Range: [{fmt_plain(s["min"])} — {fmt_plain(s["max"])}]</div>'
+            f'</div>', unsafe_allow_html=True)
+if not has_outliers:
+    st.success("✅ No significant outliers detected in numeric columns.")
 
-    if "ai_anomaly" not in st.session_state:
-        st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#5b4bff;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 AI Data Quality Analysis</div>', unsafe_allow_html=True)
-        st.session_state["ai_anomaly"] = st.write_stream(get_ai_analysis(df_info, dtype, "anomalies"))
-    else:
-        st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 AI Data Quality Analysis</div>'
-                    f'<div class="ai-box-text">{st.session_state["ai_anomaly"].replace(chr(10),"<br>")}</div></div>',
+if "ai_anomaly" not in st.session_state:
+    st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#5b4bff;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 AI Data Quality Analysis</div>', unsafe_allow_html=True)
+    st.session_state["ai_anomaly"] = st.write_stream(get_ai_analysis(df_info, dtype, "anomalies"))
+else:
+    st.markdown(f'<div class="ai-box"><div class="ai-box-title">🤖 AI Data Quality Analysis</div>'
+                f'<div class="ai-box-text">{st.session_state["ai_anomaly"].replace(chr(10),"<br>")}</div></div>',
+                unsafe_allow_html=True)
+_sec_divider()
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PAGE: FORECASTING
+# ══════════════════════════════════════════════════════════════════════════════
+_sec_anchor("forecast")
+st.markdown('<div class="sec-head">🔮 Forecasting — Predict Future Trends</div>', unsafe_allow_html=True)
+if not col_analysis["date"] or not col_analysis["numeric"]:
+    st.info("Forecasting requires at least one date column and one numeric column.")
+else:
+    fc1, fc2, fc3 = st.columns([2, 1, 1])
+    with fc1:
+        fc_num = st.selectbox("Metric to forecast", col_analysis["numeric"], key="fc_num")
+    with fc2:
+        fc_periods = st.selectbox("Forecast periods", [7, 14, 30, 60, 90], index=2, key="fc_periods")
+    with fc3:
+        fc_unit = st.selectbox("Period unit", ["days", "months"], key="fc_unit")
+
+    try:
+        date_col = col_analysis["date"][0]
+        df_fc = df[[date_col, fc_num]].copy().dropna()
+        df_fc[date_col] = pd.to_datetime(df_fc[date_col], errors="coerce")
+        df_fc = df_fc.dropna(subset=[date_col])
+
+        if fc_unit == "months":
+            df_fc["_period"] = df_fc[date_col].dt.to_period("M").dt.to_timestamp()
+        else:
+            df_fc["_period"] = df_fc[date_col].dt.normalize()
+
+        agg = df_fc.groupby("_period")[fc_num].sum().reset_index().sort_values("_period")
+
+        if len(agg) < 3:
+            st.warning("Need at least 3 data points to forecast. Try switching to 'months' unit or upload more data.")
+        else:
+            x = np.arange(len(agg), dtype=float)
+            y = agg[fc_num].values.astype(float)
+            coeffs = np.polyfit(x, y, 1)
+            trend_line = np.polyval(coeffs, x)
+            std_resid = np.std(y - trend_line)
+
+            last_date = agg["_period"].iloc[-1]
+            if fc_unit == "months":
+                future_dates = [last_date + pd.DateOffset(months=i+1) for i in range(fc_periods)]
+            else:
+                future_dates = [last_date + pd.Timedelta(days=i+1) for i in range(fc_periods)]
+
+            x_future = np.arange(len(agg), len(agg) + fc_periods, dtype=float)
+            y_forecast = np.polyval(coeffs, x_future)
+
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(
+                x=agg["_period"], y=y, mode="lines+markers",
+                name="Historical", line=dict(color="#5b4bff", width=2.5),
+                marker=dict(size=6, color="#5b4bff")))
+            fig.add_trace(go.Scatter(
+                x=agg["_period"], y=trend_line, mode="lines",
+                name="Trend line", line=dict(color="#94a3b8", width=1.5, dash="dot")))
+            fig.add_trace(go.Scatter(
+                x=future_dates, y=y_forecast, mode="lines+markers",
+                name="Forecast", line=dict(color="#10b981", width=2.5, dash="dash"),
+                marker=dict(size=7, color="#10b981", symbol="diamond")))
+            fig.add_trace(go.Scatter(
+                x=list(future_dates) + list(reversed(future_dates)),
+                y=list(y_forecast + 1.96*std_resid) + list(reversed(y_forecast - 1.96*std_resid)),
+                fill="toself", fillcolor="rgba(16,185,129,0.10)",
+                line=dict(color="rgba(0,0,0,0)"),
+                name="95% confidence", hoverinfo="skip"))
+
+            fig.add_vline(x=str(last_date), line_width=1.5, line_dash="dash", line_color="#e2e8f0")
+            fig.update_layout(**mk_layout(height=420, showlegend=True))
+            fig.update_layout(
+                legend=dict(orientation="h", y=1.02, x=0),
+                xaxis_title="Period",
+                yaxis_title=fc_num.replace("_", " ").title()
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
+            last_val = float(y[-1])
+            next_val = float(y_forecast[0])
+            end_val  = float(y_forecast[-1])
+            pct_chg  = (next_val - last_val) / abs(last_val) * 100 if last_val != 0 else 0
+            growth_rate = float(coeffs[0])
+
+            fk1, fk2, fk3, fk4 = st.columns(4)
+            with fk1:
+                dir_color = "#10b981" if growth_rate >= 0 else "#ef4444"
+                dir_txt   = "▲ Upward" if growth_rate >= 0 else "▼ Downward"
+                st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:{dir_color}"></div><div class="kpi-label">Trend Direction</div><div class="kpi-value" style="font-size:18px;color:{dir_color}">{dir_txt}</div><div class="kpi-sub">{fmt_plain(abs(growth_rate))} per period</div></div>', unsafe_allow_html=True)
+            with fk2:
+                st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#5b4bff"></div><div class="kpi-label">Next Period</div><div class="kpi-value">{fmt_plain(next_val)}</div><div class="kpi-sub">Current: {fmt_plain(last_val)}</div></div>', unsafe_allow_html=True)
+            with fk3:
+                chg_cls = "kpi-up" if pct_chg >= 0 else "kpi-dn"
+                st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#f59e0b"></div><div class="kpi-label">Expected Change</div><div class="kpi-value"><span class="{chg_cls}">{pct_chg:+.1f}%</span></div><div class="kpi-sub">vs current period</div></div>', unsafe_allow_html=True)
+            with fk4:
+                st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#8b5cf6"></div><div class="kpi-label">{fc_periods} {fc_unit.title()} Out</div><div class="kpi-value">{fmt_plain(end_val)}</div><div class="kpi-sub">End of forecast range</div></div>', unsafe_allow_html=True)
+
+            st.markdown("<br>", unsafe_allow_html=True)
+
+            fc_cache_key = f"ai_forecast_{fc_num}_{fc_periods}_{fc_unit}"
+            forecast_ctx = (
+                f"Metric: {fc_num}. Historical periods: {len(agg)}. "
+                f"Last value: {fmt_plain(last_val)}. "
+                f"Trend: {'growing' if growth_rate>=0 else 'declining'} at {fmt_plain(abs(growth_rate))} per period. "
+                f"Next period forecast: {fmt_plain(next_val)} ({pct_chg:+.1f}% change). "
+                f"{fc_periods}-{fc_unit} forecast end: {fmt_plain(end_val)}. Dataset type: {dtype}."
+            )
+            if fc_cache_key not in st.session_state:
+                st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#5b4bff;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Forecast Interpretation</div>', unsafe_allow_html=True)
+                st.session_state[fc_cache_key] = st.write_stream(
+                    ask_claude(
+                        f"Interpret this forecast and give 3-4 specific actionable recommendations: {forecast_ctx}",
+                        df_info, dtype
+                    )
+                )
+            else:
+                st.markdown(
+                    f'<div class="ai-box"><div class="ai-box-title">🤖 Forecast Interpretation</div>'
+                    f'<div class="ai-box-text">{st.session_state[fc_cache_key].replace(chr(10),"<br>")}</div></div>',
                     unsafe_allow_html=True)
+            if st.button("↻ Regenerate interpretation", key="regen_forecast"):
+                if fc_cache_key in st.session_state:
+                    del st.session_state[fc_cache_key]
+                st.rerun()
+
+    except Exception as _fe:
+        st.error(f"Forecasting error: {_fe}")
+_sec_divider()
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: AI ANALYSIS
 # ══════════════════════════════════════════════════════════════════════════════
-elif active_view == "ai":
-    st.markdown(f'<div class="sec-head">🤖 AI Analysis — {cfg["label"]}</div>', unsafe_allow_html=True)
-    st.markdown(f"<p style='color:#64748b;font-size:13px;margin-bottom:1.5rem'>Deep AI analysis tailored specifically for your {dtype} dataset. All insights use actual numbers from your data.</p>", unsafe_allow_html=True)
+_sec_anchor("ai")
+st.markdown(f'<div class="sec-head">🤖 AI Analysis — {cfg["label"]}</div>', unsafe_allow_html=True)
+st.markdown(f"<p style='color:#64748b;font-size:13px;margin-bottom:1.5rem'>Deep AI analysis tailored specifically for your {dtype} dataset. All insights use actual numbers from your data.</p>", unsafe_allow_html=True)
 
-    ai_sections = [
-        ("ai_exec",   "exec",       "🏢 Executive Summary",  "Key findings, risks and recommendations"),
-        ("ai_trends", "trends",     "📈 Trend Analysis",      "Time patterns, growth rates, forecasting"),
-        ("ai_cat",    "categories", "📦 Category Insights",   "Segment performance and quick wins"),
-        ("ai_anomaly","anomalies",  "🔍 Data Quality Report", "Outliers, anomalies and data issues"),
-    ]
-    for key, page_key, title, desc in ai_sections:
-        with st.expander(f"{title} — {desc}", expanded=(key=="ai_exec")):
-            if key not in st.session_state:
-                st.session_state[key] = st.write_stream(get_ai_analysis(df_info, dtype, page_key))
-            else:
-                st.markdown(
-                    f'<div class="ai-box"><div class="ai-box-title">{title}</div>'
-                    f'<div class="ai-box-text">{st.session_state[key].replace(chr(10),"<br>")}</div></div>',
-                    unsafe_allow_html=True)
-            if st.button(f"↻ Regenerate", key=f"regen_{key}"):
-                del st.session_state[key]; st.rerun()
-
-    st.markdown('<div class="sec-head">Data Chat — Ask a Question, Get an Answer</div>', unsafe_allow_html=True)
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
-    for msg in st.session_state.messages:
-        if msg["role"] == "user":
-            st.markdown(f'<div class="chat-user">🧑 {msg["content"]}</div>', unsafe_allow_html=True)
+ai_sections = [
+    ("ai_exec",   "exec",       "🏢 Executive Summary",  "Key findings, risks and recommendations"),
+    ("ai_trends", "trends",     "📈 Trend Analysis",      "Time patterns, growth rates, forecasting"),
+    ("ai_cat",    "categories", "📦 Category Insights",   "Segment performance and quick wins"),
+    ("ai_anomaly","anomalies",  "🔍 Data Quality Report", "Outliers, anomalies and data issues"),
+]
+for key, page_key, title, desc in ai_sections:
+    with st.expander(f"{title} — {desc}", expanded=(key=="ai_exec")):
+        if key not in st.session_state:
+            st.session_state[key] = st.write_stream(get_ai_analysis(df_info, dtype, page_key))
         else:
-            st.markdown(f'<div class="chat-ai">🤖 {msg["content"].replace(chr(10), "<br>")}</div>', unsafe_allow_html=True)
-    with st.form("chat", clear_on_submit=True):
-        qc1, qc2 = st.columns([5,1])
-        with qc1:
-            q = st.text_input("", placeholder=f"Ask anything about your {dtype} data...", label_visibility="collapsed")
-        with qc2:
-            sub = st.form_submit_button("Ask →", use_container_width=True)
-    if sub and q:
-        st.session_state.messages.append({"role":"user","content":q})
-        answer = st.write_stream(ask_claude(q, df_info, dtype))
-        st.session_state.messages.append({"role":"assistant","content":answer})
-        st.rerun()
-    if st.session_state.get("messages"):
-        if st.button("Clear chat"):
-            st.session_state.messages = []; st.rerun()
+            st.markdown(
+                f'<div class="ai-box"><div class="ai-box-title">{title}</div>'
+                f'<div class="ai-box-text">{st.session_state[key].replace(chr(10),"<br>")}</div></div>',
+                unsafe_allow_html=True)
+        if st.button(f"↻ Regenerate", key=f"regen_{key}"):
+            del st.session_state[key]; st.rerun()
+
+st.markdown('<div class="sec-head">Data Chat — Ask a Question, Get an Answer</div>', unsafe_allow_html=True)
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+for msg in st.session_state.messages:
+    if msg["role"] == "user":
+        st.markdown(f'<div class="chat-user">🧑 {msg["content"]}</div>', unsafe_allow_html=True)
+    else:
+        st.markdown(f'<div class="chat-ai">🤖 {msg["content"].replace(chr(10), "<br>")}</div>', unsafe_allow_html=True)
+with st.form("chat", clear_on_submit=True):
+    qc1, qc2 = st.columns([5,1])
+    with qc1:
+        q = st.text_input("", placeholder=f"Ask anything about your {dtype} data...", label_visibility="collapsed")
+    with qc2:
+        sub = st.form_submit_button("Ask →", use_container_width=True)
+if sub and q:
+    st.session_state.messages.append({"role":"user","content":q})
+    answer = st.write_stream(ask_claude(q, df_info, dtype))
+    st.session_state.messages.append({"role":"assistant","content":answer})
+    st.rerun()
+if st.session_state.get("messages"):
+    if st.button("Clear chat"):
+        st.session_state.messages = []; st.rerun()
+_sec_divider()
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PAGE: DATA TABLE
+# PAGE: DATA CLEANING
 # ══════════════════════════════════════════════════════════════════════════════
-elif active_view == "table":
-    st.markdown('<div class="sec-head">Data Table</div>', unsafe_allow_html=True)
-    search = st.text_input("", placeholder="🔍 Search / filter rows...", label_visibility="collapsed")
-    display_df = df
-    if search:
-        _safe = re.escape(search)
-        mask = df.apply(lambda row: row.astype(str).str.contains(_safe, case=False, na=False, regex=True).any(), axis=1)
-        display_df = df[mask]
-        st.caption(f"{len(display_df):,} rows matching '{search}'")
-    st.dataframe(display_df, use_container_width=True, height=520)
-    dl1, dl2 = st.columns(2)
-    with dl1:
-        csv2 = display_df.to_csv(index=False).encode('utf-8')
-        st.download_button("⬇ Download filtered CSV", csv2, f"{file_title}_filtered.csv", "text/csv", use_container_width=True)
-    with dl2:
-        st.caption(f"{len(display_df):,} of {len(df):,} rows shown")
+_sec_anchor("clean")
+st.markdown('<div class="sec-head">🧹 Data Cleaning Panel — Fix Missing Values, Duplicates & Columns</div>', unsafe_allow_html=True)
+
+_work_df = df.copy()
+total_missing = int(_work_df.isnull().sum().sum())
+dupes = int(_work_df.duplicated().sum())
+completeness = round((1 - _work_df.isnull().sum().sum() / (_work_df.shape[0]*_work_df.shape[1])) * 100, 1)
+
+cl1, cl2, cl3, cl4 = st.columns(4)
+with cl1:
+    st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#2563eb"></div><div class="kpi-label">Completeness</div><div class="kpi-value">{completeness}%</div></div>', unsafe_allow_html=True)
+with cl2:
+    st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:{"#ef4444" if total_missing>0 else "#10b981"}"></div><div class="kpi-label">Missing Values</div><div class="kpi-value">{total_missing:,}</div><div class="kpi-sub">Across all columns</div></div>', unsafe_allow_html=True)
+with cl3:
+    st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:{"#ef4444" if dupes>0 else "#10b981"}"></div><div class="kpi-label">Duplicate Rows</div><div class="kpi-value">{dupes:,}</div></div>', unsafe_allow_html=True)
+with cl4:
+    is_modified = st.session_state.get("df_modified_for") == _stored["name"]
+    st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#8b5cf6"></div><div class="kpi-label">Dataset Status</div><div class="kpi-value" style="font-size:16px">{"✏ Modified" if is_modified else "✅ Original"}</div></div>', unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+tab_missing, tab_dupes, tab_cols = st.tabs(["📭 Missing Values", "🔄 Duplicates", "🗂️ Drop Columns"])
+
+with tab_missing:
+    cols_with_missing = [c for c in _work_df.columns if _work_df[c].isna().sum() > 0]
+    if not cols_with_missing:
+        st.success("✅ No missing values found in your dataset!")
+    else:
+        st.markdown(f"<p style='color:#64748b;font-size:13px'>{len(cols_with_missing)} column(s) have missing values. Choose how to handle each.</p>", unsafe_allow_html=True)
+        fill_actions = {}
+        for col in cols_with_missing:
+            miss_count = int(_work_df[col].isna().sum())
+            miss_pct = round(miss_count / len(_work_df) * 100, 1)
+            is_num = pd.api.types.is_numeric_dtype(_work_df[col])
+            mc1, mc2, mc3 = st.columns([2, 1.5, 1.5])
+            with mc1:
+                st.markdown(
+                    f'<div style="padding:8px 0">'
+                    f'<div style="font-size:13px;font-weight:600;color:#0d1f3c">{col}</div>'
+                    f'<div style="font-size:11px;color:#94a3b8">{miss_count:,} missing ({miss_pct}%)</div>'
+                    f'</div>', unsafe_allow_html=True)
+            with mc2:
+                if is_num:
+                    opts = ["Leave as-is", "Fill with Mean", "Fill with Median", "Fill with Zero", "Drop rows"]
+                else:
+                    opts = ["Leave as-is", "Fill with Mode", "Fill with 'Unknown'", "Drop rows"]
+                action = st.selectbox("", opts, key=f"fill_{col}", label_visibility="collapsed")
+                fill_actions[col] = action
+            with mc3:
+                if is_num and "Mean" in action:
+                    st.caption(f"→ will fill with {fmt_plain(_work_df[col].mean())}")
+                elif is_num and "Median" in action:
+                    st.caption(f"→ will fill with {fmt_plain(_work_df[col].median())}")
+                elif is_num and "Zero" in action:
+                    st.caption("→ will fill with 0")
+                elif "Mode" in action:
+                    mode_v = _work_df[col].mode()
+                    st.caption(f"→ will fill with '{mode_v[0] if len(mode_v) else '?'}'")
+                elif "Unknown" in action:
+                    st.caption("→ will fill with 'Unknown'")
+                elif "Drop" in action:
+                    st.caption(f"→ will drop {miss_count} rows")
+
+        if st.button("✅ Apply Missing Value Fixes", type="primary", key="apply_missing"):
+            new_df = _work_df.copy()
+            for col, action in fill_actions.items():
+                if action == "Fill with Mean":
+                    new_df[col] = new_df[col].fillna(new_df[col].mean())
+                elif action == "Fill with Median":
+                    new_df[col] = new_df[col].fillna(new_df[col].median())
+                elif action == "Fill with Zero":
+                    new_df[col] = new_df[col].fillna(0)
+                elif action == "Fill with Mode":
+                    mv = new_df[col].mode()
+                    if len(mv): new_df[col] = new_df[col].fillna(mv[0])
+                elif action == "Fill with 'Unknown'":
+                    new_df[col] = new_df[col].fillna("Unknown")
+                elif action == "Drop rows":
+                    new_df = new_df.dropna(subset=[col])
+            st.session_state["df_modified"] = new_df.reset_index(drop=True)
+            st.session_state["df_modified_for"] = _stored["name"]
+            for k in list(st.session_state.keys()):
+                if k.startswith("ai_"): del st.session_state[k]
+            st.success(f"✅ Applied! Dataset now has {len(new_df):,} rows and {new_df.isnull().sum().sum()} missing values.")
+            st.rerun()
+
+with tab_dupes:
+    if dupes == 0:
+        st.success("✅ No duplicate rows found in your dataset!")
+    else:
+        st.warning(f"⚠️ Found **{dupes:,}** duplicate row(s) — {round(dupes/len(_work_df)*100,1)}% of your data.")
+        with st.expander("Preview duplicate rows (first 20)"):
+            st.dataframe(_work_df[_work_df.duplicated(keep=False)].head(20), use_container_width=True)
+        if st.button(f"🗑️ Remove All {dupes:,} Duplicate Rows", type="primary", key="remove_dupes"):
+            new_df = _work_df.drop_duplicates().reset_index(drop=True)
+            st.session_state["df_modified"] = new_df
+            st.session_state["df_modified_for"] = _stored["name"]
+            for k in list(st.session_state.keys()):
+                if k.startswith("ai_"): del st.session_state[k]
+            st.success(f"✅ Removed {dupes:,} duplicates. {len(new_df):,} unique rows remain.")
+            st.rerun()
+
+with tab_cols:
+    st.markdown("<p style='color:#64748b;font-size:13px'>Select columns to permanently remove from the working dataset.</p>", unsafe_allow_html=True)
+    cols_to_drop = st.multiselect("Columns to drop", options=_work_df.columns.tolist(), key="cols_to_drop")
+    if cols_to_drop:
+        st.warning(f"Will remove: **{', '.join(cols_to_drop)}**  ({len(_work_df.columns) - len(cols_to_drop)} columns will remain)")
+        if st.button(f"🗑️ Drop {len(cols_to_drop)} Column(s)", type="primary", key="drop_cols"):
+            new_df = _work_df.drop(columns=cols_to_drop)
+            st.session_state["df_modified"] = new_df
+            st.session_state["df_modified_for"] = _stored["name"]
+            for k in list(st.session_state.keys()):
+                if k.startswith("ai_"): del st.session_state[k]
+            st.success(f"✅ Dropped {len(cols_to_drop)} column(s). {len(new_df.columns)} columns remain.")
+            st.rerun()
+
+st.markdown("<br>", unsafe_allow_html=True)
+if st.session_state.get("df_modified_for") == _stored["name"]:
+    st.markdown('<div class="sec-head">Reset to Original</div>', unsafe_allow_html=True)
+    st.markdown("<p style='color:#64748b;font-size:13px'>Undo all cleaning changes and restore the original uploaded data.</p>", unsafe_allow_html=True)
+    if st.button("↺ Reset to Original Data", key="reset_clean"):
+        st.session_state["df_modified"] = None
+        st.session_state["df_modified_for"] = None
+        for k in list(st.session_state.keys()):
+            if k.startswith("ai_"): del st.session_state[k]
+        st.success("✅ Restored to original data.")
+        st.rerun()
+_sec_divider()
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: DATA AGENT
 # ══════════════════════════════════════════════════════════════════════════════
-elif active_view == "agent":
-    st.markdown(f'''
-    <div style="background:linear-gradient(135deg,#0f172a,#1e3a5f);border-radius:16px;
-    padding:1.5rem 2rem;margin-bottom:1.5rem;border:1px solid #1e293b">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-        <span style="font-size:28px">🤖</span>
-        <div>
-          <div style="font-size:16px;font-weight:800;color:#f1f5f9">Data Agent</div>
-          <div style="font-size:12px;color:#64748b">Ask questions in plain English — get back data, tables and charts</div>
-        </div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">
-        <span style="background:rgba(255,255,255,0.08);border-radius:20px;padding:3px 12px;font-size:11px;color:#94a3b8">🔍 Filter data</span>
-        <span style="background:rgba(255,255,255,0.08);border-radius:20px;padding:3px 12px;font-size:11px;color:#94a3b8">📊 Aggregate & group</span>
-        <span style="background:rgba(255,255,255,0.08);border-radius:20px;padding:3px 12px;font-size:11px;color:#94a3b8">📈 Show charts</span>
-        <span style="background:rgba(255,255,255,0.08);border-radius:20px;padding:3px 12px;font-size:11px;color:#94a3b8">🔢 Calculate stats</span>
-        <span style="background:rgba(255,255,255,0.08);border-radius:20px;padding:3px 12px;font-size:11px;color:#94a3b8">📋 Export results</span>
-      </div>
+_sec_anchor("agent")
+st.markdown(f'''
+<div style="background:linear-gradient(135deg,#0f172a,#1e3a5f);border-radius:16px;
+padding:1.5rem 2rem;margin-bottom:1.5rem;border:1px solid #1e293b">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+    <span style="font-size:28px">🤖</span>
+    <div>
+      <div style="font-size:16px;font-weight:800;color:#f1f5f9">Data Agent</div>
+      <div style="font-size:12px;color:#64748b">Ask questions in plain English — get back data, tables and charts</div>
     </div>
-    ''', unsafe_allow_html=True)
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">
+    <span style="background:rgba(255,255,255,0.08);border-radius:20px;padding:3px 12px;font-size:11px;color:#94a3b8">🔍 Filter data</span>
+    <span style="background:rgba(255,255,255,0.08);border-radius:20px;padding:3px 12px;font-size:11px;color:#94a3b8">📊 Aggregate & group</span>
+    <span style="background:rgba(255,255,255,0.08);border-radius:20px;padding:3px 12px;font-size:11px;color:#94a3b8">📈 Show charts</span>
+    <span style="background:rgba(255,255,255,0.08);border-radius:20px;padding:3px 12px;font-size:11px;color:#94a3b8">🔢 Calculate stats</span>
+    <span style="background:rgba(255,255,255,0.08);border-radius:20px;padding:3px 12px;font-size:11px;color:#94a3b8">📋 Export results</span>
+  </div>
+</div>
+''', unsafe_allow_html=True)
 
-    # ── DYNAMIC quick queries based on ACTUAL columns in uploaded file ──────────
-    def build_quick_queries(df, col_analysis, dtype):
-        nums = col_analysis["numeric"]
-        cats = col_analysis["categorical"]
-        dates = col_analysis["date"]
-        qs = []
+# ── DYNAMIC quick queries based on ACTUAL columns in uploaded file ──────────
+def build_quick_queries(df, col_analysis, dtype):
+    nums = col_analysis["numeric"]
+    cats = col_analysis["categorical"]
+    dates = col_analysis["date"]
+    qs = []
 
-        # Top N by first numeric
-        if nums and cats:
-            qs.append(f"Show top 10 rows by {nums[0]}")
-            qs.append(f"Group by {cats[0]} and sum {nums[0]}")
-            qs.append(f"Which {cats[0]} has the highest {nums[0]}?")
-            qs.append(f"Which {cats[0]} has the lowest {nums[0]}?")
+    # Top N by first numeric
+    if nums and cats:
+        qs.append(f"Show top 10 rows by {nums[0]}")
+        qs.append(f"Group by {cats[0]} and sum {nums[0]}")
+        qs.append(f"Which {cats[0]} has the highest {nums[0]}?")
+        qs.append(f"Which {cats[0]} has the lowest {nums[0]}?")
 
-        # Filter by numeric threshold
-        if nums:
-            avg_val = df[nums[0]].mean()
-            qs.append(f"Filter rows where {nums[0]} > {avg_val:.0f}")
-            qs.append(f"Show top 5 rows sorted by {nums[0]} descending")
-            qs.append(f"What is the average {nums[0]} by {cats[0]}?" if cats else f"Show summary stats for {nums[0]}")
+    # Filter by numeric threshold
+    if nums:
+        avg_val = df[nums[0]].mean()
+        qs.append(f"Filter rows where {nums[0]} > {avg_val:.0f}")
+        qs.append(f"Show top 5 rows sorted by {nums[0]} descending")
+        qs.append(f"What is the average {nums[0]} by {cats[0]}?" if cats else f"Show summary stats for {nums[0]}")
 
-        # Date-based queries
-        if dates and nums:
-            qs.append(f"Show {nums[0]} trend over time")
-            qs.append(f"Which month has the highest {nums[0]}?")
+    # Date-based queries
+    if dates and nums:
+        qs.append(f"Show {nums[0]} trend over time")
+        qs.append(f"Which month has the highest {nums[0]}?")
 
-        # Second numeric column
-        if len(nums) >= 2:
-            qs.append(f"Compare {nums[0]} vs {nums[1]} by {cats[0]}" if cats else f"Show {nums[0]} vs {nums[1]}")
-            qs.append(f"Show correlation between {nums[0]} and {nums[1]}")
+    # Second numeric column
+    if len(nums) >= 2:
+        qs.append(f"Compare {nums[0]} vs {nums[1]} by {cats[0]}" if cats else f"Show {nums[0]} vs {nums[1]}")
+        qs.append(f"Show correlation between {nums[0]} and {nums[1]}")
 
-        # Second categorical
-        if len(cats) >= 2 and nums:
-            qs.append(f"Group by {cats[1]} and sum {nums[0]}")
+    # Second categorical
+    if len(cats) >= 2 and nums:
+        qs.append(f"Group by {cats[1]} and sum {nums[0]}")
 
-        # Status/categorical filter
-        for cat in cats:
-            unique_vals = df[cat].dropna().unique()
-            if len(unique_vals) <= 6:
-                qs.append(f"Show rows where {cat} = {unique_vals[0]}")
-                break
+    # Status/categorical filter
+    for cat in cats:
+        unique_vals = df[cat].dropna().unique()
+        if len(unique_vals) <= 6:
+            qs.append(f"Show rows where {cat} = {unique_vals[0]}")
+            break
 
-        # Always include these
-        qs.append("Show summary statistics for all columns")
-        qs.append("Find rows with missing values")
-        qs.append(f"Show first 20 rows")
+    # Always include these
+    qs.append("Show summary statistics for all columns")
+    qs.append("Find rows with missing values")
+    qs.append(f"Show first 20 rows")
 
-        return qs[:12]  # max 12 queries
+    return qs[:12]  # max 12 queries
 
-    qs = build_quick_queries(df, col_analysis, dtype)
+qs = build_quick_queries(df, col_analysis, dtype)
 
-    # Quick question buttons - clicking sets pending and reruns
-    st.markdown('<div class="sec-head">Quick Queries — Tailored to Your Data</div>', unsafe_allow_html=True)
-    btn_cols = st.columns(3)
-    for i, q_text in enumerate(qs):
-        with btn_cols[i % 3]:
-            if st.button(q_text, key=f"quick_{i}", use_container_width=True):
-                if "agent_messages" not in st.session_state:
-                    st.session_state.agent_messages = []
-                st.session_state["agent_auto_q"] = q_text
-                st.rerun()
+# Quick question buttons - clicking sets pending and reruns
+st.markdown('<div class="sec-head">Quick Queries — Tailored to Your Data</div>', unsafe_allow_html=True)
+btn_cols = st.columns(3)
+for i, q_text in enumerate(qs):
+    with btn_cols[i % 3]:
+        if st.button(q_text, key=f"quick_{i}", use_container_width=True):
+            if "agent_messages" not in st.session_state:
+                st.session_state.agent_messages = []
+            st.session_state["agent_auto_q"] = q_text
+            st.rerun()
 
-    st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
 
-    # Chat area
-    if "agent_messages" not in st.session_state:
-        st.session_state.agent_messages = []
+# Chat area
+if "agent_messages" not in st.session_state:
+    st.session_state.agent_messages = []
 
-    # Display chat history
-    for msg in st.session_state.agent_messages:
-        if msg["role"] == "user":
-            st.markdown(f'<div class="chat-user">🧑 {msg["content"]}</div>', unsafe_allow_html=True)
-        else:
-            st.markdown(f'<div class="chat-ai">🤖 {msg["content"].replace(chr(10), "<br>")}</div>', unsafe_allow_html=True)
-            if "dataframe" in msg:
-                st.dataframe(msg["dataframe"], use_container_width=True)
-                csv_out = msg["dataframe"].to_csv(index=False).encode("utf-8")
-                st.download_button("⬇ Download this result", csv_out,
-                                   "query_result.csv", "text/csv",
-                                   key=f"dl_{msg.get('id',0)}")
-            if "chart" in msg:
-                st.plotly_chart(msg["chart"], use_container_width=True)
-            if "code" in msg:
-                with st.expander("📝 View generated code"):
-                    st.code(msg["code"], language="python")
+# Display chat history
+for msg in st.session_state.agent_messages:
+    if msg["role"] == "user":
+        st.markdown(f'<div class="chat-user">🧑 {msg["content"]}</div>', unsafe_allow_html=True)
+    else:
+        st.markdown(f'<div class="chat-ai">🤖 {msg["content"].replace(chr(10), "<br>")}</div>', unsafe_allow_html=True)
+        if "dataframe" in msg:
+            st.dataframe(msg["dataframe"], use_container_width=True)
+            csv_out = msg["dataframe"].to_csv(index=False).encode("utf-8")
+            st.download_button("⬇ Download this result", csv_out,
+                               "query_result.csv", "text/csv",
+                               key=f"dl_{msg.get('id',0)}")
+        if "chart" in msg:
+            st.plotly_chart(msg["chart"], use_container_width=True)
+        if "code" in msg:
+            with st.expander("📝 View generated code"):
+                st.code(msg["code"], language="python")
 
-    # Input form — handle quick query auto-submit
-    auto_q = st.session_state.pop("agent_auto_q", None)
+# Input form — handle quick query auto-submit
+auto_q = st.session_state.pop("agent_auto_q", None)
 
-    with st.form("agent_form", clear_on_submit=True):
-        fc1, fc2 = st.columns([5, 1])
-        with fc1:
-            ph = f"e.g. Show top 10 rows by {col_analysis['numeric'][0] if col_analysis['numeric'] else 'value'}..."
-            agent_q = st.text_input("", placeholder=ph, label_visibility="collapsed")
-        with fc2:
-            agent_sub = st.form_submit_button("Query →", use_container_width=True)
+with st.form("agent_form", clear_on_submit=True):
+    fc1, fc2 = st.columns([5, 1])
+    with fc1:
+        ph = f"e.g. Show top 10 rows by {col_analysis['numeric'][0] if col_analysis['numeric'] else 'value'}..."
+        agent_q = st.text_input("", placeholder=ph, label_visibility="collapsed")
+    with fc2:
+        agent_sub = st.form_submit_button("Query →", use_container_width=True)
 
-    # If quick button was clicked, use that as the query
-    if auto_q and not agent_sub:
-        agent_q  = auto_q
-        agent_sub = True
+# If quick button was clicked, use that as the query
+if auto_q and not agent_sub:
+    agent_q  = auto_q
+    agent_sub = True
 
-    if agent_sub and agent_q:
-        st.session_state.agent_messages.append({"role": "user", "content": agent_q})
+if agent_sub and agent_q:
+    st.session_state.agent_messages.append({"role": "user", "content": agent_q})
 
-        # Ask Claude to write pandas code to answer the question
-        with st.spinner("Thinking..."):
-            try:
-                client = anthropic.Anthropic()
-                system = f"""You are a data analyst and Python/pandas expert.
+    # Ask Claude to write pandas code to answer the question
+    with st.spinner("Thinking..."):
+        try:
+            client = anthropic.Anthropic()
+            system = f"""You are a data analyst and Python/pandas expert.
 The user has a dataframe called `df` with these properties:
 - Shape: {df.shape[0]} rows x {df.shape[1]} columns
 - Columns: {df.columns.tolist()}
@@ -2659,366 +2901,107 @@ Rules:
 - NEVER import anything - only use df, pd, and np which are already available
 - Output ONLY the Python code, no explanation, no markdown, no backticks"""
 
-                response = client.messages.create(
-                    model=MODEL,
-                    max_tokens=1000,
-                    system=system,
-                    messages=[{"role": "user", "content": agent_q}]
-                )
+            response = client.messages.create(
+                model=MODEL,
+                max_tokens=1000,
+                system=system,
+                messages=[{"role": "user", "content": agent_q}]
+            )
 
-                code = response.content[0].text.strip()
-                # Remove any accidental markdown fences
-                if "```" in code:
-                    m = re.search(r"```(?:python)?\n?(.*?)```", code, re.DOTALL)
-                    if m:
-                        code = m.group(1).strip()
-                    else:
-                        code = code.replace("```python", "").replace("```", "").strip()
+            code = response.content[0].text.strip()
+            # Remove any accidental markdown fences
+            if "```" in code:
+                m = re.search(r"```(?:python)?\n?(.*?)```", code, re.DOTALL)
+                if m:
+                    code = m.group(1).strip()
+                else:
+                    code = code.replace("```python", "").replace("```", "").strip()
 
-                # Execute the code
-                exec_globals = {"df": df.copy(), "pd": pd, "np": np,
-                                "result": None, "answer_text": ""}
-                try:
-                    exec(code, exec_globals)
-                    result = exec_globals.get("result")
-                    answer_text = exec_globals.get("answer_text", "")
+            # Execute the code
+            exec_globals = {"df": df.copy(), "pd": pd, "np": np,
+                            "result": None, "answer_text": ""}
+            try:
+                exec(code, exec_globals)
+                result = exec_globals.get("result")
+                answer_text = exec_globals.get("answer_text", "")
 
-                    msg = {"role": "assistant", "id": len(st.session_state.agent_messages),
-                           "content": answer_text or "Here are the results:", "code": code}
+                msg = {"role": "assistant", "id": len(st.session_state.agent_messages),
+                       "content": answer_text or "Here are the results:", "code": code}
 
-                    if isinstance(result, pd.DataFrame):
-                        msg["dataframe"] = result
-                        msg["content"] = (answer_text or
-                                          f"Found {len(result):,} rows matching your query.")
+                if isinstance(result, pd.DataFrame):
+                    msg["dataframe"] = result
+                    msg["content"] = (answer_text or
+                                      f"Found {len(result):,} rows matching your query.")
 
-                    elif isinstance(result, dict):
-                        if "answer" in result:
-                            msg["content"] = result["answer"]
-                        if "dataframe" in result and isinstance(result["dataframe"], pd.DataFrame):
-                            msg["dataframe"] = result["dataframe"]
-                        # Build chart if requested
-                        if "chart_type" in result and "dataframe" in result:
-                            try:
-                                cdf = result["dataframe"]
-                                if len(cdf.columns) == 0:
-                                    raise ValueError("Chart DataFrame has no columns")
-                                cx  = result.get("chart_x", cdf.columns[0])
-                                cy  = result.get("chart_y", cdf.columns[1] if len(cdf.columns)>1 else cdf.columns[0])
-                                cc  = result.get("chart_color")
-                                ct  = result["chart_type"]
-                                if ct == "bar":
-                                    fig = px.bar(cdf, x=cx, y=cy, color=cc,
+                elif isinstance(result, dict):
+                    if "answer" in result:
+                        msg["content"] = result["answer"]
+                    if "dataframe" in result and isinstance(result["dataframe"], pd.DataFrame):
+                        msg["dataframe"] = result["dataframe"]
+                    # Build chart if requested
+                    if "chart_type" in result and "dataframe" in result:
+                        try:
+                            cdf = result["dataframe"]
+                            if len(cdf.columns) == 0:
+                                raise ValueError("Chart DataFrame has no columns")
+                            cx  = result.get("chart_x", cdf.columns[0])
+                            cy  = result.get("chart_y", cdf.columns[1] if len(cdf.columns)>1 else cdf.columns[0])
+                            cc  = result.get("chart_color")
+                            ct  = result["chart_type"]
+                            if ct == "bar":
+                                fig = px.bar(cdf, x=cx, y=cy, color=cc,
+                                             color_discrete_sequence=COLORS)
+                            elif ct == "line":
+                                fig = px.line(cdf, x=cx, y=cy, color=cc,
+                                              color_discrete_sequence=COLORS,
+                                              markers=True)
+                            elif ct == "pie":
+                                fig = px.pie(cdf, names=cx, values=cy,
+                                             color_discrete_sequence=COLORS, hole=0.4)
+                            elif ct == "scatter":
+                                fig = px.scatter(cdf, x=cx, y=cy, color=cc,
                                                  color_discrete_sequence=COLORS)
-                                elif ct == "line":
-                                    fig = px.line(cdf, x=cx, y=cy, color=cc,
-                                                  color_discrete_sequence=COLORS,
-                                                  markers=True)
-                                elif ct == "pie":
-                                    fig = px.pie(cdf, names=cx, values=cy,
-                                                 color_discrete_sequence=COLORS, hole=0.4)
-                                elif ct == "scatter":
-                                    fig = px.scatter(cdf, x=cx, y=cy, color=cc,
-                                                     color_discrete_sequence=COLORS)
-                                else:
-                                    fig = None
-                                if fig:
-                                    fig.update_layout(**mk_layout(height=340, showlegend=True))
-                                    msg["chart"] = fig
-                            except Exception:
-                                pass
-                    elif result is not None:
-                        msg["content"] = str(result)
+                            else:
+                                fig = None
+                            if fig:
+                                fig.update_layout(**mk_layout(height=340, showlegend=True))
+                                msg["chart"] = fig
+                        except Exception:
+                            pass
+                elif result is not None:
+                    msg["content"] = str(result)
 
-                    st.session_state.agent_messages.append(msg)
+                st.session_state.agent_messages.append(msg)
 
-                except Exception as exec_err:
-                    # Fallback: ask Claude to just answer in plain text
-                    fallback_text = ""
-                    with client.messages.stream(
-                        model=MODEL, max_tokens=400,
-                        system="You are a data analyst. Dataset:\n" + df_info + "\nAnswer concisely with numbers.",
-                        messages=[{"role": "user", "content": agent_q}]
-                    ) as stream:
-                        for chunk in stream.text_stream:
-                            fallback_text += chunk
-                    st.session_state.agent_messages.append({
-                        "role": "assistant",
-                        "content": fallback_text or "I couldn't compute that. Please try rephrasing.",
-                        "id": len(st.session_state.agent_messages)
-                    })
-
-            except anthropic.AuthenticationError:
+            except Exception as exec_err:
+                # Fallback: ask Claude to just answer in plain text
+                fallback_text = ""
+                with client.messages.stream(
+                    model=MODEL, max_tokens=400,
+                    system="You are a data analyst. Dataset:\n" + df_info + "\nAnswer concisely with numbers.",
+                    messages=[{"role": "user", "content": agent_q}]
+                ) as stream:
+                    for chunk in stream.text_stream:
+                        fallback_text += chunk
                 st.session_state.agent_messages.append({
-                    "role": "assistant", "id": 0,
-                    "content": "Auth error — check your API key."
+                    "role": "assistant",
+                    "content": fallback_text or "I couldn't compute that. Please try rephrasing.",
+                    "id": len(st.session_state.agent_messages)
                 })
-            except Exception as e:
-                st.session_state.agent_messages.append({
-                    "role": "assistant", "id": 0,
-                    "content": f"Error: {e}"
-                })
+
+        except anthropic.AuthenticationError:
+            st.session_state.agent_messages.append({
+                "role": "assistant", "id": 0,
+                "content": "Auth error — check your API key."
+            })
+        except Exception as e:
+            st.session_state.agent_messages.append({
+                "role": "assistant", "id": 0,
+                "content": f"Error: {e}"
+            })
+    st.rerun()
+
+if st.session_state.get("agent_messages"):
+    if st.button("🗑️ Clear conversation", use_container_width=False):
+        st.session_state.agent_messages = []
         st.rerun()
-
-    if st.session_state.get("agent_messages"):
-        if st.button("🗑️ Clear conversation", use_container_width=False):
-            st.session_state.agent_messages = []
-            st.rerun()
-
-# ══════════════════════════════════════════════════════════════════════════════
-# PAGE: DATA CLEANING
-# ══════════════════════════════════════════════════════════════════════════════
-elif active_view == "clean":
-    st.markdown('<div class="sec-head">🧹 Data Cleaning Panel — Fix Missing Values, Duplicates & Columns</div>', unsafe_allow_html=True)
-
-    _work_df = df.copy()
-    total_missing = int(_work_df.isnull().sum().sum())
-    dupes = int(_work_df.duplicated().sum())
-    completeness = round((1 - _work_df.isnull().sum().sum() / (_work_df.shape[0]*_work_df.shape[1])) * 100, 1)
-
-    cl1, cl2, cl3, cl4 = st.columns(4)
-    with cl1:
-        st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#2563eb"></div><div class="kpi-label">Completeness</div><div class="kpi-value">{completeness}%</div></div>', unsafe_allow_html=True)
-    with cl2:
-        st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:{"#ef4444" if total_missing>0 else "#10b981"}"></div><div class="kpi-label">Missing Values</div><div class="kpi-value">{total_missing:,}</div><div class="kpi-sub">Across all columns</div></div>', unsafe_allow_html=True)
-    with cl3:
-        st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:{"#ef4444" if dupes>0 else "#10b981"}"></div><div class="kpi-label">Duplicate Rows</div><div class="kpi-value">{dupes:,}</div></div>', unsafe_allow_html=True)
-    with cl4:
-        is_modified = st.session_state.get("df_modified_for") == _stored["name"]
-        st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#8b5cf6"></div><div class="kpi-label">Dataset Status</div><div class="kpi-value" style="font-size:16px">{"✏ Modified" if is_modified else "✅ Original"}</div></div>', unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    tab_missing, tab_dupes, tab_cols = st.tabs(["📭 Missing Values", "🔄 Duplicates", "🗂️ Drop Columns"])
-
-    with tab_missing:
-        cols_with_missing = [c for c in _work_df.columns if _work_df[c].isna().sum() > 0]
-        if not cols_with_missing:
-            st.success("✅ No missing values found in your dataset!")
-        else:
-            st.markdown(f"<p style='color:#64748b;font-size:13px'>{len(cols_with_missing)} column(s) have missing values. Choose how to handle each.</p>", unsafe_allow_html=True)
-            fill_actions = {}
-            for col in cols_with_missing:
-                miss_count = int(_work_df[col].isna().sum())
-                miss_pct = round(miss_count / len(_work_df) * 100, 1)
-                is_num = pd.api.types.is_numeric_dtype(_work_df[col])
-                mc1, mc2, mc3 = st.columns([2, 1.5, 1.5])
-                with mc1:
-                    st.markdown(
-                        f'<div style="padding:8px 0">'
-                        f'<div style="font-size:13px;font-weight:600;color:#0d1f3c">{col}</div>'
-                        f'<div style="font-size:11px;color:#94a3b8">{miss_count:,} missing ({miss_pct}%)</div>'
-                        f'</div>', unsafe_allow_html=True)
-                with mc2:
-                    if is_num:
-                        opts = ["Leave as-is", "Fill with Mean", "Fill with Median", "Fill with Zero", "Drop rows"]
-                    else:
-                        opts = ["Leave as-is", "Fill with Mode", "Fill with 'Unknown'", "Drop rows"]
-                    action = st.selectbox("", opts, key=f"fill_{col}", label_visibility="collapsed")
-                    fill_actions[col] = action
-                with mc3:
-                    if is_num and "Mean" in action:
-                        st.caption(f"→ will fill with {fmt_plain(_work_df[col].mean())}")
-                    elif is_num and "Median" in action:
-                        st.caption(f"→ will fill with {fmt_plain(_work_df[col].median())}")
-                    elif is_num and "Zero" in action:
-                        st.caption("→ will fill with 0")
-                    elif "Mode" in action:
-                        mode_v = _work_df[col].mode()
-                        st.caption(f"→ will fill with '{mode_v[0] if len(mode_v) else '?'}'")
-                    elif "Unknown" in action:
-                        st.caption("→ will fill with 'Unknown'")
-                    elif "Drop" in action:
-                        st.caption(f"→ will drop {miss_count} rows")
-
-            if st.button("✅ Apply Missing Value Fixes", type="primary", key="apply_missing"):
-                new_df = _work_df.copy()
-                for col, action in fill_actions.items():
-                    if action == "Fill with Mean":
-                        new_df[col] = new_df[col].fillna(new_df[col].mean())
-                    elif action == "Fill with Median":
-                        new_df[col] = new_df[col].fillna(new_df[col].median())
-                    elif action == "Fill with Zero":
-                        new_df[col] = new_df[col].fillna(0)
-                    elif action == "Fill with Mode":
-                        mv = new_df[col].mode()
-                        if len(mv): new_df[col] = new_df[col].fillna(mv[0])
-                    elif action == "Fill with 'Unknown'":
-                        new_df[col] = new_df[col].fillna("Unknown")
-                    elif action == "Drop rows":
-                        new_df = new_df.dropna(subset=[col])
-                st.session_state["df_modified"] = new_df.reset_index(drop=True)
-                st.session_state["df_modified_for"] = _stored["name"]
-                for k in list(st.session_state.keys()):
-                    if k.startswith("ai_"): del st.session_state[k]
-                st.success(f"✅ Applied! Dataset now has {len(new_df):,} rows and {new_df.isnull().sum().sum()} missing values.")
-                st.rerun()
-
-    with tab_dupes:
-        if dupes == 0:
-            st.success("✅ No duplicate rows found in your dataset!")
-        else:
-            st.warning(f"⚠️ Found **{dupes:,}** duplicate row(s) — {round(dupes/len(_work_df)*100,1)}% of your data.")
-            with st.expander("Preview duplicate rows (first 20)"):
-                st.dataframe(_work_df[_work_df.duplicated(keep=False)].head(20), use_container_width=True)
-            if st.button(f"🗑️ Remove All {dupes:,} Duplicate Rows", type="primary", key="remove_dupes"):
-                new_df = _work_df.drop_duplicates().reset_index(drop=True)
-                st.session_state["df_modified"] = new_df
-                st.session_state["df_modified_for"] = _stored["name"]
-                for k in list(st.session_state.keys()):
-                    if k.startswith("ai_"): del st.session_state[k]
-                st.success(f"✅ Removed {dupes:,} duplicates. {len(new_df):,} unique rows remain.")
-                st.rerun()
-
-    with tab_cols:
-        st.markdown("<p style='color:#64748b;font-size:13px'>Select columns to permanently remove from the working dataset.</p>", unsafe_allow_html=True)
-        cols_to_drop = st.multiselect("Columns to drop", options=_work_df.columns.tolist(), key="cols_to_drop")
-        if cols_to_drop:
-            st.warning(f"Will remove: **{', '.join(cols_to_drop)}**  ({len(_work_df.columns) - len(cols_to_drop)} columns will remain)")
-            if st.button(f"🗑️ Drop {len(cols_to_drop)} Column(s)", type="primary", key="drop_cols"):
-                new_df = _work_df.drop(columns=cols_to_drop)
-                st.session_state["df_modified"] = new_df
-                st.session_state["df_modified_for"] = _stored["name"]
-                for k in list(st.session_state.keys()):
-                    if k.startswith("ai_"): del st.session_state[k]
-                st.success(f"✅ Dropped {len(cols_to_drop)} column(s). {len(new_df.columns)} columns remain.")
-                st.rerun()
-
-    st.markdown("<br>", unsafe_allow_html=True)
-    if st.session_state.get("df_modified_for") == _stored["name"]:
-        st.markdown('<div class="sec-head">Reset to Original</div>', unsafe_allow_html=True)
-        st.markdown("<p style='color:#64748b;font-size:13px'>Undo all cleaning changes and restore the original uploaded data.</p>", unsafe_allow_html=True)
-        if st.button("↺ Reset to Original Data", key="reset_clean"):
-            st.session_state["df_modified"] = None
-            st.session_state["df_modified_for"] = None
-            for k in list(st.session_state.keys()):
-                if k.startswith("ai_"): del st.session_state[k]
-            st.success("✅ Restored to original data.")
-            st.rerun()
-
-# ══════════════════════════════════════════════════════════════════════════════
-# PAGE: FORECASTING
-# ══════════════════════════════════════════════════════════════════════════════
-elif active_view == "forecast":
-    st.markdown('<div class="sec-head">🔮 Forecasting — Predict Future Trends</div>', unsafe_allow_html=True)
-    if not col_analysis["date"] or not col_analysis["numeric"]:
-        st.info("Forecasting requires at least one date column and one numeric column.")
-    else:
-        fc1, fc2, fc3 = st.columns([2, 1, 1])
-        with fc1:
-            fc_num = st.selectbox("Metric to forecast", col_analysis["numeric"], key="fc_num")
-        with fc2:
-            fc_periods = st.selectbox("Forecast periods", [7, 14, 30, 60, 90], index=2, key="fc_periods")
-        with fc3:
-            fc_unit = st.selectbox("Period unit", ["days", "months"], key="fc_unit")
-
-        try:
-            date_col = col_analysis["date"][0]
-            df_fc = df[[date_col, fc_num]].copy().dropna()
-            df_fc[date_col] = pd.to_datetime(df_fc[date_col], errors="coerce")
-            df_fc = df_fc.dropna(subset=[date_col])
-
-            if fc_unit == "months":
-                df_fc["_period"] = df_fc[date_col].dt.to_period("M").dt.to_timestamp()
-            else:
-                df_fc["_period"] = df_fc[date_col].dt.normalize()
-
-            agg = df_fc.groupby("_period")[fc_num].sum().reset_index().sort_values("_period")
-
-            if len(agg) < 3:
-                st.warning("Need at least 3 data points to forecast. Try switching to 'months' unit or upload more data.")
-            else:
-                x = np.arange(len(agg), dtype=float)
-                y = agg[fc_num].values.astype(float)
-                coeffs = np.polyfit(x, y, 1)
-                trend_line = np.polyval(coeffs, x)
-                std_resid = np.std(y - trend_line)
-
-                last_date = agg["_period"].iloc[-1]
-                if fc_unit == "months":
-                    future_dates = [last_date + pd.DateOffset(months=i+1) for i in range(fc_periods)]
-                else:
-                    future_dates = [last_date + pd.Timedelta(days=i+1) for i in range(fc_periods)]
-
-                x_future = np.arange(len(agg), len(agg) + fc_periods, dtype=float)
-                y_forecast = np.polyval(coeffs, x_future)
-
-                fig = go.Figure()
-                fig.add_trace(go.Scatter(
-                    x=agg["_period"], y=y, mode="lines+markers",
-                    name="Historical", line=dict(color="#5b4bff", width=2.5),
-                    marker=dict(size=6, color="#5b4bff")))
-                fig.add_trace(go.Scatter(
-                    x=agg["_period"], y=trend_line, mode="lines",
-                    name="Trend line", line=dict(color="#94a3b8", width=1.5, dash="dot")))
-                fig.add_trace(go.Scatter(
-                    x=future_dates, y=y_forecast, mode="lines+markers",
-                    name="Forecast", line=dict(color="#10b981", width=2.5, dash="dash"),
-                    marker=dict(size=7, color="#10b981", symbol="diamond")))
-                fig.add_trace(go.Scatter(
-                    x=list(future_dates) + list(reversed(future_dates)),
-                    y=list(y_forecast + 1.96*std_resid) + list(reversed(y_forecast - 1.96*std_resid)),
-                    fill="toself", fillcolor="rgba(16,185,129,0.10)",
-                    line=dict(color="rgba(0,0,0,0)"),
-                    name="95% confidence", hoverinfo="skip"))
-
-                fig.add_vline(x=str(last_date), line_width=1.5, line_dash="dash", line_color="#e2e8f0")
-                fig.update_layout(**mk_layout(height=420, showlegend=True))
-                fig.update_layout(
-                    legend=dict(orientation="h", y=1.02, x=0),
-                    xaxis_title="Period",
-                    yaxis_title=fc_num.replace("_", " ").title()
-                )
-                st.plotly_chart(fig, use_container_width=True)
-
-                last_val = float(y[-1])
-                next_val = float(y_forecast[0])
-                end_val  = float(y_forecast[-1])
-                pct_chg  = (next_val - last_val) / abs(last_val) * 100 if last_val != 0 else 0
-                growth_rate = float(coeffs[0])
-
-                fk1, fk2, fk3, fk4 = st.columns(4)
-                with fk1:
-                    dir_color = "#10b981" if growth_rate >= 0 else "#ef4444"
-                    dir_txt   = "▲ Upward" if growth_rate >= 0 else "▼ Downward"
-                    st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:{dir_color}"></div><div class="kpi-label">Trend Direction</div><div class="kpi-value" style="font-size:18px;color:{dir_color}">{dir_txt}</div><div class="kpi-sub">{fmt_plain(abs(growth_rate))} per period</div></div>', unsafe_allow_html=True)
-                with fk2:
-                    st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#5b4bff"></div><div class="kpi-label">Next Period</div><div class="kpi-value">{fmt_plain(next_val)}</div><div class="kpi-sub">Current: {fmt_plain(last_val)}</div></div>', unsafe_allow_html=True)
-                with fk3:
-                    chg_cls = "kpi-up" if pct_chg >= 0 else "kpi-dn"
-                    st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#f59e0b"></div><div class="kpi-label">Expected Change</div><div class="kpi-value"><span class="{chg_cls}">{pct_chg:+.1f}%</span></div><div class="kpi-sub">vs current period</div></div>', unsafe_allow_html=True)
-                with fk4:
-                    st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#8b5cf6"></div><div class="kpi-label">{fc_periods} {fc_unit.title()} Out</div><div class="kpi-value">{fmt_plain(end_val)}</div><div class="kpi-sub">End of forecast range</div></div>', unsafe_allow_html=True)
-
-                st.markdown("<br>", unsafe_allow_html=True)
-
-                fc_cache_key = f"ai_forecast_{fc_num}_{fc_periods}_{fc_unit}"
-                forecast_ctx = (
-                    f"Metric: {fc_num}. Historical periods: {len(agg)}. "
-                    f"Last value: {fmt_plain(last_val)}. "
-                    f"Trend: {'growing' if growth_rate>=0 else 'declining'} at {fmt_plain(abs(growth_rate))} per period. "
-                    f"Next period forecast: {fmt_plain(next_val)} ({pct_chg:+.1f}% change). "
-                    f"{fc_periods}-{fc_unit} forecast end: {fmt_plain(end_val)}. Dataset type: {dtype}."
-                )
-                if fc_cache_key not in st.session_state:
-                    st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#5b4bff;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Forecast Interpretation</div>', unsafe_allow_html=True)
-                    st.session_state[fc_cache_key] = st.write_stream(
-                        ask_claude(
-                            f"Interpret this forecast and give 3-4 specific actionable recommendations: {forecast_ctx}",
-                            df_info, dtype
-                        )
-                    )
-                else:
-                    st.markdown(
-                        f'<div class="ai-box"><div class="ai-box-title">🤖 Forecast Interpretation</div>'
-                        f'<div class="ai-box-text">{st.session_state[fc_cache_key].replace(chr(10),"<br>")}</div></div>',
-                        unsafe_allow_html=True)
-                if st.button("↻ Regenerate interpretation", key="regen_forecast"):
-                    if fc_cache_key in st.session_state:
-                        del st.session_state[fc_cache_key]
-                    st.rerun()
-
-        except Exception as _fe:
-            st.error(f"Forecasting error: {_fe}")
-
-else:
-    st.info("Select a page from the navigation bar above.")
