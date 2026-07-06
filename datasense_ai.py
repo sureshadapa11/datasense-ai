@@ -81,55 +81,50 @@ section[data-testid="stSidebar"] .stSuccess p { color: #059669 !important; font-
 [data-testid="stColumns"] > div { min-width: 0 !important; }
 [data-testid="stColumn"] { min-width: 0 !important; }
 
-/* ── FILE UPLOADER — full card restyle ── */
+/* ── SMART UPLOAD — gradient dropzone ── */
 div[data-testid="stFileUploader"] {
-    background: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
-    padding: 0 !important;
-    margin-top: -3px !important;
+    background: transparent !important; border: none !important;
+    padding: 0 !important; margin: 0 !important;
 }
+div[data-testid="stFileUploader"] label { display: none !important; }
 section[data-testid="stFileUploaderDropzone"] {
-    background: #f8f7ff !important;
-    border: 2px dashed #c4b5fd !important;
-    border-top: none !important;
-    border-radius: 0 0 20px 20px !important;
-    padding: 0.5rem 2rem 2rem !important;
-    transition: background 0.2s, border-color 0.2s !important;
-    min-height: 80px !important;
+    background: linear-gradient(135deg,#4f46e5 0%,#6d28d9 60%,#5b4bff 100%) !important;
+    border: none !important; border-radius: 18px !important;
+    padding: 1.4rem 1.8rem !important; min-height: 80px !important;
+    box-shadow: 0 8px 32px rgba(79,70,229,0.28) !important;
+    transition: box-shadow 0.2s !important;
 }
 section[data-testid="stFileUploaderDropzone"]:hover {
-    background: #f0eeff !important;
-    border-color: #5b4bff !important;
+    box-shadow: 0 12px 40px rgba(79,70,229,0.38) !important;
 }
 section[data-testid="stFileUploaderDropzone"] > div {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 0 !important;
-    padding: 0.75rem 0 !important;
+    display: flex !important; flex-direction: row !important;
+    align-items: center !important; justify-content: space-between !important;
+    gap: 16px !important; padding: 0 !important;
 }
-/* Browse files button — filled violet pill */
 section[data-testid="stFileUploaderDropzone"] button {
-    background: #5b4bff !important;
-    color: #ffffff !important;
-    border: none !important;
-    border-radius: 10px !important;
-    font-size: 14px !important;
-    font-weight: 600 !important;
-    padding: 0.6rem 2rem !important;
-    box-shadow: 0 4px 14px rgba(91,75,255,0.28) !important;
-    transition: all 0.18s ease !important;
-    min-width: 160px !important;
+    background: rgba(255,255,255,0.22) !important; color: #fff !important;
+    border: 1px solid rgba(255,255,255,0.35) !important; border-radius: 12px !important;
+    font-size: 13px !important; font-weight: 700 !important;
+    padding: 0.55rem 1.4rem !important; white-space: nowrap !important;
+    backdrop-filter: blur(8px) !important; min-width: auto !important;
+    box-shadow: none !important; transition: background 0.18s !important;
+    flex-shrink: 0 !important;
 }
 section[data-testid="stFileUploaderDropzone"] button:hover {
-    background: #4c3de0 !important;
-    box-shadow: 0 6px 20px rgba(91,75,255,0.38) !important;
-    transform: translateY(-1px) !important;
+    background: rgba(255,255,255,0.32) !important;
+    transform: none !important; box-shadow: none !important;
 }
-/* Hide the collapsed uploader label entirely */
-div[data-testid="stFileUploader"] label { display: none !important; }
+div[data-testid="stFileUploaderDropzoneInstructions"] {
+    flex: 1 !important; text-align: left !important;
+}
+div[data-testid="stFileUploaderDropzoneInstructions"] span {
+    color: rgba(255,255,255,0.9) !important; font-size: 14px !important;
+    font-weight: 500 !important;
+}
+div[data-testid="stFileUploaderDropzoneInstructions"] small {
+    color: rgba(255,255,255,0.6) !important; font-size: 12px !important;
+}
 
 /* ── TABS ── */
 .stTabs [data-baseweb="tab-list"] {
@@ -1826,23 +1821,40 @@ if not st.session_state["stored_file"]:
                                                        "name": "sample_sales_data.csv"}
                 st.rerun()
 
-    # ── UPLOADER REVEAL (shown only after clicking Upload button) ─────────────
+    # ── UPLOADER REVEAL ───────────────────────────────────────────────────────
     if st.session_state.get("show_uploader"):
-        st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
-        _ul, _uc, _ur = st.columns([0.8, 2.4, 0.8])
+        st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
+        _ul, _uc, _ur = st.columns([0.6, 2.8, 0.6])
         with _uc:
-            # Header only — no merging with native dropzone
+            # ── Cloud icon + headline ────────────────────────────────────────
             st.markdown("""
-            <div style='text-align:center;padding:0.5rem 0 1rem'>
-              <div style='font-size:38px;line-height:1;margin-bottom:10px'>☁️</div>
-              <div style='font-size:17px;font-weight:700;color:#0d1f3c;margin-bottom:4px'>
-                Upload your data file
+            <div style='text-align:center;padding:0.25rem 0 1.5rem'>
+              <div style='margin-bottom:16px'>
+                <svg width="80" height="70" viewBox="0 0 80 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="upcloud" x1="0" y1="0" x2="80" y2="70" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stop-color="#7c3aed"/>
+                      <stop offset="100%" stop-color="#4f46e5"/>
+                    </linearGradient>
+                  </defs>
+                  <ellipse cx="40" cy="42" rx="35" ry="22" fill="url(#upcloud)" opacity="0.15"/>
+                  <path d="M62 34C62 47.255 51.255 58 38 58C24.745 58 14 47.255 14 34C14 20.745 24.745 10 38 10C51.255 10 62 20.745 62 34Z" fill="url(#upcloud)" opacity="0.2"/>
+                  <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M64 38.5C64 44.299 59.299 49 53.5 49H20.5C14.149 49 9 43.851 9 37.5C9 31.149 14.149 26 20.5 26C20.833 26 21.163 26.015 21.489 26.044C23.132 19.619 28.964 15 36 15C39.37 15 42.488 16.103 45 18H45C47.209 14.641 51.004 12.5 55.5 12.5C62.404 12.5 68 18.096 68 25C68 28.4 66.624 31.486 64.388 33.729C64.786 35.257 65 36.855 65 38.5H64Z"
+                    fill="url(#upcloud)"/>
+                  <rect x="34" y="27" width="8" height="14" rx="2" fill="white" opacity="0.95"/>
+                  <path d="M29 34L40 23L51 34" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>
+                </svg>
               </div>
-              <div style='font-size:12.5px;color:#94a3b8;letter-spacing:0.04em'>
-                CSV &nbsp;·&nbsp; XLSX &nbsp;·&nbsp; XLS &nbsp;·&nbsp; up to 200 MB
+              <div style='font-size:28px;font-weight:800;color:#0d1f3c;letter-spacing:-0.025em;margin-bottom:8px'>
+                Smart Data Ingestion
+              </div>
+              <div style='font-size:14.5px;color:#64748b;line-height:1.6'>
+                Securely upload your CSV, XLSX, or XLS file &nbsp;·&nbsp; Up to 200 MB
               </div>
             </div>""", unsafe_allow_html=True)
-            # Native uploader with collapsed label — no custom text that overlaps button
+
+            # ── Gradient upload bar (native Streamlit uploader) ──────────────
             _new_file = st.file_uploader(
                 "upload", type=["csv", "xlsx", "xls"],
                 label_visibility="collapsed", key="cta_uploader"
@@ -1852,9 +1864,81 @@ if not st.session_state["stored_file"]:
                 st.session_state["stored_file"] = {"bytes": _data, "name": _new_file.name}
                 st.session_state.pop("show_uploader", None)
                 st.rerun()
-            st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
-            _xl, _xc, _xr = st.columns([1, 1.4, 1])
-            with _xc:
+
+            # ── Example files + info row ─────────────────────────────────────
+            st.markdown("""
+            <div style='margin-top:16px;background:#f8f7ff;border-radius:14px;
+              padding:14px 18px;border:1px solid #e4e0ff'>
+              <div style='display:flex;flex-direction:column;gap:9px'>
+                <div style='display:flex;align-items:center;gap:9px;font-size:13px;color:#334155'>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5b4bff"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                  </svg>
+                  Example_Sales_Data.csv
+                  <span style='background:#dcfce7;color:#166534;border-radius:5px;
+                    padding:1px 7px;font-size:10.5px;font-weight:700'>✓ Detected</span>
+                </div>
+                <div style='display:flex;align-items:center;gap:9px;font-size:13px;color:#334155'>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5b4bff"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                  </svg>
+                  HR_Employees_Q3.xlsx
+                </div>
+                <div style='display:flex;align-items:center;gap:8px;font-size:12px;color:#94a3b8;
+                  padding-top:8px;border-top:1px solid #e4e0ff;margin-top:2px'>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  Single file max: 200 MB &nbsp;·&nbsp; CSV, XLSX, XLS formats auto-verified
+                </div>
+              </div>
+            </div>""", unsafe_allow_html=True)
+
+            # ── Three feature cards ──────────────────────────────────────────
+            st.markdown("<div style='height:14px'></div>", unsafe_allow_html=True)
+            _fa, _fb, _fc = st.columns(3)
+            _card_style = ("background:#fff;border:1px solid #e2e8f0;border-radius:14px;"
+                           "padding:14px 14px;display:flex;gap:11px;align-items:flex-start;"
+                           "box-shadow:0 1px 4px rgba(0,0,0,0.04)")
+            with _fa:
+                st.markdown(f"""<div style='{_card_style}'>
+                  <div style='font-size:24px;flex-shrink:0;line-height:1'>🔒</div>
+                  <div>
+                    <div style='font-size:13px;font-weight:700;color:#0d1f3c;margin-bottom:3px'>
+                      Data Privacy</div>
+                    <div style='font-size:12px;color:#64748b;line-height:1.5'>
+                      Never stored or shared</div>
+                  </div></div>""", unsafe_allow_html=True)
+            with _fb:
+                st.markdown(f"""<div style='{_card_style}'>
+                  <div style='font-size:24px;flex-shrink:0;line-height:1'>⚡</div>
+                  <div>
+                    <div style='font-size:13px;font-weight:700;color:#0d1f3c;margin-bottom:3px'>
+                      Instant Analysis</div>
+                    <div style='font-size:12px;color:#64748b;line-height:1.5'>
+                      Dashboard in seconds</div>
+                  </div></div>""", unsafe_allow_html=True)
+            with _fc:
+                st.markdown(f"""<div style='{_card_style}'>
+                  <div style='font-size:24px;flex-shrink:0;line-height:1'>🤖</div>
+                  <div>
+                    <div style='font-size:13px;font-weight:700;color:#0d1f3c;margin-bottom:3px'>
+                      AI Powered</div>
+                    <div style='font-size:12px;color:#64748b;line-height:1.5'>
+                      Claude drives insights</div>
+                  </div></div>""", unsafe_allow_html=True)
+
+            # ── Close ────────────────────────────────────────────────────────
+            st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
+            _xcl, _xcc, _xcr = st.columns([1, 1.2, 1])
+            with _xcc:
                 if st.button("✕  Close", use_container_width=True, key="hide_uploader"):
                     st.session_state.pop("show_uploader", None)
                     st.rerun()
