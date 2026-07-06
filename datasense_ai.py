@@ -128,9 +128,10 @@ section[data-testid="stFileUploaderDropzone"] button:hover {
     box-shadow: 0 6px 20px rgba(91,75,255,0.38) !important;
     transform: translateY(-1px) !important;
 }
-/* Hide Streamlit's built-in instructions — our card HTML already shows them */
-div[data-testid="stFileUploaderDropzoneInstructions"] {
-    display: none !important;
+/* File uploader label — make it visible as a proper heading */
+div[data-testid="stFileUploader"] label {
+    font-size: 13px !important; font-weight: 600 !important;
+    color: #334155 !important; margin-bottom: 6px !important;
 }
 
 /* ── TABS ── */
@@ -1830,42 +1831,33 @@ if not st.session_state["stored_file"]:
 
     # ── UPLOADER REVEAL (shown only after clicking Upload button) ─────────────
     if st.session_state.get("show_uploader"):
-        st.markdown("<div style='height:32px'></div>", unsafe_allow_html=True)
-        _ul, _uc, _ur = st.columns([0.5, 3, 0.5])
+        st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
+        _ul, _uc, _ur = st.columns([0.8, 2.4, 0.8])
         with _uc:
             st.markdown("""
-            <div style='background:#f8f7ff;border:2px dashed #c4b5fd;border-bottom:none;
-              border-radius:20px 20px 0 0;padding:2.5rem 2rem 1.5rem;text-align:center'>
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
-                stroke="#5b4bff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
-                style="display:block;margin:0 auto 14px">
-                <polyline points="16 16 12 12 8 16"></polyline>
-                <line x1="12" y1="12" x2="12" y2="21"></line>
-                <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path>
-              </svg>
-              <p style='font-size:16px;font-weight:700;color:#0d1f3c;margin:0 0 6px'>
-                Drag &amp; drop your file here
-              </p>
-              <p style='font-size:13px;color:#94a3b8;margin:0'>
-                CSV &nbsp;·&nbsp; XLSX &nbsp;·&nbsp; XLS &nbsp;·&nbsp; up to 200 MB
-              </p>
+            <div style='text-align:center;padding:1.2rem 0 0.75rem'>
+              <div style='font-size:36px;margin-bottom:8px'>☁️</div>
+              <div style='font-size:16px;font-weight:700;color:#0d1f3c;margin-bottom:4px'>
+                Upload your data file
+              </div>
+              <div style='font-size:13px;color:#94a3b8'>
+                CSV &nbsp;·&nbsp; XLSX &nbsp;·&nbsp; XLS
+              </div>
             </div>""", unsafe_allow_html=True)
-            _new_file = st.file_uploader("", type=["csv","xlsx","xls"],
-                                         label_visibility="collapsed", key="cta_uploader")
+            _new_file = st.file_uploader(
+                "Drop file here or click Browse",
+                type=["csv", "xlsx", "xls"],
+                key="cta_uploader",
+                help="Supports CSV, XLSX, XLS up to 200 MB"
+            )
             if _new_file:
                 _data = _new_file.read()
                 st.session_state["stored_file"] = {"bytes": _data, "name": _new_file.name}
                 st.session_state.pop("show_uploader", None)
                 st.rerun()
-            st.markdown("""
-            <div style='text-align:center;margin-top:14px'>
-              <span style='font-size:12px;color:#94a3b8'>
-                Changed your mind?
-              </span>
-            </div>""", unsafe_allow_html=True)
             _xl, _xc, _xr = st.columns([1, 1.4, 1])
             with _xc:
-                if st.button("✕  Hide uploader", use_container_width=True, key="hide_uploader"):
+                if st.button("✕  Close", use_container_width=True, key="hide_uploader"):
                     st.session_state.pop("show_uploader", None)
                     st.rerun()
 
@@ -1899,6 +1891,14 @@ if st.session_state.get("last_file") != _stored["name"]:
     st.session_state["df_modified_for"] = None
     for k in list(st.session_state.keys()):
         if k.startswith("ai_"): del st.session_state[k]
+
+# Scroll to top of page whenever dashboard renders
+st.markdown("""<script>
+(function() {
+    var main = window.parent.document.querySelector('[data-testid="stMain"]');
+    if (main) main.scrollTop = 0;
+})();
+</script>""", unsafe_allow_html=True)
 
 col_analysis  = analyze_columns(df)
 dtype         = detect_type(df)
