@@ -207,7 +207,7 @@ div[data-testid="stFileUploaderDropzoneInstructions"] {
     text-transform: uppercase; letter-spacing: 0.1em;
     margin: 1.75rem 0 1rem;
     display: flex; align-items: center; gap: 8px;
-    flex-wrap: wrap; overflow-wrap: break-word; word-break: break-word;
+    flex-wrap: wrap; word-break: break-word;
 }
 .sec-head::before {
     content: ''; display: block; width: 3px; height: 14px;
@@ -302,14 +302,23 @@ h1, h2, h3, h4 { color: #0d1f3c !important; }
 /* ── INFO/SUCCESS/ERROR ── */
 .stAlert { border-radius: 10px !important; }
 
-/* ── PREVENT HORIZONTAL TEXT CLIP — global wrap rule ── */
-p, li, span, label,
-.sec-head, .insight-text, .insight-title, .insight-tag,
-.ai-box-text, .kpi-sub, .kpi-label, .kpi-value,
-.stat-pill, .slabel {
+/* ── PREVENT HORIZONTAL TEXT CLIP ── */
+p, li,
+.insight-text, .insight-title,
+.ai-box-text, .kpi-sub {
     overflow-wrap: break-word !important;
-    word-break: break-word !important;
+    white-space: normal !important;
     max-width: 100% !important;
+}
+/* Ensure markdown paragraph containers are fully visible */
+[data-testid="stMarkdownContainer"] {
+    overflow: visible !important;
+    max-width: 100% !important;
+}
+[data-testid="stMarkdownContainer"] p {
+    overflow: visible !important;
+    white-space: normal !important;
+    overflow-wrap: break-word !important;
 }
 
 /* ── HIDE SIDEBAR ── */
@@ -2061,7 +2070,12 @@ if active_view == "overview":
 # ══════════════════════════════════════════════════════════════════════════════
 elif active_view == "smart":
     st.markdown(f'<div class="sec-head">{cfg["icon"]} Smart Insights — {cfg["label"]}</div>', unsafe_allow_html=True)
-    st.markdown(f"<p style='color:#64748b;font-size:13px;margin-bottom:1.5rem'>Smart insights built from your actual {dtype} dataset based on actual column values.</p>", unsafe_allow_html=True)
+    st.markdown(
+        f"<p style='color:#64748b;font-size:13px;margin-bottom:1.5rem;"
+        f"white-space:normal;overflow:visible;display:block;width:100%;max-width:100%'>"
+        f"Generate dataset-specific insight cards based on actual column names and values — "
+        f"tailored to your <b style='color:#334155'>{dtype}</b> dataset.</p>",
+        unsafe_allow_html=True)
 
     if smart_insights:
         for ins in smart_insights:
