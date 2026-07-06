@@ -1069,9 +1069,37 @@ if not st.session_state["stored_file"]:
           <div style='font-size:12px;color:#64748b;line-height:1.55'>{desc}</div>
         </div>"""
 
-    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+    # ── NAVBAR ───────────────────────────────────────────────────────────────
+    st.markdown("""
+    <div style='display:flex;align-items:center;justify-content:space-between;
+      padding:12px 0 16px;margin-bottom:4px;border-bottom:1px solid #f1f5f9'>
+      <div style='display:flex;align-items:center;gap:10px'>
+        <div style='width:34px;height:34px;background:linear-gradient(135deg,#5b4bff,#7c3aed);
+          border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px'>🧠</div>
+        <span style='font-size:16px;font-weight:800;color:#0d1f3c;letter-spacing:-0.02em'>
+          DataSense <span style='color:#5b4bff'>AI</span></span>
+      </div>
+      <div style='display:flex;align-items:center;gap:24px;flex-wrap:wrap'>
+        <a href="javascript:void(0)" onclick="window.parent.scrollTo({top:0,behavior:'smooth'})"
+          style='font-size:13px;font-weight:500;color:#475569;text-decoration:none'>Home</a>
+        <a href="javascript:void(0)"
+          onclick="document.getElementById('features-section').scrollIntoView({behavior:'smooth',block:'start'})"
+          style='font-size:13px;font-weight:500;color:#475569;text-decoration:none'>Features</a>
+        <a href="javascript:void(0)"
+          onclick="document.getElementById('howitworks-section').scrollIntoView({behavior:'smooth',block:'start'})"
+          style='font-size:13px;font-weight:500;color:#475569;text-decoration:none'>How It Works</a>
+        <a href="javascript:void(0)"
+          onclick="document.getElementById('cta-section').scrollIntoView({behavior:'smooth',block:'start'})"
+          style='font-size:13px;font-weight:700;color:#fff;background:linear-gradient(135deg,#5b4bff,#7c3aed);
+          border-radius:8px;padding:8px 18px;text-decoration:none;
+          box-shadow:0 2px 8px rgba(91,75,255,0.3)'>
+          Get Started →</a>
+      </div>
+    </div>
+    <div style='height:16px'></div>
+    """, unsafe_allow_html=True)
 
-    # ── HERO (2-column: text left, product mockup right) ─────────────────────
+    # ── HERO (2-column: text left, feature cards right) ───────────────────────
     hero_l, hero_r = st.columns([1.05, 0.95])
     with hero_l:
         st.markdown("""
@@ -1110,80 +1138,135 @@ if not st.session_state["stored_file"]:
 
     with hero_r:
         st.markdown("""
-        <div style='padding-top:0.25rem;display:flex;justify-content:center'>
-          <div style='box-shadow:0 24px 64px rgba(79,70,229,0.13),0 4px 20px rgba(0,0,0,0.07);
-            border-radius:18px;overflow:hidden;width:100%;border:1px solid #e2e8f0'>
-            <svg viewBox="0 0 420 308" width="100%" xmlns="http://www.w3.org/2000/svg">
-              <rect width="420" height="308" fill="#fff"/>
-              <rect width="420" height="40" fill="#f8fafc"/>
-              <rect y="39" width="420" height="1" fill="#e2e8f0"/>
-              <circle cx="18" cy="20" r="5" fill="#fc5c5c"/>
-              <circle cx="32" cy="20" r="5" fill="#fdbc2c"/>
-              <circle cx="46" cy="20" r="5" fill="#34c759"/>
-              <text x="210" y="24" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="system-ui,sans-serif" font-weight="500">DataSense AI  ·  Sales Dashboard</text>
-              <rect y="40" width="420" height="268" fill="#f8fafc"/>
-              <rect x="12" y="52" width="122" height="56" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
-              <text x="22" y="68" font-size="8" fill="#3b82f6" font-family="system-ui,sans-serif" font-weight="700">REVENUE</text>
-              <text x="22" y="87" font-size="19" fill="#1e3a8a" font-family="system-ui,sans-serif" font-weight="800">$23.8K</text>
-              <text x="22" y="100" font-size="8" fill="#22c55e" font-family="system-ui,sans-serif" font-weight="600">up 12.4% vs last month</text>
-              <rect x="142" y="52" width="122" height="56" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
-              <text x="152" y="68" font-size="8" fill="#16a34a" font-family="system-ui,sans-serif" font-weight="700">ORDERS</text>
-              <text x="152" y="87" font-size="19" fill="#14532d" font-family="system-ui,sans-serif" font-weight="800">1,240</text>
-              <text x="152" y="100" font-size="8" fill="#22c55e" font-family="system-ui,sans-serif" font-weight="600">up 8.1% vs last month</text>
-              <rect x="272" y="52" width="136" height="56" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
-              <text x="282" y="68" font-size="8" fill="#7c3aed" font-family="system-ui,sans-serif" font-weight="700">GROWTH RATE</text>
-              <text x="282" y="87" font-size="19" fill="#4c1d95" font-family="system-ui,sans-serif" font-weight="800">+18.4%</text>
-              <text x="282" y="100" font-size="8" fill="#22c55e" font-family="system-ui,sans-serif" font-weight="600">up 3.2% vs last quarter</text>
-              <text x="12" y="124" font-size="10" fill="#0f172a" font-family="system-ui,sans-serif" font-weight="700">Revenue Trend</text>
-              <text x="272" y="124" font-size="10" fill="#0f172a" font-family="system-ui,sans-serif" font-weight="700">Top Products</text>
-              <rect x="12" y="130" width="248" height="122" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
-              <line x1="22" y1="162" x2="250" y2="162" stroke="#f1f5f9" stroke-width="1"/>
-              <line x1="22" y1="182" x2="250" y2="182" stroke="#f1f5f9" stroke-width="1"/>
-              <line x1="22" y1="202" x2="250" y2="202" stroke="#f1f5f9" stroke-width="1"/>
-              <line x1="22" y1="222" x2="250" y2="222" stroke="#f1f5f9" stroke-width="1"/>
-              <defs>
-                <linearGradient id="cg" x1="0" y1="140" x2="0" y2="242" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stop-color="#4f46e5" stop-opacity="0.18"/>
-                  <stop offset="100%" stop-color="#4f46e5" stop-opacity="0.01"/>
-                </linearGradient>
-              </defs>
-              <path d="M22 232 L60 218 L100 200 L140 184 L180 168 L220 152 L250 140 L250 242 L22 242 Z" fill="url(#cg)"/>
-              <path d="M22 232 L60 218 L100 200 L140 184 L180 168 L220 152 L250 140" stroke="#4f46e5" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="22" cy="232" r="3" fill="#fff" stroke="#4f46e5" stroke-width="1.5"/>
-              <circle cx="100" cy="200" r="3" fill="#fff" stroke="#4f46e5" stroke-width="1.5"/>
-              <circle cx="180" cy="168" r="3" fill="#fff" stroke="#4f46e5" stroke-width="1.5"/>
-              <circle cx="250" cy="140" r="4" fill="#4f46e5" stroke="#fff" stroke-width="1.5"/>
-              <text x="22"  y="255" font-size="7" fill="#94a3b8" font-family="system-ui,sans-serif" text-anchor="middle">Jan</text>
-              <text x="60"  y="255" font-size="7" fill="#94a3b8" font-family="system-ui,sans-serif" text-anchor="middle">Feb</text>
-              <text x="100" y="255" font-size="7" fill="#94a3b8" font-family="system-ui,sans-serif" text-anchor="middle">Mar</text>
-              <text x="140" y="255" font-size="7" fill="#94a3b8" font-family="system-ui,sans-serif" text-anchor="middle">Apr</text>
-              <text x="180" y="255" font-size="7" fill="#94a3b8" font-family="system-ui,sans-serif" text-anchor="middle">May</text>
-              <text x="220" y="255" font-size="7" fill="#94a3b8" font-family="system-ui,sans-serif" text-anchor="middle">Jun</text>
-              <text x="250" y="255" font-size="7" fill="#94a3b8" font-family="system-ui,sans-serif" text-anchor="middle">Jul</text>
-              <rect x="272" y="130" width="136" height="122" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
-              <text x="282" y="151" font-size="8" fill="#64748b" font-family="system-ui,sans-serif">Laptop Pro</text>
-              <rect x="282" y="154" width="116" height="8" rx="3" fill="#e0e7ff"/>
-              <rect x="282" y="154" width="105" height="8" rx="3" fill="#4f46e5"/>
-              <text x="282" y="175" font-size="8" fill="#64748b" font-family="system-ui,sans-serif">Monitor X</text>
-              <rect x="282" y="178" width="116" height="8" rx="3" fill="#e0e7ff"/>
-              <rect x="282" y="178" width="86" height="8" rx="3" fill="#818cf8"/>
-              <text x="282" y="199" font-size="8" fill="#64748b" font-family="system-ui,sans-serif">Keyboard</text>
-              <rect x="282" y="202" width="116" height="8" rx="3" fill="#e0e7ff"/>
-              <rect x="282" y="202" width="64" height="8" rx="3" fill="#a5b4fc"/>
-              <text x="282" y="223" font-size="8" fill="#64748b" font-family="system-ui,sans-serif">Mouse Elite</text>
-              <rect x="282" y="226" width="116" height="8" rx="3" fill="#e0e7ff"/>
-              <rect x="282" y="226" width="44" height="8" rx="3" fill="#c7d2fe"/>
-              <rect x="12" y="260" width="396" height="36" rx="10" fill="#faf5ff" stroke="#e9d5ff" stroke-width="1"/>
-              <text x="42" y="275" font-size="8.5" fill="#6d28d9" font-family="system-ui,sans-serif" font-weight="700">AI Insight:</text>
-              <text x="100" y="275" font-size="8.5" fill="#6d28d9" font-family="system-ui,sans-serif">Revenue grew 18.4% YoY — Laptop Pro drives 91% of category sales.</text>
-              <text x="42" y="288" font-size="7.5" fill="#7c3aed" font-family="system-ui,sans-serif" opacity="0.65">Powered by Claude AI · Generated in real-time from your data</text>
-            </svg>
+        <div style='display:flex;flex-direction:column;gap:14px;padding-top:0.25rem'>
+
+          <!-- Card 1: Dark indigo — Sales / Revenue Storytelling -->
+          <div style='background:linear-gradient(135deg,#1e1b4b 0%,#312e81 60%,#3730a3 100%);
+            border-radius:20px;padding:1.5rem 1.6rem;border:1px solid #3730a3;
+            box-shadow:0 8px 32px rgba(55,48,163,0.35);position:relative;overflow:hidden'>
+            <span style='background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);
+              color:#c7d2fe;font-size:9.5px;font-weight:700;letter-spacing:0.07em;
+              text-transform:uppercase;border-radius:20px;padding:3px 10px'>
+              Sales Analytics</span>
+            <h3 style='font-size:21px;font-weight:800;color:#fff;margin:10px 0 6px;
+              letter-spacing:-0.02em;line-height:1.2'>
+              Revenue<br>Storytelling</h3>
+            <p style='font-size:12px;color:#a5b4fc;margin:0 0 4px;line-height:1.55'>
+              Revenue grew 18.4% YoY — Laptop Pro drives 91% of category sales.</p>
+            <p style='font-size:11px;color:#818cf8;font-style:italic;margin:0 0 12px'>
+              <b style="color:#c7d2fe">AI Narrative:</b> Customer acquisition has doubled.</p>
+            <div style='background:rgba(255,255,255,0.06);border-radius:10px;padding:10px;
+              border:1px solid rgba(255,255,255,0.1)'>
+              <svg viewBox="0 0 340 100" width="100%" xmlns="http://www.w3.org/2000/svg">
+                <rect x="0" y="0" width="100" height="40" rx="7" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+                <text x="7" y="13" font-size="7" fill="#a5b4fc" font-family="system-ui,sans-serif" font-weight="600">REVENUE</text>
+                <text x="7" y="28" font-size="13" fill="#fff" font-family="system-ui,sans-serif" font-weight="800">$23.8K</text>
+                <text x="7" y="37" font-size="6.5" fill="#34d399" font-family="system-ui,sans-serif">▲ 12.4% last month</text>
+                <rect x="108" y="0" width="100" height="40" rx="7" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+                <text x="115" y="13" font-size="7" fill="#a5b4fc" font-family="system-ui,sans-serif" font-weight="600">ORDERS</text>
+                <text x="115" y="28" font-size="13" fill="#fff" font-family="system-ui,sans-serif" font-weight="800">1,240</text>
+                <text x="115" y="37" font-size="6.5" fill="#34d399" font-family="system-ui,sans-serif">▲ 8.7% in sat sample</text>
+                <rect x="216" y="0" width="124" height="40" rx="7" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+                <text x="223" y="13" font-size="7" fill="#a5b4fc" font-family="system-ui,sans-serif" font-weight="600">TOP PRODUCT</text>
+                <text x="223" y="28" font-size="11" fill="#fff" font-family="system-ui,sans-serif" font-weight="800">Laptop Pro</text>
+                <text x="223" y="37" font-size="6.5" fill="#a5b4fc" font-family="system-ui,sans-serif">91% category share</text>
+                <text x="0" y="52" font-size="7" fill="#6366f1" font-family="system-ui,sans-serif" font-weight="600">Orders Breakdown</text>
+                <text x="216" y="52" font-size="7" fill="#6366f1" font-family="system-ui,sans-serif" font-weight="600">Top Products</text>
+                <rect x="0" y="56" width="200" height="44" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+                <rect x="10" y="76" width="22" height="17" rx="2" fill="#4f46e5" opacity="0.9"/>
+                <rect x="38" y="68" width="22" height="25" rx="2" fill="#4f46e5" opacity="0.75"/>
+                <rect x="66" y="62" width="22" height="31" rx="2" fill="#4f46e5" opacity="0.6"/>
+                <rect x="94" y="70" width="22" height="23" rx="2" fill="#4f46e5" opacity="0.5"/>
+                <rect x="122" y="74" width="22" height="19" rx="2" fill="#4f46e5" opacity="0.4"/>
+                <text x="10" y="100" font-size="5.5" fill="#6366f1" font-family="system-ui,sans-serif">Laptop</text>
+                <text x="36" y="100" font-size="5.5" fill="#6366f1" font-family="system-ui,sans-serif">Master 2</text>
+                <text x="64" y="100" font-size="5.5" fill="#6366f1" font-family="system-ui,sans-serif">Keyboard</text>
+                <text x="94" y="100" font-size="5.5" fill="#6366f1" font-family="system-ui,sans-serif">Mouse</text>
+                <text x="122" y="100" font-size="5.5" fill="#6366f1" font-family="system-ui,sans-serif">Mouse L</text>
+                <rect x="208" y="56" width="132" height="44" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+                <text x="216" y="68" font-size="7" fill="#94a3b8" font-family="system-ui,sans-serif">Laptop Pro</text>
+                <rect x="216" y="71" width="112" height="6" rx="2" fill="rgba(99,102,241,0.2)"/>
+                <rect x="216" y="71" width="100" height="6" rx="2" fill="#4f46e5"/>
+                <text x="216" y="84" font-size="7" fill="#94a3b8" font-family="system-ui,sans-serif">Monitor X</text>
+                <rect x="216" y="87" width="112" height="6" rx="2" fill="rgba(99,102,241,0.2)"/>
+                <rect x="216" y="87" width="80" height="6" rx="2" fill="#818cf8"/>
+                <text x="216" y="100" font-size="7" fill="#94a3b8" font-family="system-ui,sans-serif">Keyboard</text>
+                <rect x="216" y="90" width="112" height="0" rx="2" fill="rgba(99,102,241,0.2)"/>
+              </svg>
+            </div>
+            <div style='margin-top:12px'>
+              <a href="javascript:void(0)"
+                onclick="document.getElementById('cta-section').scrollIntoView({behavior:'smooth',block:'start'})"
+                style='display:inline-flex;align-items:center;gap:6px;
+                background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.25);
+                color:#e0e7ff;font-size:12px;font-weight:600;border-radius:8px;
+                padding:7px 14px;text-decoration:none'>
+                Learn more →</a>
+            </div>
           </div>
+
+          <!-- Card 2: Green — Revenue Statistics and Trends -->
+          <div style='background:linear-gradient(135deg,#064e3b 0%,#065f46 50%,#059669 100%);
+            border-radius:20px;padding:1.5rem 1.6rem;border:1px solid #047857;
+            box-shadow:0 8px 32px rgba(5,150,105,0.28);overflow:hidden'>
+            <span style='background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);
+              color:#a7f3d0;font-size:9.5px;font-weight:700;letter-spacing:0.07em;
+              text-transform:uppercase;border-radius:20px;padding:3px 10px'>
+              Trends &amp; Forecast</span>
+            <h3 style='font-size:21px;font-weight:800;color:#fff;margin:10px 0 6px;
+              letter-spacing:-0.02em;line-height:1.2'>
+              Revenue Statistics<br>and Trends</h3>
+            <p style='font-size:12px;color:#6ee7b7;margin:0 0 4px;line-height:1.55'>
+              Detailed financial metrics and forecast models.</p>
+            <p style='font-size:11px;color:#34d399;font-style:italic;margin:0 0 12px'>
+              <b style="color:#a7f3d0">Key Trend:</b> Subscription revenue up 22%.</p>
+            <div style='background:rgba(255,255,255,0.06);border-radius:10px;padding:10px;
+              border:1px solid rgba(255,255,255,0.1)'>
+              <svg viewBox="0 0 340 72" width="100%" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="10" font-size="7" fill="#6ee7b7" font-family="system-ui,sans-serif" font-weight="600">Growth Trend</text>
+                <line x1="0" y1="18" x2="340" y2="18" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+                <line x1="0" y1="32" x2="340" y2="32" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+                <line x1="0" y1="46" x2="340" y2="46" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+                <line x1="0" y1="60" x2="340" y2="60" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+                <defs>
+                  <linearGradient id="gg1" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#34d399" stop-opacity="0.3"/>
+                    <stop offset="100%" stop-color="#34d399" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M0,58 L43,50 L86,42 L129,35 L172,28 L215,20 L258,15 L301,11 L340,8 L340,68 L0,68 Z" fill="url(#gg1)"/>
+                <polyline points="0,58 43,50 86,42 129,35 172,28 215,20 258,15 301,11 340,8"
+                  stroke="#34d399" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                <polyline points="0,65 43,62 86,59 129,56 172,53 215,50 258,47 301,44 340,41"
+                  stroke="#6ee7b7" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-dasharray="4,2"/>
+                <polyline points="0,68 43,67 86,66 129,65 172,64 215,63 258,62 301,61 340,59"
+                  stroke="#a7f3d0" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-dasharray="2,3"/>
+                <circle cx="340" cy="8" r="3.5" fill="#34d399"/>
+                <text x="0"   y="71" font-size="6" fill="#6ee7b7" font-family="system-ui,sans-serif" text-anchor="middle">Jan</text>
+                <text x="57"  y="71" font-size="6" fill="#6ee7b7" font-family="system-ui,sans-serif" text-anchor="middle">Feb</text>
+                <text x="114" y="71" font-size="6" fill="#6ee7b7" font-family="system-ui,sans-serif" text-anchor="middle">Mar</text>
+                <text x="171" y="71" font-size="6" fill="#6ee7b7" font-family="system-ui,sans-serif" text-anchor="middle">Apr</text>
+                <text x="228" y="71" font-size="6" fill="#6ee7b7" font-family="system-ui,sans-serif" text-anchor="middle">May</text>
+                <text x="285" y="71" font-size="6" fill="#6ee7b7" font-family="system-ui,sans-serif" text-anchor="middle">Jun</text>
+                <text x="336" y="71" font-size="6" fill="#6ee7b7" font-family="system-ui,sans-serif" text-anchor="middle">Jul</text>
+              </svg>
+            </div>
+            <div style='margin-top:12px'>
+              <a href="javascript:void(0)"
+                onclick="document.getElementById('cta-section').scrollIntoView({behavior:'smooth',block:'start'})"
+                style='display:inline-flex;align-items:center;gap:6px;
+                background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.25);
+                color:#d1fae5;font-size:12px;font-weight:600;border-radius:8px;
+                padding:7px 14px;text-decoration:none'>
+                Learn more →</a>
+            </div>
+          </div>
+
         </div>
         """, unsafe_allow_html=True)
 
     # ── FEATURE HIGHLIGHTS ────────────────────────────────────────────────────
-    st.markdown("<div style='height:72px'></div>", unsafe_allow_html=True)
+    st.markdown("<div id='features-section' style='height:72px'></div>", unsafe_allow_html=True)
     st.markdown("""
     <span class='slabel'>What You Get</span>
     <h2 style='font-size:30px;font-weight:800;color:#0d1f3c;margin:0 0 6px;letter-spacing:-0.02em'>
@@ -1253,7 +1336,7 @@ if not st.session_state["stored_file"]:
         st.markdown(card("linechart","grid",  "Generic", "Works with any tabular dataset automatically",        "#f3f4f6", "#1f2937", "#6b7280"), unsafe_allow_html=True)
 
     # How it works (full width)
-    st.markdown("<div style='height:72px'></div>", unsafe_allow_html=True)
+    st.markdown("<div id='howitworks-section' style='height:72px'></div>", unsafe_allow_html=True)
     st.markdown("""
     <div style='background:#f8f7ff;border-radius:20px;padding:2.25rem 2.5rem 1.75rem;
       border:1px solid #e4e0ff;box-shadow:0 1px 4px rgba(91,75,255,0.06)'>
@@ -1768,7 +1851,7 @@ if not st.session_state["stored_file"]:
     # ══════════════════════════════════════════════════════════════════════
     # SECTION: FINAL CTA
     # ══════════════════════════════════════════════════════════════════════
-    st.markdown("<div style='height:88px'></div>", unsafe_allow_html=True)
+    st.markdown("<div id='cta-section' style='height:88px'></div>", unsafe_allow_html=True)
     st.markdown("""
     <div style='background:linear-gradient(135deg,#5b4bff 0%,#7c3aed 100%);
       border-radius:24px;padding:4rem 3rem;text-align:center;
@@ -1964,6 +2047,27 @@ if not st.session_state["stored_file"]:
                     st.rerun()
 
     st.markdown("<div style='height:56px'></div>", unsafe_allow_html=True)
+
+    # ── FOOTER ───────────────────────────────────────────────────────────────
+    st.markdown("""
+    <div style='border-top:1px solid #f1f5f9;padding:2rem 0 1rem;
+      display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px'>
+      <div style='display:flex;align-items:center;gap:8px'>
+        <div style='width:28px;height:28px;background:linear-gradient(135deg,#5b4bff,#7c3aed);
+          border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px'>🧠</div>
+        <span style='font-size:14px;font-weight:700;color:#0d1f3c'>
+          DataSense <span style='color:#5b4bff'>AI</span></span>
+      </div>
+      <div style='display:flex;gap:24px;flex-wrap:wrap'>
+        <span style='font-size:12px;color:#94a3b8'>Privacy</span>
+        <span style='font-size:12px;color:#94a3b8'>Terms</span>
+        <span style='font-size:12px;color:#94a3b8'>
+          Claude AI Integration · <span style='color:#5b4bff'>by Anthropic</span></span>
+      </div>
+      <span style='font-size:11.5px;color:#cbd5e1'>
+        Built with ❤️ · Powered by Claude AI</span>
+    </div>
+    """, unsafe_allow_html=True)
 
     st.stop()
 
