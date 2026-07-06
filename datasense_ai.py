@@ -28,24 +28,24 @@ st.markdown("""
 
 /* ── SIDEBAR ── */
 section[data-testid="stSidebar"] {
-    background: #0c1220 !important;
-    border-right: 1px solid #1a2540 !important;
+    background: #ffffff !important;
+    border-right: 1px solid #e8edf2 !important;
     min-width: 240px !important;
 }
 section[data-testid="stSidebar"] > div { padding-top: 0 !important; }
-section[data-testid="stSidebar"] * { color: #8b9ab0 !important; }
-section[data-testid="stSidebar"] hr { border-color: #1a2540 !important; margin: 8px 0 !important; }
+section[data-testid="stSidebar"] * { color: #475569 !important; }
+section[data-testid="stSidebar"] hr { border-color: #e2e8f0 !important; margin: 8px 0 !important; }
 section[data-testid="stSidebar"] .stSuccess {
-    background: rgba(16,185,129,0.08) !important;
-    border: 1px solid rgba(16,185,129,0.2) !important;
+    background: rgba(5,150,105,0.07) !important;
+    border: 1px solid rgba(5,150,105,0.25) !important;
     border-radius: 8px !important;
 }
-section[data-testid="stSidebar"] .stSuccess p { color: #34d399 !important; font-size: 12px !important; }
+section[data-testid="stSidebar"] .stSuccess p { color: #059669 !important; font-size: 12px !important; }
 
 /* ── SIDEBAR NAV BUTTONS ── */
 section[data-testid="stSidebar"] .stButton > button {
     background: transparent !important;
-    color: #8b9ab0 !important;
+    color: #475569 !important;
     border: none !important;
     border-radius: 8px !important;
     font-size: 13px !important;
@@ -57,8 +57,8 @@ section[data-testid="stSidebar"] .stButton > button {
     transition: all 0.15s ease !important;
 }
 section[data-testid="stSidebar"] .stButton > button:hover {
-    background: rgba(59,130,246,0.1) !important;
-    color: #93c5fd !important;
+    background: #f1f5f9 !important;
+    color: #1e40af !important;
 }
 
 /* ── MAIN AREA BUTTONS ── */
@@ -81,19 +81,20 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 
 /* ── FILE UPLOADER ── */
 div[data-testid="stFileUploader"] {
-    background: rgba(255,255,255,0.04) !important;
-    border: 1.5px dashed #253552 !important;
-    border-radius: 10px !important;
+    background: #f8fafc !important;
+    border: 1.5px dashed #cbd5e1 !important;
+    border-radius: 12px !important;
     padding: 0.5rem !important;
 }
 div[data-testid="stFileUploader"]:hover { border-color: #3b82f6 !important; }
-div[data-testid="stFileUploader"] * { color: #4a5568 !important; }
+div[data-testid="stFileUploader"] * { color: #64748b !important; }
 div[data-testid="stFileUploader"] button {
-    background: #2563eb !important; color: #fff !important;
-    border: none !important; border-radius: 6px !important;
+    background: #ffffff !important; color: #334155 !important;
+    border: 1px solid #cbd5e1 !important; border-radius: 6px !important;
     font-size: 12px !important; font-weight: 600 !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06) !important;
 }
-div[data-testid="stFileUploaderDropzoneInstructions"] span { color: #60a5fa !important; font-weight: 600 !important; }
+div[data-testid="stFileUploaderDropzoneInstructions"] span { color: #3b82f6 !important; font-weight: 600 !important; }
 
 /* ── TABS ── */
 .stTabs [data-baseweb="tab-list"] {
@@ -842,16 +843,16 @@ with st.sidebar:
       align-items:center;justify-content:center;font-size:17px;
       box-shadow:0 4px 12px rgba(79,70,229,0.4)'>🧠</div>
     <div>
-      <div style='font-size:15px;font-weight:700;color:#e2e8f0;letter-spacing:-0.01em;line-height:1.2'>DataSense AI</div>
-      <div style='font-size:10px;color:#475569;font-weight:500;letter-spacing:0.04em'>Insights That Drive Action</div>
+      <div style='font-size:15px;font-weight:700;color:#0f172a;letter-spacing:-0.01em;line-height:1.2'>DataSense AI</div>
+      <div style='font-size:10px;color:#94a3b8;font-weight:500;letter-spacing:0.04em'>Insights That Drive Action</div>
     </div>
   </div>
-  <div style='height:1px;background:linear-gradient(90deg,rgba(59,130,246,0.4),transparent);margin-top:14px'></div>
+  <div style='height:1px;background:linear-gradient(90deg,#e2e8f0,transparent);margin-top:14px'></div>
 </div>
 """, unsafe_allow_html=True)
 
     # ── UPLOAD SECTION ────────────────────────────────────────────────────────
-    st.markdown("<p style='color:#3b5275;font-size:10px;text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:8px;padding-left:2px'>📂 Data Source</p>",
+    st.markdown("<p style='color:#94a3b8;font-size:10px;text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:8px;padding-left:2px'>📂 Data Source</p>",
                 unsafe_allow_html=True)
     uploaded = st.file_uploader("", type=["csv","xlsx","xls"], label_visibility="collapsed")
     if uploaded:
@@ -1069,13 +1070,13 @@ smart_insights= compute_smart_insights(df, col_analysis, dtype)
 with st.sidebar:
     # Dataset badge
     st.markdown(
-        f"<div style='background:rgba(37,99,235,0.1);border:1px solid rgba(37,99,235,0.2);"
+        f"<div style='background:#eff6ff;border:1px solid #bfdbfe;"
         f"border-radius:8px;padding:8px 12px;margin-bottom:12px'>"
         f"<span style='font-size:14px'>{cfg['icon']}</span>"
-        f"<span style='color:#60a5fa;font-size:11px;font-weight:700;margin-left:6px'>{cfg['label']}</span>"
+        f"<span style='color:#1d4ed8;font-size:11px;font-weight:700;margin-left:6px'>{cfg['label']}</span>"
         f"</div>",
         unsafe_allow_html=True)
-    st.markdown("<p style='color:#3b5275;font-size:10px;text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:6px;padding-left:2px'>🗂 Navigation</p>",
+    st.markdown("<p style='color:#94a3b8;font-size:10px;text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:6px;padding-left:2px'>🗂 Navigation</p>",
                 unsafe_allow_html=True)
 
     pages = [("🏠  Overview","overview"),("💡  Smart Insights","smart"),
@@ -1097,9 +1098,9 @@ with st.sidebar:
         is_active = (active_view_check == key)
         if is_active:
             st.markdown(
-                f'<div style="background:rgba(59,130,246,0.12);border-left:2px solid #3b82f6;'
+                f'<div style="background:#eff6ff;border-left:2px solid #3b82f6;'
                 f'border-radius:0 8px 8px 0;padding:0.45rem 0.85rem;margin-bottom:2px;'
-                f'font-size:13px;font-weight:600;color:#93c5fd">{label}</div>',
+                f'font-size:13px;font-weight:600;color:#1d4ed8">{label}</div>',
                 unsafe_allow_html=True
             )
         else:
@@ -1108,23 +1109,23 @@ with st.sidebar:
 
     # Footer stats
     st.markdown(
-        f"<div style='margin-top:auto;padding:12px;background:rgba(255,255,255,0.02);"
-        f"border:1px solid #1e293b;border-radius:10px;margin-top:12px'>"
-        f"<div style='font-size:10px;color:#334155;font-weight:700;text-transform:uppercase;"
+        f"<div style='margin-top:12px;padding:12px;background:#f8fafc;"
+        f"border:1px solid #e2e8f0;border-radius:10px'>"
+        f"<div style='font-size:10px;color:#94a3b8;font-weight:700;text-transform:uppercase;"
         f"letter-spacing:0.1em;margin-bottom:8px'>Dataset Info</div>"
         f"<div style='display:grid;grid-template-columns:1fr 1fr;gap:6px'>"
-        f"<div style='background:#0f172a;border-radius:6px;padding:6px 8px;text-align:center'>"
-        f"<div style='font-size:16px;font-weight:800;color:#60a5fa'>{df.shape[0]:,}</div>"
-        f"<div style='font-size:9px;color:#475569;text-transform:uppercase;letter-spacing:0.06em'>Rows</div></div>"
-        f"<div style='background:#0f172a;border-radius:6px;padding:6px 8px;text-align:center'>"
-        f"<div style='font-size:16px;font-weight:800;color:#34d399'>{df.shape[1]}</div>"
-        f"<div style='font-size:9px;color:#475569;text-transform:uppercase;letter-spacing:0.06em'>Columns</div></div>"
-        f"<div style='background:#0f172a;border-radius:6px;padding:6px 8px;text-align:center'>"
-        f"<div style='font-size:16px;font-weight:800;color:#a78bfa'>{len(col_analysis['numeric'])}</div>"
-        f"<div style='font-size:9px;color:#475569;text-transform:uppercase;letter-spacing:0.06em'>Numeric</div></div>"
-        f"<div style='background:#0f172a;border-radius:6px;padding:6px 8px;text-align:center'>"
-        f"<div style='font-size:16px;font-weight:800;color:#fb923c'>{len(col_analysis['categorical'])}</div>"
-        f"<div style='font-size:9px;color:#475569;text-transform:uppercase;letter-spacing:0.06em'>Category</div></div>"
+        f"<div style='background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;text-align:center'>"
+        f"<div style='font-size:16px;font-weight:800;color:#2563eb'>{df.shape[0]:,}</div>"
+        f"<div style='font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em'>Rows</div></div>"
+        f"<div style='background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;text-align:center'>"
+        f"<div style='font-size:16px;font-weight:800;color:#059669'>{df.shape[1]}</div>"
+        f"<div style='font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em'>Columns</div></div>"
+        f"<div style='background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;text-align:center'>"
+        f"<div style='font-size:16px;font-weight:800;color:#7c3aed'>{len(col_analysis['numeric'])}</div>"
+        f"<div style='font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em'>Numeric</div></div>"
+        f"<div style='background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;text-align:center'>"
+        f"<div style='font-size:16px;font-weight:800;color:#ea580c'>{len(col_analysis['categorical'])}</div>"
+        f"<div style='font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em'>Category</div></div>"
         f"</div></div>",
         unsafe_allow_html=True)
 
