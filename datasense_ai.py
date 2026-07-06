@@ -890,12 +890,117 @@ def ask_claude(question, df_info, dtype):
     except Exception as e:
         yield f"Error: {e}"
 
+# ── REPORT GENERATOR ──────────────────────────────────────────────────────────
+def generate_html_report(file_title, dtype, cfg, df, col_analysis, adv_stats, ss):
+    import datetime as _dt
+    now_str = _dt.datetime.now().strftime("%Y-%m-%d %H:%M")
+    total_missing = int(df.isnull().sum().sum())
+    dupes = int(df.duplicated().sum())
+    completeness = round((1 - df.isnull().sum().sum() / (df.shape[0]*df.shape[1])) * 100, 1)
+
+    kpi_html = ""
+    for nc in col_analysis["numeric"][:6]:
+        s = df[nc].dropna()
+        kpi_html += (
+            f'<div class="kpi-card">'
+            f'<div class="kpi-label">{nc.replace("_"," ").upper()}</div>'
+            f'<div class="kpi-value">{fmt_plain(s.sum())}</div>'
+            f'<div class="kpi-sub">Avg {fmt_plain(s.mean())} · Max {fmt_plain(s.max())}</div>'
+            f'</div>'
+        )
+
+    charts_html = ""
+    try:
+        if col_analysis["date"] and col_analysis["numeric"]:
+            fig_t = plot_trend(df, col_analysis)
+            charts_html += "<h3 class='section-title'>Trend Chart</h3>" + fig_t.to_html(full_html=False, include_plotlyjs="cdn")
+        if col_analysis["categorical"] and col_analysis["numeric"]:
+            fig_p = plot_pie(df, col_analysis["categorical"][0], col_analysis["numeric"][0])
+            charts_html += "<h3 class='section-title'>Category Breakdown</h3>" + fig_p.to_html(full_html=False, include_plotlyjs=False)
+    except Exception:
+        charts_html = "<p>Charts could not be generated.</p>"
+
+    ai_html = ""
+    ai_labels = {"ai_exec": "Executive Summary", "ai_trends": "Trend Analysis",
+                 "ai_cat": "Category Insights", "ai_anomaly": "Data Quality Report"}
+    for ai_key, label in ai_labels.items():
+        txt = ss.get(ai_key, "")
+        if txt:
+            ai_html += (
+                f'<div class="ai-box">'
+                f'<div class="ai-title">{label}</div>'
+                f'<p>{txt.replace(chr(10), "<br>")}</p>'
+                f'</div>'
+            )
+
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DataSense AI Report — {file_title}</title>
+<style>
+body{{font-family:system-ui,sans-serif;background:#f8fafc;color:#0d1f3c;margin:0;padding:0}}
+.header{{background:linear-gradient(135deg,#0f172a,#1e3a5f);color:#fff;padding:2rem 3rem}}
+.header h1{{margin:0 0 6px;font-size:26px;font-weight:800}}
+.header p{{margin:0;color:#94a3b8;font-size:13px}}
+.badge{{background:rgba(91,75,255,0.3);color:#c4b5fd;border-radius:6px;padding:2px 10px;font-size:11px;font-weight:700;margin-right:6px}}
+.content{{max-width:1100px;margin:0 auto;padding:2rem 3rem}}
+.section-title{{font-size:11px;font-weight:700;color:#5b4bff;text-transform:uppercase;letter-spacing:0.1em;border-left:3px solid #5b4bff;padding-left:10px;margin:2rem 0 1rem}}
+.kpi-grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:14px;margin-bottom:2rem}}
+.kpi-card{{background:#fff;border-radius:12px;padding:1rem 1.2rem;border:1px solid #edf0f7;box-shadow:0 1px 4px rgba(0,0,0,0.04)}}
+.kpi-label{{font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px}}
+.kpi-value{{font-size:24px;font-weight:800;color:#0d1f3c;line-height:1.1;margin-bottom:4px}}
+.kpi-sub{{font-size:11px;color:#94a3b8}}
+.stats-row{{display:flex;flex-wrap:wrap;gap:0;background:#fff;border-radius:10px;border:1px solid #edf0f7;margin-bottom:1.5rem;overflow:hidden}}
+.stat-item{{padding:12px 20px;border-right:1px solid #e2e8f0}}
+.stat-label{{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em}}
+.stat-val{{font-size:20px;font-weight:800;color:#0d1f3c}}
+.ai-box{{background:#fff;border:1px solid #e4e0ff;border-left:3px solid #5b4bff;border-radius:0 12px 12px 0;padding:1rem 1.4rem;margin-bottom:1rem}}
+.ai-title{{font-size:11px;font-weight:700;color:#5b4bff;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px}}
+.ai-box p{{font-size:13px;color:#1e293b;line-height:1.8;margin:0}}
+footer{{background:#0f172a;color:#475569;text-align:center;padding:1.5rem;font-size:12px;margin-top:3rem}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div style="margin-bottom:10px">
+    <span class="badge">{cfg["icon"]} {cfg["label"]}</span>
+    <span class="badge">Generated {now_str}</span>
+  </div>
+  <h1>{file_title}</h1>
+  <p>{df.shape[0]:,} rows · {df.shape[1]} columns · DataSense AI Report</p>
+</div>
+<div class="content">
+  <div class="section-title">Data Overview</div>
+  <div class="stats-row">
+    <div class="stat-item"><div class="stat-label">Rows</div><div class="stat-val">{df.shape[0]:,}</div></div>
+    <div class="stat-item"><div class="stat-label">Columns</div><div class="stat-val">{df.shape[1]}</div></div>
+    <div class="stat-item"><div class="stat-label">Completeness</div><div class="stat-val">{completeness}%</div></div>
+    <div class="stat-item"><div class="stat-label">Missing</div><div class="stat-val">{total_missing:,}</div></div>
+    <div class="stat-item"><div class="stat-label">Duplicates</div><div class="stat-val">{dupes:,}</div></div>
+    <div class="stat-item"><div class="stat-label">Numeric Cols</div><div class="stat-val">{len(col_analysis["numeric"])}</div></div>
+  </div>
+  <div class="section-title">Key Performance Indicators</div>
+  <div class="kpi-grid">{kpi_html}</div>
+  <div class="section-title">Charts</div>
+  {charts_html}
+  {"<div class='section-title'>AI Insights</div>" + ai_html if ai_html else ""}
+</div>
+<footer>Generated by DataSense AI · {now_str} · Powered by Claude</footer>
+</body>
+</html>"""
+    return html.encode("utf-8")
+
 # ── FILE STATE ────────────────────────────────────────────────────────────────
 _HERE = os.path.dirname(os.path.abspath(__file__))
 if "stored_file" not in st.session_state:
     st.session_state["stored_file"] = None
 if "show_uploader" not in st.session_state:
     st.session_state["show_uploader"] = False
+if "df_modified" not in st.session_state:
+    st.session_state["df_modified"] = None
+if "df_modified_for" not in st.session_state:
+    st.session_state["df_modified_for"] = None
 
 # ══════════════════════════════════════════════════════════════════════════════
 # WELCOME
@@ -1756,10 +1861,17 @@ except Exception as e:
         st.session_state["stored_file"] = None; st.rerun()
     st.stop()
 
+# Apply cleaned/modified df if it belongs to the current file
+if (st.session_state.get("df_modified_for") == _stored["name"]
+        and st.session_state.get("df_modified") is not None):
+    df = st.session_state["df_modified"]
+
 if st.session_state.get("last_file") != _stored["name"]:
     st.session_state["active_view"] = "overview"
     st.session_state["last_file"]   = _stored["name"]
     st.session_state["messages"]    = []
+    st.session_state["df_modified"] = None
+    st.session_state["df_modified_for"] = None
     for k in list(st.session_state.keys()):
         if k.startswith("ai_"): del st.session_state[k]
 
@@ -1775,8 +1887,11 @@ smart_insights= compute_smart_insights(df, col_analysis, dtype)
 file_title = (_stored["name"].replace(".csv","").replace(".xlsx","").replace(".xls","")
               .replace("_"," ").replace("-"," ").title())
 
-tb1, tb2, tb3, tb4 = st.columns([4, 1, 1, 1])
+tb1, tb2, tb3, tb4, tb5 = st.columns([3.5, 1, 1, 1, 1])
 with tb1:
+    _modified_badge = (' <span style="background:#fef3c7;border:1px solid #fde68a;color:#92400e;'
+                       'border-radius:6px;padding:1px 7px;font-size:10px;font-weight:700">✏ Cleaned</span>'
+                       if st.session_state.get("df_modified_for") == _stored["name"] else "")
     st.markdown(
         f'<div style="display:flex;align-items:center;gap:10px;padding:6px 0 2px">'
         f'<div style="background:#f0eeff;border:1px solid #c4b5fd;border-radius:8px;padding:4px 12px;display:flex;align-items:center;gap:6px">'
@@ -1785,21 +1900,25 @@ with tb1:
         f'</div>'
         f'<span style="font-size:16px;font-weight:700;color:#0d1f3c">{file_title}</span>'
         f'<span style="font-size:12px;color:#94a3b8">{df.shape[0]:,} rows · {df.shape[1]} cols</span>'
+        f'{_modified_badge}'
         f'</div>',
         unsafe_allow_html=True)
 with tb2:
     csv = df.to_csv(index=False).encode('utf-8')
-    st.download_button("⬇ Export", csv, f"{file_title}.csv", "text/csv", use_container_width=True)
+    st.download_button("⬇ CSV", csv, f"{file_title}.csv", "text/csv", use_container_width=True)
 with tb3:
+    _report_bytes = generate_html_report(file_title, dtype, cfg, df, col_analysis, adv_stats, st.session_state)
+    st.download_button("📄 Report", _report_bytes, f"{file_title}_report.html", "text/html", use_container_width=True)
+with tb4:
     if st.button("🔄 Refresh AI", use_container_width=True):
         for k in list(st.session_state.keys()):
             if k.startswith("ai_"): del st.session_state[k]
         st.rerun()
-with tb4:
+with tb5:
     if st.button("↩ Home", use_container_width=True):
         st.session_state["stored_file"] = None
         for k in list(st.session_state.keys()):
-            if k.startswith(("df_","ai_","last_","messages","active_")): del st.session_state[k]
+            if k.startswith(("df_","ai_","last_","messages","active_","df_modified")): del st.session_state[k]
         st.rerun()
 
 # ── HORIZONTAL NAV ───────────────────────────────────────────────────────────
@@ -1807,10 +1926,11 @@ pages = [("🏠 Overview","overview"),("💡 Insights","smart"),
          ("📊 KPIs","kpis"),("📈 Trends","trends"),
          ("📦 Categories","categories"),("🔗 Correlations","correlations"),
          ("🔍 Anomalies","anomalies"),("🤖 AI Analysis","ai"),
-         ("📋 Data Table","table"),("🤖 Data Agent","agent")]
+         ("📋 Data Table","table"),("🤖 Data Agent","agent"),
+         ("🧹 Clean","clean"),("🔮 Forecast","forecast")]
 
 if not col_analysis["date"] or not col_analysis["numeric"]:
-    pages = [p for p in pages if p[1] != "trends"]
+    pages = [p for p in pages if p[1] not in ("trends", "forecast")]
 if not col_analysis["categorical"]:
     pages = [p for p in pages if p[1] != "categories"]
 if len(col_analysis["numeric"]) < 2:
@@ -2506,6 +2626,262 @@ Rules:
         if st.button("🗑️ Clear conversation", use_container_width=False):
             st.session_state.agent_messages = []
             st.rerun()
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PAGE: DATA CLEANING
+# ══════════════════════════════════════════════════════════════════════════════
+elif active_view == "clean":
+    st.markdown('<div class="sec-head">🧹 Data Cleaning Panel — Fix Missing Values, Duplicates & Columns</div>', unsafe_allow_html=True)
+
+    _work_df = df.copy()
+    total_missing = int(_work_df.isnull().sum().sum())
+    dupes = int(_work_df.duplicated().sum())
+    completeness = round((1 - _work_df.isnull().sum().sum() / (_work_df.shape[0]*_work_df.shape[1])) * 100, 1)
+
+    cl1, cl2, cl3, cl4 = st.columns(4)
+    with cl1:
+        st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#2563eb"></div><div class="kpi-label">Completeness</div><div class="kpi-value">{completeness}%</div></div>', unsafe_allow_html=True)
+    with cl2:
+        st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:{"#ef4444" if total_missing>0 else "#10b981"}"></div><div class="kpi-label">Missing Values</div><div class="kpi-value">{total_missing:,}</div><div class="kpi-sub">Across all columns</div></div>', unsafe_allow_html=True)
+    with cl3:
+        st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:{"#ef4444" if dupes>0 else "#10b981"}"></div><div class="kpi-label">Duplicate Rows</div><div class="kpi-value">{dupes:,}</div></div>', unsafe_allow_html=True)
+    with cl4:
+        is_modified = st.session_state.get("df_modified_for") == _stored["name"]
+        st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#8b5cf6"></div><div class="kpi-label">Dataset Status</div><div class="kpi-value" style="font-size:16px">{"✏ Modified" if is_modified else "✅ Original"}</div></div>', unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    tab_missing, tab_dupes, tab_cols = st.tabs(["📭 Missing Values", "🔄 Duplicates", "🗂️ Drop Columns"])
+
+    with tab_missing:
+        cols_with_missing = [c for c in _work_df.columns if _work_df[c].isna().sum() > 0]
+        if not cols_with_missing:
+            st.success("✅ No missing values found in your dataset!")
+        else:
+            st.markdown(f"<p style='color:#64748b;font-size:13px'>{len(cols_with_missing)} column(s) have missing values. Choose how to handle each.</p>", unsafe_allow_html=True)
+            fill_actions = {}
+            for col in cols_with_missing:
+                miss_count = int(_work_df[col].isna().sum())
+                miss_pct = round(miss_count / len(_work_df) * 100, 1)
+                is_num = pd.api.types.is_numeric_dtype(_work_df[col])
+                mc1, mc2, mc3 = st.columns([2, 1.5, 1.5])
+                with mc1:
+                    st.markdown(
+                        f'<div style="padding:8px 0">'
+                        f'<div style="font-size:13px;font-weight:600;color:#0d1f3c">{col}</div>'
+                        f'<div style="font-size:11px;color:#94a3b8">{miss_count:,} missing ({miss_pct}%)</div>'
+                        f'</div>', unsafe_allow_html=True)
+                with mc2:
+                    if is_num:
+                        opts = ["Leave as-is", "Fill with Mean", "Fill with Median", "Fill with Zero", "Drop rows"]
+                    else:
+                        opts = ["Leave as-is", "Fill with Mode", "Fill with 'Unknown'", "Drop rows"]
+                    action = st.selectbox("", opts, key=f"fill_{col}", label_visibility="collapsed")
+                    fill_actions[col] = action
+                with mc3:
+                    if is_num and "Mean" in action:
+                        st.caption(f"→ will fill with {fmt_plain(_work_df[col].mean())}")
+                    elif is_num and "Median" in action:
+                        st.caption(f"→ will fill with {fmt_plain(_work_df[col].median())}")
+                    elif is_num and "Zero" in action:
+                        st.caption("→ will fill with 0")
+                    elif "Mode" in action:
+                        mode_v = _work_df[col].mode()
+                        st.caption(f"→ will fill with '{mode_v[0] if len(mode_v) else '?'}'")
+                    elif "Unknown" in action:
+                        st.caption("→ will fill with 'Unknown'")
+                    elif "Drop" in action:
+                        st.caption(f"→ will drop {miss_count} rows")
+
+            if st.button("✅ Apply Missing Value Fixes", type="primary", key="apply_missing"):
+                new_df = _work_df.copy()
+                for col, action in fill_actions.items():
+                    if action == "Fill with Mean":
+                        new_df[col] = new_df[col].fillna(new_df[col].mean())
+                    elif action == "Fill with Median":
+                        new_df[col] = new_df[col].fillna(new_df[col].median())
+                    elif action == "Fill with Zero":
+                        new_df[col] = new_df[col].fillna(0)
+                    elif action == "Fill with Mode":
+                        mv = new_df[col].mode()
+                        if len(mv): new_df[col] = new_df[col].fillna(mv[0])
+                    elif action == "Fill with 'Unknown'":
+                        new_df[col] = new_df[col].fillna("Unknown")
+                    elif action == "Drop rows":
+                        new_df = new_df.dropna(subset=[col])
+                st.session_state["df_modified"] = new_df.reset_index(drop=True)
+                st.session_state["df_modified_for"] = _stored["name"]
+                for k in list(st.session_state.keys()):
+                    if k.startswith("ai_"): del st.session_state[k]
+                st.success(f"✅ Applied! Dataset now has {len(new_df):,} rows and {new_df.isnull().sum().sum()} missing values.")
+                st.rerun()
+
+    with tab_dupes:
+        if dupes == 0:
+            st.success("✅ No duplicate rows found in your dataset!")
+        else:
+            st.warning(f"⚠️ Found **{dupes:,}** duplicate row(s) — {round(dupes/len(_work_df)*100,1)}% of your data.")
+            with st.expander("Preview duplicate rows (first 20)"):
+                st.dataframe(_work_df[_work_df.duplicated(keep=False)].head(20), use_container_width=True)
+            if st.button(f"🗑️ Remove All {dupes:,} Duplicate Rows", type="primary", key="remove_dupes"):
+                new_df = _work_df.drop_duplicates().reset_index(drop=True)
+                st.session_state["df_modified"] = new_df
+                st.session_state["df_modified_for"] = _stored["name"]
+                for k in list(st.session_state.keys()):
+                    if k.startswith("ai_"): del st.session_state[k]
+                st.success(f"✅ Removed {dupes:,} duplicates. {len(new_df):,} unique rows remain.")
+                st.rerun()
+
+    with tab_cols:
+        st.markdown("<p style='color:#64748b;font-size:13px'>Select columns to permanently remove from the working dataset.</p>", unsafe_allow_html=True)
+        cols_to_drop = st.multiselect("Columns to drop", options=_work_df.columns.tolist(), key="cols_to_drop")
+        if cols_to_drop:
+            st.warning(f"Will remove: **{', '.join(cols_to_drop)}**  ({len(_work_df.columns) - len(cols_to_drop)} columns will remain)")
+            if st.button(f"🗑️ Drop {len(cols_to_drop)} Column(s)", type="primary", key="drop_cols"):
+                new_df = _work_df.drop(columns=cols_to_drop)
+                st.session_state["df_modified"] = new_df
+                st.session_state["df_modified_for"] = _stored["name"]
+                for k in list(st.session_state.keys()):
+                    if k.startswith("ai_"): del st.session_state[k]
+                st.success(f"✅ Dropped {len(cols_to_drop)} column(s). {len(new_df.columns)} columns remain.")
+                st.rerun()
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.session_state.get("df_modified_for") == _stored["name"]:
+        st.markdown('<div class="sec-head">Reset to Original</div>', unsafe_allow_html=True)
+        st.markdown("<p style='color:#64748b;font-size:13px'>Undo all cleaning changes and restore the original uploaded data.</p>", unsafe_allow_html=True)
+        if st.button("↺ Reset to Original Data", key="reset_clean"):
+            st.session_state["df_modified"] = None
+            st.session_state["df_modified_for"] = None
+            for k in list(st.session_state.keys()):
+                if k.startswith("ai_"): del st.session_state[k]
+            st.success("✅ Restored to original data.")
+            st.rerun()
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PAGE: FORECASTING
+# ══════════════════════════════════════════════════════════════════════════════
+elif active_view == "forecast":
+    st.markdown('<div class="sec-head">🔮 Forecasting — Predict Future Trends</div>', unsafe_allow_html=True)
+    if not col_analysis["date"] or not col_analysis["numeric"]:
+        st.info("Forecasting requires at least one date column and one numeric column.")
+    else:
+        fc1, fc2, fc3 = st.columns([2, 1, 1])
+        with fc1:
+            fc_num = st.selectbox("Metric to forecast", col_analysis["numeric"], key="fc_num")
+        with fc2:
+            fc_periods = st.selectbox("Forecast periods", [7, 14, 30, 60, 90], index=2, key="fc_periods")
+        with fc3:
+            fc_unit = st.selectbox("Period unit", ["days", "months"], key="fc_unit")
+
+        try:
+            date_col = col_analysis["date"][0]
+            df_fc = df[[date_col, fc_num]].copy().dropna()
+            df_fc[date_col] = pd.to_datetime(df_fc[date_col], errors="coerce")
+            df_fc = df_fc.dropna(subset=[date_col])
+
+            if fc_unit == "months":
+                df_fc["_period"] = df_fc[date_col].dt.to_period("M").dt.to_timestamp()
+            else:
+                df_fc["_period"] = df_fc[date_col].dt.normalize()
+
+            agg = df_fc.groupby("_period")[fc_num].sum().reset_index().sort_values("_period")
+
+            if len(agg) < 3:
+                st.warning("Need at least 3 data points to forecast. Try switching to 'months' unit or upload more data.")
+            else:
+                x = np.arange(len(agg), dtype=float)
+                y = agg[fc_num].values.astype(float)
+                coeffs = np.polyfit(x, y, 1)
+                trend_line = np.polyval(coeffs, x)
+                std_resid = np.std(y - trend_line)
+
+                last_date = agg["_period"].iloc[-1]
+                if fc_unit == "months":
+                    future_dates = [last_date + pd.DateOffset(months=i+1) for i in range(fc_periods)]
+                else:
+                    future_dates = [last_date + pd.Timedelta(days=i+1) for i in range(fc_periods)]
+
+                x_future = np.arange(len(agg), len(agg) + fc_periods, dtype=float)
+                y_forecast = np.polyval(coeffs, x_future)
+
+                fig = go.Figure()
+                fig.add_trace(go.Scatter(
+                    x=agg["_period"], y=y, mode="lines+markers",
+                    name="Historical", line=dict(color="#5b4bff", width=2.5),
+                    marker=dict(size=6, color="#5b4bff")))
+                fig.add_trace(go.Scatter(
+                    x=agg["_period"], y=trend_line, mode="lines",
+                    name="Trend line", line=dict(color="#94a3b8", width=1.5, dash="dot")))
+                fig.add_trace(go.Scatter(
+                    x=future_dates, y=y_forecast, mode="lines+markers",
+                    name="Forecast", line=dict(color="#10b981", width=2.5, dash="dash"),
+                    marker=dict(size=7, color="#10b981", symbol="diamond")))
+                fig.add_trace(go.Scatter(
+                    x=list(future_dates) + list(reversed(future_dates)),
+                    y=list(y_forecast + 1.96*std_resid) + list(reversed(y_forecast - 1.96*std_resid)),
+                    fill="toself", fillcolor="rgba(16,185,129,0.10)",
+                    line=dict(color="rgba(0,0,0,0)"),
+                    name="95% confidence", hoverinfo="skip"))
+
+                fig.add_vline(x=str(last_date), line_width=1.5, line_dash="dash", line_color="#e2e8f0")
+                fig.update_layout(**mk_layout(height=420, showlegend=True))
+                fig.update_layout(
+                    legend=dict(orientation="h", y=1.02, x=0),
+                    xaxis_title="Period",
+                    yaxis_title=fc_num.replace("_", " ").title()
+                )
+                st.plotly_chart(fig, use_container_width=True)
+
+                last_val = float(y[-1])
+                next_val = float(y_forecast[0])
+                end_val  = float(y_forecast[-1])
+                pct_chg  = (next_val - last_val) / abs(last_val) * 100 if last_val != 0 else 0
+                growth_rate = float(coeffs[0])
+
+                fk1, fk2, fk3, fk4 = st.columns(4)
+                with fk1:
+                    dir_color = "#10b981" if growth_rate >= 0 else "#ef4444"
+                    dir_txt   = "▲ Upward" if growth_rate >= 0 else "▼ Downward"
+                    st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:{dir_color}"></div><div class="kpi-label">Trend Direction</div><div class="kpi-value" style="font-size:18px;color:{dir_color}">{dir_txt}</div><div class="kpi-sub">{fmt_plain(abs(growth_rate))} per period</div></div>', unsafe_allow_html=True)
+                with fk2:
+                    st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#5b4bff"></div><div class="kpi-label">Next Period</div><div class="kpi-value">{fmt_plain(next_val)}</div><div class="kpi-sub">Current: {fmt_plain(last_val)}</div></div>', unsafe_allow_html=True)
+                with fk3:
+                    chg_cls = "kpi-up" if pct_chg >= 0 else "kpi-dn"
+                    st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#f59e0b"></div><div class="kpi-label">Expected Change</div><div class="kpi-value"><span class="{chg_cls}">{pct_chg:+.1f}%</span></div><div class="kpi-sub">vs current period</div></div>', unsafe_allow_html=True)
+                with fk4:
+                    st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#8b5cf6"></div><div class="kpi-label">{fc_periods} {fc_unit.title()} Out</div><div class="kpi-value">{fmt_plain(end_val)}</div><div class="kpi-sub">End of forecast range</div></div>', unsafe_allow_html=True)
+
+                st.markdown("<br>", unsafe_allow_html=True)
+
+                fc_cache_key = f"ai_forecast_{fc_num}_{fc_periods}_{fc_unit}"
+                forecast_ctx = (
+                    f"Metric: {fc_num}. Historical periods: {len(agg)}. "
+                    f"Last value: {fmt_plain(last_val)}. "
+                    f"Trend: {'growing' if growth_rate>=0 else 'declining'} at {fmt_plain(abs(growth_rate))} per period. "
+                    f"Next period forecast: {fmt_plain(next_val)} ({pct_chg:+.1f}% change). "
+                    f"{fc_periods}-{fc_unit} forecast end: {fmt_plain(end_val)}. Dataset type: {dtype}."
+                )
+                if fc_cache_key not in st.session_state:
+                    st.markdown('<div class="ai-box-title" style="font-size:11px;font-weight:700;color:#5b4bff;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🤖 Forecast Interpretation</div>', unsafe_allow_html=True)
+                    st.session_state[fc_cache_key] = st.write_stream(
+                        ask_claude(
+                            f"Interpret this forecast and give 3-4 specific actionable recommendations: {forecast_ctx}",
+                            df_info, dtype
+                        )
+                    )
+                else:
+                    st.markdown(
+                        f'<div class="ai-box"><div class="ai-box-title">🤖 Forecast Interpretation</div>'
+                        f'<div class="ai-box-text">{st.session_state[fc_cache_key].replace(chr(10),"<br>")}</div></div>',
+                        unsafe_allow_html=True)
+                if st.button("↻ Regenerate interpretation", key="regen_forecast"):
+                    if fc_cache_key in st.session_state:
+                        del st.session_state[fc_cache_key]
+                    st.rerun()
+
+        except Exception as _fe:
+            st.error(f"Forecasting error: {_fe}")
 
 else:
     st.info("Select a page from the navigation bar above.")
