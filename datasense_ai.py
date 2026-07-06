@@ -2161,7 +2161,7 @@ with tb5:
             if k.startswith(("df_","ai_","last_","messages","active_","df_modified")): del st.session_state[k]
         st.rerun()
 
-# ── HORIZONTAL NAV (anchor links — no rerun on click) ────────────────────────
+# ── STICKY HORIZONTAL NAV (anchor links — no rerun on click) ─────────────────
 _nav_items = [("🏠 Overview","overview"),("💡 Insights","smart"),("📊 KPIs","kpis")]
 if col_analysis["date"] and col_analysis["numeric"]:
     _nav_items.append(("📈 Trends","trends"))
@@ -2172,9 +2172,14 @@ if len(col_analysis["numeric"]) >= 2:
 _nav_items.append(("🔍 Anomalies","anomalies"))
 if col_analysis["date"] and col_analysis["numeric"]:
     _nav_items.append(("🔮 Forecast","forecast"))
-_nav_items += [("🤖 AI Analysis","ai"),("🧹 Clean","clean"),("🤖 Data Agent","agent")]
+_nav_items += [("🤖 AI Analysis","ai"),("🧹 Clean","clean")]
+# Data Agent is accessed via floating chat button — not in nav
 
-_nav_html = '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px">'
+_nav_html = (
+    '<div style="position:sticky;top:0;z-index:999;background:#ffffff;'
+    'padding:8px 0 10px;border-bottom:1px solid #e2e8f0;'
+    'display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px">'
+)
 for _lbl, _k in _nav_items:
     _nav_html += (
         f'<a class="nav-link-btn" href="javascript:void(0)" '
@@ -2184,10 +2189,25 @@ for _lbl, _k in _nav_items:
     )
 _nav_html += '</div>'
 st.markdown(_nav_html, unsafe_allow_html=True)
-st.markdown("<hr style='border:none;border-top:1px solid #e2e8f0;margin:4px 0 16px'>", unsafe_allow_html=True)
+
+# ── FLOATING CHAT BUTTON — opens Data Agent section ───────────────────────────
+st.markdown("""
+<a href="javascript:void(0)"
+  onclick="(function(){var el=document.getElementById('sec-agent');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});})();return false;"
+  style="position:fixed;bottom:28px;right:28px;z-index:9999;
+  width:54px;height:54px;border-radius:50%;
+  background:linear-gradient(135deg,#5b4bff,#7c3aed);
+  color:#fff;font-size:22px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(91,75,255,0.45);
+  text-decoration:none;transition:transform 0.2s;cursor:pointer"
+  title="Open Data Agent">
+  🤖
+</a>
+""", unsafe_allow_html=True)
 
 def _sec_anchor(key):
-    st.markdown(f'<div id="sec-{key}" style="scroll-margin-top:60px"></div>', unsafe_allow_html=True)
+    st.markdown(f'<div id="sec-{key}" style="scroll-margin-top:72px"></div>', unsafe_allow_html=True)
 
 def _sec_divider():
     st.markdown("<div style='height:1.5rem'></div><hr style='border:none;border-top:2px solid #f1f5f9;margin:0 0 2rem'>", unsafe_allow_html=True)
@@ -2226,10 +2246,10 @@ with oc1:
     st.markdown('<div class="sec-head">Trend Overview — How Your Key Metrics Move</div>', unsafe_allow_html=True)
     try:
         if col_analysis["date"] and col_analysis["numeric"]:
-            st.plotly_chart(plot_trend(df, col_analysis), use_container_width=True)
+            st.plotly_chart(plot_trend(df, col_analysis), use_container_width=True, key="ov_trend")
         elif col_analysis["categorical"] and col_analysis["numeric"]:
             cat = col_analysis["categorical"][0]; num = col_analysis["numeric"][0]
-            st.plotly_chart(plot_bar(df, cat, num, horizontal=df[cat].nunique()>6), use_container_width=True)
+            st.plotly_chart(plot_bar(df, cat, num, horizontal=df[cat].nunique()>6), use_container_width=True, key="ov_bar")
         else:
             st.info("Upload data with numeric columns to see charts.")
     except Exception as e:
@@ -2240,7 +2260,7 @@ with oc2:
     try:
         if col_analysis["categorical"] and col_analysis["numeric"]:
             cat = col_analysis["categorical"][0]; num = col_analysis["numeric"][0]
-            st.plotly_chart(plot_pie(df, cat, num), use_container_width=True)
+            st.plotly_chart(plot_pie(df, cat, num), use_container_width=True, key="ov_pie")
     except Exception as e:
         st.error(f"Chart error: {e}")
 
@@ -2299,7 +2319,7 @@ if col_analysis["categorical"] and col_analysis["numeric"]:
                 st.markdown(f"**{cat.replace('_',' ').title()} by {num.replace('_',' ').title()}**")
                 try:
                     n = df[cat].nunique()
-                    st.plotly_chart(plot_bar(df, cat, num, horizontal=n>5), use_container_width=True)
+                    st.plotly_chart(plot_bar(df, cat, num, horizontal=n>5), use_container_width=True, key=f"sm_bar_{cat}")
                 except Exception as e:
                     st.error(str(e))
 _sec_divider()
@@ -2337,7 +2357,7 @@ else:
         for j, nc in enumerate(batch):
             with cols[j]:
                 st.markdown(f"**{nc.replace('_',' ').title()}**")
-                try: st.plotly_chart(plot_histogram(df, nc), use_container_width=True)
+                try: st.plotly_chart(plot_histogram(df, nc), use_container_width=True, key=f"kpi_hist_{nc}")
                 except Exception as e: st.error(str(e))
 _sec_divider()
 
@@ -2365,14 +2385,14 @@ else:
             st.markdown(f'<div class="kpi-card"><div class="kpi-bar" style="background:#f59e0b"></div><div class="kpi-label">Periods</div><div class="kpi-value">{ti["periods"]}</div><div class="kpi-sub">Monthly periods</div></div>', unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
 
-    try: st.plotly_chart(plot_trend(df, col_analysis), use_container_width=True)
+    try: st.plotly_chart(plot_trend(df, col_analysis), use_container_width=True, key="tr_trend")
     except Exception as e: st.error(f"Error: {e}")
 
     if col_analysis["categorical"]:
         st.markdown('<div class="sec-head">Heatmap — Monthly Performance by Segment</div>', unsafe_allow_html=True)
         try:
             _hm = plot_heatmap(df, col_analysis)
-            if _hm: st.plotly_chart(_hm, use_container_width=True)
+            if _hm: st.plotly_chart(_hm, use_container_width=True, key="tr_heatmap")
         except Exception as e: st.error(f"Heatmap error: {e}")
 
     if "ai_trends" not in st.session_state:
@@ -2415,10 +2435,10 @@ else:
         with bc1:
             try:
                 n = df[cat].nunique()
-                st.plotly_chart(plot_bar(df, cat, num_col, horizontal=n>6), use_container_width=True)
+                st.plotly_chart(plot_bar(df, cat, num_col, horizontal=n>6), use_container_width=True, key=f"cat_bar_{cat}")
             except Exception as e: st.error(str(e))
         with bc2:
-            try: st.plotly_chart(plot_pie(df, cat, num_col), use_container_width=True)
+            try: st.plotly_chart(plot_pie(df, cat, num_col), use_container_width=True, key=f"cat_pie_{cat}")
             except Exception as e: st.error(str(e))
 
     if "ai_cat" not in st.session_state:
@@ -2465,7 +2485,7 @@ else:
         for idx, (c1, c2) in enumerate(pairs_to_plot[:3]):
             with sc_cols[idx]:
                 st.markdown(f"**{c1.replace('_',' ').title()} vs {c2.replace('_',' ').title()}**")
-                try: st.plotly_chart(plot_scatter(df, c1, c2), use_container_width=True)
+                try: st.plotly_chart(plot_scatter(df, c1, c2), use_container_width=True, key=f"corr_sc_{c1}_{c2}")
                 except Exception as e: st.error(str(e))
 
     st.markdown('<div class="sec-head">Full Correlation Matrix — Every Pair at a Glance</div>', unsafe_allow_html=True)
@@ -2610,7 +2630,7 @@ else:
                 xaxis_title="Period",
                 yaxis_title=fc_num.replace("_", " ").title()
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True, key=f"fc_chart_{fc_num}")
 
             last_val = float(y[-1])
             next_val = float(y_forecast[0])
@@ -2949,7 +2969,7 @@ for msg in st.session_state.agent_messages:
                                "query_result.csv", "text/csv",
                                key=f"dl_{msg.get('id',0)}")
         if "chart" in msg:
-            st.plotly_chart(msg["chart"], use_container_width=True)
+            st.plotly_chart(msg["chart"], use_container_width=True, key=f"agent_chart_{msg.get('id',0)}")
         if "code" in msg:
             with st.expander("📝 View generated code"):
                 st.code(msg["code"], language="python")
