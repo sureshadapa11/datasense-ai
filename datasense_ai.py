@@ -96,8 +96,9 @@ section[data-testid="stFileUploaderDropzone"] > div {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    gap: 10px !important;
-    padding-top: 0.5rem !important;
+    justify-content: center !important;
+    gap: 0 !important;
+    padding: 0.75rem 0 !important;
 }
 /* Browse files button — filled violet pill */
 section[data-testid="stFileUploaderDropzone"] button {
@@ -117,14 +118,9 @@ section[data-testid="stFileUploaderDropzone"] button:hover {
     box-shadow: 0 6px 20px rgba(91,75,255,0.38) !important;
     transform: translateY(-1px) !important;
 }
+/* Hide Streamlit's built-in instructions — our card HTML already shows them */
 div[data-testid="stFileUploaderDropzoneInstructions"] {
-    text-align: center !important;
-}
-div[data-testid="stFileUploaderDropzoneInstructions"] span {
-    color: #94a3b8 !important;
-    font-size: 12.5px !important;
-    font-weight: 400 !important;
-    letter-spacing: 0 !important;
+    display: none !important;
 }
 
 /* ── TABS ── */
