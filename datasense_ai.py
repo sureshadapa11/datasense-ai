@@ -894,6 +894,8 @@ def ask_claude(question, df_info, dtype):
 _HERE = os.path.dirname(os.path.abspath(__file__))
 if "stored_file" not in st.session_state:
     st.session_state["stored_file"] = None
+if "show_uploader" not in st.session_state:
+    st.session_state["show_uploader"] = False
 
 # ══════════════════════════════════════════════════════════════════════════════
 # WELCOME
@@ -1081,61 +1083,6 @@ if not st.session_state["stored_file"]:
               <div style='font-size:15.5px;font-weight:700;color:#0d1f3c;margin-bottom:10px'>{title}</div>
               <div style='font-size:13.5px;color:#64748b;line-height:1.7'>{desc}</div>
             </div>""", unsafe_allow_html=True)
-
-    # ── UPLOAD ZONE ───────────────────────────────────────────────────────────
-    st.markdown("<div style='height:72px'></div>", unsafe_allow_html=True)
-    st.markdown("""
-    <div style='text-align:center;margin-bottom:6px'>
-      <span class='slabel' style='display:inline-block'>Get Started</span>
-    </div>
-    <div style='text-align:center;margin-bottom:32px'>
-      <h2 style='font-size:32px;font-weight:800;color:#0d1f3c;margin:0 0 10px;letter-spacing:-0.025em'>
-        Upload your dataset
-      </h2>
-    </div>
-    """, unsafe_allow_html=True)
-    uz_l, uz_c, uz_r = st.columns([0.5, 3, 0.5])
-    with uz_c:
-        # Card top — cloud icon + drag-drop text (visually merges with Streamlit uploader below)
-        st.markdown("""
-        <div style='background:#f8f7ff;border:2px dashed #c4b5fd;border-bottom:none;
-          border-radius:20px 20px 0 0;padding:2.75rem 2rem 1.5rem;text-align:center'>
-          <svg width="52" height="52" viewBox="0 0 24 24" fill="none"
-            stroke="#5b4bff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
-            style="display:block;margin:0 auto 14px">
-            <polyline points="16 16 12 12 8 16"></polyline>
-            <line x1="12" y1="12" x2="12" y2="21"></line>
-            <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path>
-          </svg>
-          <p style='font-size:17px;font-weight:700;color:#0d1f3c;margin:0 0 6px;letter-spacing:-0.01em'>
-            Drag &amp; drop your file here
-          </p>
-          <p style='font-size:13px;color:#94a3b8;margin:0'>
-            CSV &nbsp;·&nbsp; XLSX &nbsp;·&nbsp; XLS &nbsp;·&nbsp; up to 200 MB
-          </p>
-        </div>
-        """, unsafe_allow_html=True)
-        new_file = st.file_uploader("", type=["csv","xlsx","xls"], label_visibility="collapsed")
-        if new_file:
-            data = new_file.read()
-            st.session_state["stored_file"] = {"bytes": data, "name": new_file.name}
-            st.rerun()
-        st.markdown("""
-        <div style='display:flex;align-items:center;gap:14px;margin:24px 0 20px'>
-          <div style='flex:1;height:1px;background:#e9ecef'></div>
-          <span style='font-size:12.5px;color:#94a3b8;font-weight:500;white-space:nowrap'>
-            or try with sample data
-          </span>
-          <div style='flex:1;height:1px;background:#e9ecef'></div>
-        </div>""", unsafe_allow_html=True)
-        _sample_path = os.path.join(_HERE, "sample_sales_data.csv")
-        sc1, sc2, sc3 = st.columns([1, 2, 1])
-        with sc2:
-            if os.path.exists(_sample_path):
-                if st.button("⚡  Try with sample sales data", use_container_width=True, type="primary"):
-                    with open(_sample_path, "rb") as _f:
-                        st.session_state["stored_file"] = {"bytes": _f.read(), "name": "sample_sales_data.csv"}
-                    st.rerun()
 
     # ── DATASET TYPE SECTION HEADING ──────────────────────────────────────────
     st.markdown("""
@@ -1698,24 +1645,12 @@ if not st.session_state["stored_file"]:
         letter-spacing:-0.03em;line-height:1.1'>
         Ready to understand<br>your data?
       </h2>
-      <p style='font-size:16px;color:rgba(255,255,255,0.75);margin:0 auto 32px;
+      <p style='font-size:16px;color:rgba(255,255,255,0.75);margin:0 auto 36px;
         max-width:440px;line-height:1.7'>
         Drop any CSV or Excel file and get a full AI-powered analytics
         dashboard in under 10 seconds.
       </p>
-      <div style='display:flex;justify-content:center;gap:16px;flex-wrap:wrap'>
-        <div style='background:#fff;border-radius:12px;padding:10px 24px;
-          font-size:13.5px;font-weight:700;color:#5b4bff;
-          box-shadow:0 4px 16px rgba(0,0,0,0.15);cursor:pointer'>
-          ↑ Upload your file above
-        </div>
-        <div style='background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.3);
-          border-radius:12px;padding:10px 24px;font-size:13.5px;font-weight:600;color:#fff'>
-          ⚡ Or try the sample dataset
-        </div>
-      </div>
-      <div style='display:flex;justify-content:center;gap:32px;margin-top:32px;
-        flex-wrap:wrap'>
+      <div style='display:flex;justify-content:center;gap:32px;flex-wrap:wrap'>
         <div style='text-align:center'>
           <div style='font-size:28px;font-weight:800;color:#fff'>9</div>
           <div style='font-size:12px;color:rgba(255,255,255,0.6)'>Analytics views</div>
@@ -1736,7 +1671,75 @@ if not st.session_state["stored_file"]:
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("<div style='height:48px'></div>", unsafe_allow_html=True)
+    # ── CTA BUTTONS (real Streamlit widgets, centered) ────────────────────────
+    st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
+    _cta_l, _cta_c1, _cta_c2, _cta_r = st.columns([1.2, 1.3, 1.3, 1.2])
+
+    _sample_path = os.path.join(_HERE, "sample_sales_data.csv")
+
+    with _cta_c1:
+        st.markdown("""
+        <style>
+        div[data-testid="stButton"] button[kind="primary"] {
+            width:100%;font-size:15px !important;padding:0.75rem 1.5rem !important;
+        }
+        </style>""", unsafe_allow_html=True)
+        if st.button("📂  Upload your data", use_container_width=True, type="primary",
+                     key="cta_upload_btn"):
+            st.session_state["show_uploader"] = True
+            st.rerun()
+
+    with _cta_c2:
+        if os.path.exists(_sample_path):
+            if st.button("⚡  Try sample data", use_container_width=True,
+                         key="cta_sample_btn"):
+                with open(_sample_path, "rb") as _f:
+                    st.session_state["stored_file"] = {"bytes": _f.read(),
+                                                       "name": "sample_sales_data.csv"}
+                st.rerun()
+
+    # ── UPLOADER REVEAL (shown only after clicking Upload button) ─────────────
+    if st.session_state.get("show_uploader"):
+        st.markdown("<div style='height:32px'></div>", unsafe_allow_html=True)
+        _ul, _uc, _ur = st.columns([0.5, 3, 0.5])
+        with _uc:
+            st.markdown("""
+            <div style='background:#f8f7ff;border:2px dashed #c4b5fd;border-bottom:none;
+              border-radius:20px 20px 0 0;padding:2.5rem 2rem 1.5rem;text-align:center'>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                stroke="#5b4bff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                style="display:block;margin:0 auto 14px">
+                <polyline points="16 16 12 12 8 16"></polyline>
+                <line x1="12" y1="12" x2="12" y2="21"></line>
+                <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path>
+              </svg>
+              <p style='font-size:16px;font-weight:700;color:#0d1f3c;margin:0 0 6px'>
+                Drag &amp; drop your file here
+              </p>
+              <p style='font-size:13px;color:#94a3b8;margin:0'>
+                CSV &nbsp;·&nbsp; XLSX &nbsp;·&nbsp; XLS &nbsp;·&nbsp; up to 200 MB
+              </p>
+            </div>""", unsafe_allow_html=True)
+            _new_file = st.file_uploader("", type=["csv","xlsx","xls"],
+                                         label_visibility="collapsed", key="cta_uploader")
+            if _new_file:
+                _data = _new_file.read()
+                st.session_state["stored_file"] = {"bytes": _data, "name": _new_file.name}
+                st.session_state.pop("show_uploader", None)
+                st.rerun()
+            st.markdown("""
+            <div style='text-align:center;margin-top:14px'>
+              <span style='font-size:12px;color:#94a3b8'>
+                Changed your mind?
+              </span>
+            </div>""", unsafe_allow_html=True)
+            _xl, _xc, _xr = st.columns([1, 1.4, 1])
+            with _xc:
+                if st.button("✕  Hide uploader", use_container_width=True, key="hide_uploader"):
+                    st.session_state.pop("show_uploader", None)
+                    st.rerun()
+
+    st.markdown("<div style='height:56px'></div>", unsafe_allow_html=True)
 
     st.stop()
 
