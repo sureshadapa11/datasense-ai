@@ -1918,10 +1918,10 @@ if not st.session_state["stored_file"]:
         st.markdown("""<div id="upload-anchor"></div>
         <script>
         setTimeout(function(){
-            var anchor = window.parent.document.getElementById('upload-anchor');
+            var anchor = document.getElementById('upload-anchor');
             if(anchor) anchor.scrollIntoView({behavior:'smooth',block:'start'});
             else {
-                var main = window.parent.document.querySelector('[data-testid="stMain"]');
+                var main = document.querySelector('[data-testid="stMain"]');
                 if(main) main.scrollTop = main.scrollHeight;
             }
         }, 120);
@@ -2097,16 +2097,27 @@ if st.session_state.get("last_file") != _stored["name"]:
     for k in list(st.session_state.keys()):
         if k.startswith("ai_"): del st.session_state[k]
 
-# Scroll to top of page whenever dashboard renders
+# Scroll to top — runs inside Streamlit's own iframe (no window.parent needed)
 st.markdown("""<script>
-(function() {
-    var selectors = ['[data-testid="stMain"]', '.main', '#root > div:first-child'];
-    for (var i = 0; i < selectors.length; i++) {
-        var el = window.parent.document.querySelector(selectors[i]);
-        if (el) el.scrollTop = 0;
-    }
-    window.parent.scrollTo(0, 0);
+(function doScroll() {
+    // Primary: Streamlit's scrollable main container
+    var main = document.querySelector('[data-testid="stMain"]');
+    if (main) { main.scrollTop = 0; main.scrollTo(0, 0); }
+    // Fallbacks
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
     window.scrollTo(0, 0);
+    // Retry twice in case Streamlit re-renders after this fires
+    setTimeout(function() {
+        var m = document.querySelector('[data-testid="stMain"]');
+        if (m) { m.scrollTop = 0; m.scrollTo(0, 0); }
+        window.scrollTo(0, 0);
+    }, 120);
+    setTimeout(function() {
+        var m = document.querySelector('[data-testid="stMain"]');
+        if (m) { m.scrollTop = 0; m.scrollTo(0, 0); }
+        window.scrollTo(0, 0);
+    }, 400);
 })();
 </script>""", unsafe_allow_html=True)
 
