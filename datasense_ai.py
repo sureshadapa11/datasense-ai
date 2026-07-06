@@ -71,22 +71,61 @@ section[data-testid="stSidebar"] .stSuccess p { color: #059669 !important; font-
     box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important;
 }
 
-/* ── FILE UPLOADER ── */
+/* ── FILE UPLOADER — full card restyle ── */
 div[data-testid="stFileUploader"] {
-    background: #f8fafc !important;
-    border: 1.5px dashed #cbd5e1 !important;
-    border-radius: 12px !important;
-    padding: 0.5rem !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin-top: -3px !important;
 }
-div[data-testid="stFileUploader"]:hover { border-color: #5b4bff !important; }
-div[data-testid="stFileUploader"] * { color: #64748b !important; }
-div[data-testid="stFileUploader"] button {
-    background: #ffffff !important; color: #334155 !important;
-    border: 1px solid #cbd5e1 !important; border-radius: 6px !important;
-    font-size: 12px !important; font-weight: 600 !important;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.06) !important;
+section[data-testid="stFileUploaderDropzone"] {
+    background: #f8f7ff !important;
+    border: 2px dashed #c4b5fd !important;
+    border-top: none !important;
+    border-radius: 0 0 20px 20px !important;
+    padding: 0.5rem 2rem 2rem !important;
+    transition: background 0.2s, border-color 0.2s !important;
+    min-height: 80px !important;
 }
-div[data-testid="stFileUploaderDropzoneInstructions"] span { color: #5b4bff !important; font-weight: 600 !important; }
+section[data-testid="stFileUploaderDropzone"]:hover {
+    background: #f0eeff !important;
+    border-color: #5b4bff !important;
+}
+section[data-testid="stFileUploaderDropzone"] > div {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding-top: 0.5rem !important;
+}
+/* Browse files button — filled violet pill */
+section[data-testid="stFileUploaderDropzone"] button {
+    background: #5b4bff !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    padding: 0.6rem 2rem !important;
+    box-shadow: 0 4px 14px rgba(91,75,255,0.28) !important;
+    transition: all 0.18s ease !important;
+    min-width: 160px !important;
+}
+section[data-testid="stFileUploaderDropzone"] button:hover {
+    background: #4c3de0 !important;
+    box-shadow: 0 6px 20px rgba(91,75,255,0.38) !important;
+    transform: translateY(-1px) !important;
+}
+div[data-testid="stFileUploaderDropzoneInstructions"] {
+    text-align: center !important;
+}
+div[data-testid="stFileUploaderDropzoneInstructions"] span {
+    color: #94a3b8 !important;
+    font-size: 12.5px !important;
+    font-weight: 400 !important;
+    letter-spacing: 0 !important;
+}
 
 /* ── TABS ── */
 .stTabs [data-baseweb="tab-list"] {
@@ -1057,23 +1096,41 @@ if not st.session_state["stored_file"]:
       <h2 style='font-size:32px;font-weight:800;color:#0d1f3c;margin:0 0 10px;letter-spacing:-0.025em'>
         Upload your dataset
       </h2>
-      <p style='font-size:15px;color:#94a3b8;margin:0'>
-        Supports CSV, XLSX and XLS — up to 200 MB
-      </p>
     </div>
     """, unsafe_allow_html=True)
     uz_l, uz_c, uz_r = st.columns([0.5, 3, 0.5])
     with uz_c:
+        # Card top — cloud icon + drag-drop text (visually merges with Streamlit uploader below)
+        st.markdown("""
+        <div style='background:#f8f7ff;border:2px dashed #c4b5fd;border-bottom:none;
+          border-radius:20px 20px 0 0;padding:2.75rem 2rem 1.5rem;text-align:center'>
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none"
+            stroke="#5b4bff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+            style="display:block;margin:0 auto 14px">
+            <polyline points="16 16 12 12 8 16"></polyline>
+            <line x1="12" y1="12" x2="12" y2="21"></line>
+            <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path>
+          </svg>
+          <p style='font-size:17px;font-weight:700;color:#0d1f3c;margin:0 0 6px;letter-spacing:-0.01em'>
+            Drag &amp; drop your file here
+          </p>
+          <p style='font-size:13px;color:#94a3b8;margin:0'>
+            CSV &nbsp;·&nbsp; XLSX &nbsp;·&nbsp; XLS &nbsp;·&nbsp; up to 200 MB
+          </p>
+        </div>
+        """, unsafe_allow_html=True)
         new_file = st.file_uploader("", type=["csv","xlsx","xls"], label_visibility="collapsed")
         if new_file:
             data = new_file.read()
             st.session_state["stored_file"] = {"bytes": data, "name": new_file.name}
             st.rerun()
         st.markdown("""
-        <div style='display:flex;align-items:center;gap:12px;margin:18px 0'>
-          <div style='flex:1;height:1px;background:#e2e8f0'></div>
-          <span style='font-size:13px;color:#94a3b8;font-weight:500'>or try with sample data</span>
-          <div style='flex:1;height:1px;background:#e2e8f0'></div>
+        <div style='display:flex;align-items:center;gap:14px;margin:24px 0 20px'>
+          <div style='flex:1;height:1px;background:#e9ecef'></div>
+          <span style='font-size:12.5px;color:#94a3b8;font-weight:500;white-space:nowrap'>
+            or try with sample data
+          </span>
+          <div style='flex:1;height:1px;background:#e9ecef'></div>
         </div>""", unsafe_allow_html=True)
         _sample_path = os.path.join(_HERE, "sample_sales_data.csv")
         sc1, sc2, sc3 = st.columns([1, 2, 1])
