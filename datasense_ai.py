@@ -27,8 +27,8 @@ st.markdown("""
 *, html, body, [class*="css"] { font-family: 'Inter', sans-serif !important; }
 
 /* ── MAIN BACKGROUND ── */
-.stApp { background: #f8fafc; }
-.block-container { padding: 1.5rem 2rem 3rem !important; max-width: 1400px !important; }
+.stApp { background: #ffffff; }
+.block-container { padding: 2rem 2.5rem 4rem !important; max-width: 1400px !important; }
 
 /* ── SIDEBAR ── */
 section[data-testid="stSidebar"] {
@@ -78,7 +78,7 @@ div[data-testid="stFileUploader"] {
     border-radius: 12px !important;
     padding: 0.5rem !important;
 }
-div[data-testid="stFileUploader"]:hover { border-color: #3b82f6 !important; }
+div[data-testid="stFileUploader"]:hover { border-color: #5b4bff !important; }
 div[data-testid="stFileUploader"] * { color: #64748b !important; }
 div[data-testid="stFileUploader"] button {
     background: #ffffff !important; color: #334155 !important;
@@ -86,7 +86,7 @@ div[data-testid="stFileUploader"] button {
     font-size: 12px !important; font-weight: 600 !important;
     box-shadow: 0 1px 2px rgba(0,0,0,0.06) !important;
 }
-div[data-testid="stFileUploaderDropzoneInstructions"] span { color: #3b82f6 !important; font-weight: 600 !important; }
+div[data-testid="stFileUploaderDropzoneInstructions"] span { color: #5b4bff !important; font-weight: 600 !important; }
 
 /* ── TABS ── */
 .stTabs [data-baseweb="tab-list"] {
@@ -119,7 +119,7 @@ div[data-testid="stFileUploaderDropzoneInstructions"] span { color: #3b82f6 !imp
     font-size: 10.5px; font-weight: 600; color: #94a3b8;
     text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px;
 }
-.kpi-value { font-size: 26px; font-weight: 700; color: #0f172a; line-height: 1.1; margin-bottom: 4px; }
+.kpi-value { font-size: 26px; font-weight: 700; color: #0d1f3c; line-height: 1.1; margin-bottom: 4px; }
 .kpi-sub { font-size: 12px; color: #94a3b8; }
 .kpi-up { color: #10b981 !important; font-weight: 600; }
 .kpi-dn { color: #ef4444 !important; font-weight: 600; }
@@ -142,15 +142,15 @@ div[data-testid="stFileUploaderDropzoneInstructions"] span { color: #3b82f6 !imp
 /* ── AI BOX ── */
 .ai-box {
     background: #fff;
-    border: 1px solid #e0e7ff;
-    border-left: 3px solid #6366f1;
+    border: 1px solid #e4e0ff;
+    border-left: 3px solid #5b4bff;
     border-radius: 0 12px 12px 0;
     padding: 1.1rem 1.4rem;
     margin-bottom: 0.75rem;
-    box-shadow: 0 1px 4px rgba(99,102,241,0.06);
+    box-shadow: 0 1px 4px rgba(91,75,255,0.06);
 }
 .ai-box-title {
-    font-size: 10.5px; font-weight: 700; color: #6366f1;
+    font-size: 10.5px; font-weight: 700; color: #5b4bff;
     text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;
     display: flex; align-items: center; gap: 6px;
 }
@@ -165,7 +165,7 @@ div[data-testid="stFileUploaderDropzoneInstructions"] span { color: #3b82f6 !imp
 }
 .sec-head::before {
     content: ''; display: block; width: 3px; height: 14px;
-    background: linear-gradient(180deg, #3b82f6, #6366f1);
+    background: #5b4bff;
     border-radius: 2px; flex-shrink: 0;
 }
 
@@ -212,12 +212,12 @@ div[data-testid="stFileUploaderDropzoneInstructions"] span { color: #3b82f6 !imp
 /* ── FORM INPUTS ── */
 .stTextInput > div > div > input {
     background: #fff !important; border: 1px solid #e2e8f0 !important;
-    border-radius: 8px !important; color: #0f172a !important;
+    border-radius: 8px !important; color: #0d1f3c !important;
     font-size: 13px !important; padding: 0.5rem 0.75rem !important;
 }
 .stTextInput > div > div > input:focus {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 3px rgba(59,130,246,0.1) !important;
+    border-color: #5b4bff !important;
+    box-shadow: 0 0 0 3px rgba(91,75,255,0.1) !important;
 }
 
 /* ── DOWNLOAD BUTTON ── */
@@ -241,7 +241,15 @@ details { border: 1px solid #e2e8f0 !important; border-radius: 10px !important; 
 .stDataFrame { border-radius: 10px !important; overflow: hidden !important; }
 
 /* ── HEADINGS ── */
-h1, h2, h3, h4 { color: #0f172a !important; }
+h1, h2, h3, h4 { color: #0d1f3c !important; }
+
+/* ── SECTION LABELS (small-caps Tellius style) ── */
+.slabel {
+    display: block;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: #5b4bff;
+    margin-bottom: 10px;
+}
 
 /* ── INFO/SUCCESS/ERROR ── */
 .stAlert { border-radius: 10px !important; }
@@ -249,6 +257,25 @@ h1, h2, h3, h4 { color: #0f172a !important; }
 /* ── HIDE SIDEBAR ── */
 section[data-testid="stSidebar"] { display:none !important; }
 [data-testid="collapsedControl"] { display:none !important; }
+
+/* ── PRIMARY BUTTON (outlined pill CTA style) ── */
+.stButton > button[kind="primary"] {
+    background: transparent !important;
+    color: #5b4bff !important;
+    border: 2px solid #5b4bff !important;
+    border-radius: 100px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    padding: 0.55rem 1.75rem !important;
+    letter-spacing: 0.01em !important;
+    box-shadow: none !important;
+    transition: all 0.18s ease !important;
+}
+.stButton > button[kind="primary"]:hover {
+    background: #5b4bff !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 16px rgba(91,75,255,0.25) !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -871,36 +898,34 @@ if not st.session_state["stored_file"]:
     hero_l, hero_r = st.columns([1.05, 0.95])
     with hero_l:
         st.markdown("""
-        <div style='padding-top:1.5rem'>
-          <div style='display:inline-flex;align-items:center;gap:6px;
-            background:#f0f4ff;border:1px solid #c7d7fd;border-radius:20px;
-            padding:5px 14px;margin-bottom:22px'>
-            <span style='font-size:14px'>✨</span>
-            <span style='font-size:12px;font-weight:600;color:#3b5bdb;letter-spacing:0.01em'>Powered by Claude AI</span>
-          </div>
-          <h1 style='font-size:48px;font-weight:800;color:#0f172a;line-height:1.1;
-            margin:0 0 18px;letter-spacing:-0.03em'>
-            Turn any spreadsheet<br>into <span style='color:#4f46e5'>AI-powered</span><br>insights
+        <div style='padding-top:2rem'>
+          <span class='slabel'>Powered by Claude AI</span>
+          <h1 style='font-size:52px;font-weight:800;color:#0d1f3c;line-height:1.08;
+            margin:0 0 20px;letter-spacing:-0.035em'>
+            Instant Insights.<br><span style='color:#5b4bff'>Any Spreadsheet.</span>
           </h1>
-          <p style='font-size:15px;color:#64748b;line-height:1.7;margin:0 0 2rem;max-width:440px'>
-            Upload a CSV or Excel file. DataSense AI auto-detects your dataset type and instantly
-            builds a full analytics dashboard &mdash; KPIs, charts, trends &amp; AI insights.
+          <p style='font-size:15.5px;color:#64748b;line-height:1.75;margin:0 0 2.5rem;max-width:420px'>
+            Upload a CSV or Excel file. DataSense AI auto-detects your dataset type and
+            builds a full analytics dashboard in seconds — KPIs, charts, trends &amp; AI narratives.
           </p>
-          <div style='display:flex;flex-wrap:wrap;gap:20px'>
-            <div style='display:flex;align-items:center;gap:8px'>
-              <div style='width:30px;height:30px;background:#eff6ff;border-radius:8px;
-                display:flex;align-items:center;justify-content:center;font-size:15px'>📊</div>
-              <span style='font-size:13px;color:#475569;font-weight:500'>9 analytics views</span>
+          <!-- Stats bar -->
+          <div style='display:flex;flex-wrap:wrap;gap:0;border:1px solid #e9ecf0;border-radius:12px;
+            overflow:hidden;background:#fff;width:fit-content;box-shadow:0 1px 3px rgba(0,0,0,0.05)'>
+            <div style='padding:10px 20px;border-right:1px solid #e9ecf0'>
+              <div style='font-size:20px;font-weight:800;color:#0d1f3c;line-height:1'>9</div>
+              <div style='font-size:11px;color:#94a3b8;margin-top:2px'>Analytics Views</div>
             </div>
-            <div style='display:flex;align-items:center;gap:8px'>
-              <div style='width:30px;height:30px;background:#f0fdf4;border-radius:8px;
-                display:flex;align-items:center;justify-content:center;font-size:15px'>🔍</div>
-              <span style='font-size:13px;color:#475569;font-weight:500'>6 dataset types</span>
+            <div style='padding:10px 20px;border-right:1px solid #e9ecf0'>
+              <div style='font-size:20px;font-weight:800;color:#0d1f3c;line-height:1'>6</div>
+              <div style='font-size:11px;color:#94a3b8;margin-top:2px'>Dataset Types</div>
             </div>
-            <div style='display:flex;align-items:center;gap:8px'>
-              <div style='width:30px;height:30px;background:#faf5ff;border-radius:8px;
-                display:flex;align-items:center;justify-content:center;font-size:15px'>🤖</div>
-              <span style='font-size:13px;color:#475569;font-weight:500'>Claude AI powered</span>
+            <div style='padding:10px 20px;border-right:1px solid #e9ecf0'>
+              <div style='font-size:20px;font-weight:800;color:#5b4bff;line-height:1'>AI</div>
+              <div style='font-size:11px;color:#94a3b8;margin-top:2px'>Claude Powered</div>
+            </div>
+            <div style='padding:10px 20px'>
+              <div style='font-size:20px;font-weight:800;color:#0d1f3c;line-height:1'>0</div>
+              <div style='font-size:11px;color:#94a3b8;margin-top:2px'>Setup Required</div>
             </div>
           </div>
         </div>
@@ -981,18 +1006,27 @@ if not st.session_state["stored_file"]:
         """, unsafe_allow_html=True)
 
     # ── FEATURE HIGHLIGHTS ────────────────────────────────────────────────────
-    st.markdown("<div style='height:56px'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:72px'></div>", unsafe_allow_html=True)
+    st.markdown("""
+    <span class='slabel'>What You Get</span>
+    <h2 style='font-size:30px;font-weight:800;color:#0d1f3c;margin:0 0 6px;letter-spacing:-0.02em'>
+      Everything you need to understand your data
+    </h2>
+    <p style='font-size:14px;color:#64748b;margin:0 0 28px'>
+      No configuration. No code. Just upload and explore.
+    </p>
+    """, unsafe_allow_html=True)
     f1, f2, f3 = st.columns(3)
     FEAT = [
-        ("#eff6ff","#dbeafe","#2563eb",
+        ("#f5f3ff","#ede9fe","#5b4bff",
          '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>',
          "Auto-Detect Dataset",
          "Instantly classifies your data as Sales, HR, Finance, Marketing, Inventory, or Generic — no setup needed."),
-        ("#f0fdf4","#dcfce7","#16a34a",
+        ("#f0fdf4","#dcfce7","#059669",
          '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
          "Smart Visualizations",
          "Auto-generates trend lines, bar charts, heatmaps and scatter plots — all tailored to your data domain."),
-        ("#faf5ff","#ede9fe","#7c3aed",
+        ("#fffbeb","#fef3c7","#d97706",
          '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
          "AI-Powered Analysis",
          "Claude AI writes domain-specific insights grounded in your exact numbers and answers questions in plain English."),
@@ -1001,29 +1035,33 @@ if not st.session_state["stored_file"]:
         icon = svg.replace('stroke="currentColor"', f'stroke="{ic}"')
         with col:
             st.markdown(f"""
-            <div style='background:{bg};border-radius:16px;padding:1.5rem 1.5rem 1.4rem;
+            <div style='background:{bg};border-radius:16px;padding:1.75rem 1.75rem 1.6rem;
               border:1px solid rgba(0,0,0,0.05);height:100%'>
-              <div style='width:44px;height:44px;background:{ibg};border-radius:12px;
-                display:flex;align-items:center;justify-content:center;margin-bottom:16px'>
+              <div style='width:46px;height:46px;background:{ibg};border-radius:13px;
+                display:flex;align-items:center;justify-content:center;margin-bottom:18px'>
                 {icon}
               </div>
-              <div style='font-size:15px;font-weight:700;color:#0f172a;margin-bottom:8px'>{title}</div>
-              <div style='font-size:13px;color:#64748b;line-height:1.65'>{desc}</div>
+              <div style='font-size:15.5px;font-weight:700;color:#0d1f3c;margin-bottom:10px'>{title}</div>
+              <div style='font-size:13.5px;color:#64748b;line-height:1.7'>{desc}</div>
             </div>""", unsafe_allow_html=True)
 
     # ── UPLOAD ZONE ───────────────────────────────────────────────────────────
-    st.markdown("<div style='height:52px'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:72px'></div>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style='text-align:center;margin-bottom:6px'>
+      <span class='slabel' style='display:inline-block'>Get Started</span>
+    </div>
+    <div style='text-align:center;margin-bottom:32px'>
+      <h2 style='font-size:32px;font-weight:800;color:#0d1f3c;margin:0 0 10px;letter-spacing:-0.025em'>
+        Upload your dataset
+      </h2>
+      <p style='font-size:15px;color:#94a3b8;margin:0'>
+        Supports CSV, XLSX and XLS — up to 200 MB
+      </p>
+    </div>
+    """, unsafe_allow_html=True)
     uz_l, uz_c, uz_r = st.columns([0.5, 3, 0.5])
     with uz_c:
-        st.markdown("""
-        <div style='text-align:center;margin-bottom:20px'>
-          <h2 style='font-size:28px;font-weight:800;color:#0f172a;margin:0 0 8px;letter-spacing:-0.02em'>
-            Upload your dataset to get started
-          </h2>
-          <p style='font-size:14px;color:#64748b;margin:0'>
-            Supports CSV, XLSX and XLS &mdash; up to 200 MB
-          </p>
-        </div>""", unsafe_allow_html=True)
         new_file = st.file_uploader("", type=["csv","xlsx","xls"], label_visibility="collapsed")
         if new_file:
             data = new_file.read()
@@ -1046,11 +1084,12 @@ if not st.session_state["stored_file"]:
 
     # ── DATASET TYPE SECTION HEADING ──────────────────────────────────────────
     st.markdown("""
-    <div style='margin:56px 0 24px'>
-      <h2 style='font-size:32px;font-weight:800;color:#0f172a;margin:0 0 8px;letter-spacing:-0.02em'>
+    <div style='margin:80px 0 28px'>
+      <span class='slabel'>Supported Datasets</span>
+      <h2 style='font-size:32px;font-weight:800;color:#0d1f3c;margin:0 0 10px;letter-spacing:-0.025em'>
         Works with any dataset
       </h2>
-      <p style='font-size:15px;color:#64748b;margin:0'>
+      <p style='font-size:15px;color:#94a3b8;margin:0'>
         Upload your data and DataSense AI figures out everything else.
       </p>
     </div>
@@ -1074,11 +1113,14 @@ if not st.session_state["stored_file"]:
         st.markdown(card("linechart","grid",  "Generic", "Works with any tabular dataset automatically",        "#f3f4f6", "#1f2937", "#6b7280"), unsafe_allow_html=True)
 
     # How it works (full width)
-    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:72px'></div>", unsafe_allow_html=True)
     st.markdown("""
-    <div style='background:#fff;border-radius:16px;padding:1.75rem 2rem 1.2rem;
-      border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.05)'>
-      <p style='font-size:18px;font-weight:800;color:#0f172a;margin:0'>How it works</p>
+    <div style='background:#f8f7ff;border-radius:20px;padding:2.25rem 2.5rem 1.75rem;
+      border:1px solid #e4e0ff;box-shadow:0 1px 4px rgba(91,75,255,0.06)'>
+      <span class='slabel'>How It Works</span>
+      <p style='font-size:22px;font-weight:800;color:#0d1f3c;margin:0 0 4px;letter-spacing:-0.02em'>
+        From upload to insight in seconds
+      </p>
     </div>""", unsafe_allow_html=True)
 
     hw_l, hw_c, hw_r = st.columns([1, 1.4, 1])
@@ -1087,17 +1129,17 @@ if not st.session_state["stored_file"]:
         st.markdown("""
         <div style='padding:0 0 0 0.5rem;display:flex;flex-direction:column;gap:32px;padding-top:8px'>
           <div style='display:flex;gap:10px;align-items:flex-start'>
-            <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
+            <span style='background:#ede9fe;color:#5b4bff;font-size:11px;font-weight:700;
               padding:3px 8px;border-radius:8px;flex-shrink:0;margin-top:2px'>01</span>
             <span style='font-size:13px;color:#334155;line-height:1.55'>
-              <b style="color:#0f172a">Upload</b> any CSV or Excel file
+              <b style="color:#0d1f3c">Upload</b> any CSV or Excel file
             </span>
           </div>
           <div style='display:flex;gap:10px;align-items:flex-start'>
-            <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
+            <span style='background:#ede9fe;color:#5b4bff;font-size:11px;font-weight:700;
               padding:3px 8px;border-radius:8px;flex-shrink:0;margin-top:2px'>03</span>
             <span style='font-size:13px;color:#334155;line-height:1.55'>
-              <b style="color:#0f172a">Explore</b> KPIs, charts &amp; trends
+              <b style="color:#0d1f3c">Explore</b> KPIs, charts &amp; trends
             </span>
           </div>
         </div>""", unsafe_allow_html=True)
@@ -1145,17 +1187,17 @@ if not st.session_state["stored_file"]:
         st.markdown("""
         <div style='padding:0 0.5rem 0 0;display:flex;flex-direction:column;gap:32px;padding-top:8px'>
           <div style='display:flex;gap:10px;align-items:flex-start'>
-            <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
+            <span style='background:#ede9fe;color:#5b4bff;font-size:11px;font-weight:700;
               padding:3px 8px;border-radius:8px;flex-shrink:0;margin-top:2px'>02</span>
             <span style='font-size:13px;color:#334155;line-height:1.55'>
-              <b style="color:#0f172a">Auto-detect</b> dataset type instantly
+              <b style="color:#0d1f3c">Auto-detect</b> dataset type instantly
             </span>
           </div>
           <div style='display:flex;gap:10px;align-items:flex-start'>
-            <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
+            <span style='background:#ede9fe;color:#5b4bff;font-size:11px;font-weight:700;
               padding:3px 8px;border-radius:8px;flex-shrink:0;margin-top:2px'>04</span>
             <span style='font-size:13px;color:#334155;line-height:1.55'>
-              <b style="color:#0f172a">Ask</b> any question via Data Agent
+              <b style="color:#0d1f3c">Ask</b> any question via Data Agent
             </span>
           </div>
         </div>""", unsafe_allow_html=True)
@@ -1198,11 +1240,11 @@ tb1, tb2, tb3, tb4 = st.columns([4, 1, 1, 1])
 with tb1:
     st.markdown(
         f'<div style="display:flex;align-items:center;gap:10px;padding:6px 0 2px">'
-        f'<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:4px 12px;display:flex;align-items:center;gap:6px">'
+        f'<div style="background:#f0eeff;border:1px solid #c4b5fd;border-radius:8px;padding:4px 12px;display:flex;align-items:center;gap:6px">'
         f'<span style="font-size:14px">{cfg["icon"]}</span>'
-        f'<span style="color:#1d4ed8;font-size:11px;font-weight:700">{cfg["label"]}</span>'
+        f'<span style="color:#5b4bff;font-size:11px;font-weight:700">{cfg["label"]}</span>'
         f'</div>'
-        f'<span style="font-size:16px;font-weight:700;color:#0f172a">{file_title}</span>'
+        f'<span style="font-size:16px;font-weight:700;color:#0d1f3c">{file_title}</span>'
         f'<span style="font-size:12px;color:#94a3b8">{df.shape[0]:,} rows · {df.shape[1]} cols</span>'
         f'</div>',
         unsafe_allow_html=True)
@@ -1241,8 +1283,8 @@ for (label, key), col in zip(pages, nav_cols):
     with col:
         if active_view_check == key:
             st.markdown(
-                f'<div style="background:#eff6ff;border-bottom:2px solid #3b82f6;border-radius:8px 8px 0 0;'
-                f'padding:0.4rem 0.2rem;text-align:center;font-size:11.5px;font-weight:700;color:#1d4ed8;'
+                f'<div style="background:#f0eeff;border-bottom:2px solid #5b4bff;border-radius:8px 8px 0 0;'
+                f'padding:0.4rem 0.2rem;text-align:center;font-size:11.5px;font-weight:700;color:#5b4bff;'
                 f'white-space:nowrap">{label}</div>',
                 unsafe_allow_html=True)
         else:
@@ -1498,11 +1540,11 @@ elif active_view == "correlations":
                 st.markdown(
                     f'<div class="kpi-card" style="margin-bottom:8px">'
                     f'<div style="display:flex;justify-content:space-between;align-items:center">'
-                    f'<div><b style="color:#0f172a">{pair["col1"].replace("_"," ").title()}</b>'
+                    f'<div><b style="color:#0d1f3c">{pair["col1"].replace("_"," ").title()}</b>'
                     f' <span style="color:#94a3b8">↔</span> '
-                    f'<b style="color:#0f172a">{pair["col2"].replace("_"," ").title()}</b></div>'
+                    f'<b style="color:#0d1f3c">{pair["col2"].replace("_"," ").title()}</b></div>'
                     f'<div><span class="badge {badge_cls}">{strength} {direction}</span>'
-                    f' <b style="color:#0f172a;font-size:16px;margin-left:10px">r = {r}</b></div>'
+                    f' <b style="color:#0d1f3c;font-size:16px;margin-left:10px">r = {r}</b></div>'
                     f'</div><div style="margin-top:10px;background:#f1f5f9;border-radius:4px;height:5px">'
                     f'<div style="width:{int(abs(r)*100)}%;background:{bar_c};height:5px;border-radius:4px"></div>'
                     f'</div></div>', unsafe_allow_html=True)
