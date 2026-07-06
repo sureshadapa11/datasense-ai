@@ -1,4 +1,4 @@
-import os, json
+import os, io, json
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -7,6 +7,10 @@ from datetime import datetime
 import plotly.express as px
 import plotly.graph_objects as go
 
+class NamedBytesIO(io.BytesIO):
+    """BytesIO with a .name attribute so load_dataframe can detect file type."""
+    def __init__(self, data, name): super().__init__(data); self.name = name
+
 try:
     os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
 except Exception:
@@ -14,7 +18,7 @@ except Exception:
 
 MODEL = "claude-sonnet-4-6"
 
-st.set_page_config(page_title="DataSense AI", page_icon="🧠", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="DataSense AI", page_icon="🧠", layout="wide", initial_sidebar_state="collapsed")
 
 st.markdown("""
 <style>
@@ -42,23 +46,11 @@ section[data-testid="stSidebar"] .stSuccess {
 }
 section[data-testid="stSidebar"] .stSuccess p { color: #059669 !important; font-size: 12px !important; }
 
-/* ── SIDEBAR NAV BUTTONS ── */
-section[data-testid="stSidebar"] .stButton > button {
-    background: transparent !important;
-    color: #475569 !important;
-    border: none !important;
-    border-radius: 8px !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    text-align: left !important;
-    padding: 0.45rem 0.85rem !important;
-    margin-bottom: 2px !important;
-    width: 100% !important;
-    transition: all 0.15s ease !important;
-}
-section[data-testid="stSidebar"] .stButton > button:hover {
-    background: #f1f5f9 !important;
-    color: #1e40af !important;
+/* ── NAV BUTTONS (horizontal bar) ── */
+.stButton > button[kind="secondary"] {
+    font-size: 11.5px !important;
+    padding: 0.4rem 0.3rem !important;
+    white-space: nowrap !important;
 }
 
 /* ── MAIN AREA BUTTONS ── */
@@ -253,6 +245,10 @@ h1, h2, h3, h4 { color: #0f172a !important; }
 
 /* ── INFO/SUCCESS/ERROR ── */
 .stAlert { border-radius: 10px !important; }
+
+/* ── HIDE SIDEBAR ── */
+section[data-testid="stSidebar"] { display:none !important; }
+[data-testid="collapsedControl"] { display:none !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -830,38 +826,15 @@ def ask_claude(question, df_info, dtype):
     except Exception as e:
         yield f"Error: {e}"
 
-# ══════════════════════════════════════════════════════════════════════════════
-# SIDEBAR
-# ══════════════════════════════════════════════════════════════════════════════
-with st.sidebar:
-    # ── BRAND HEADER ─────────────────────────────────────────────────────────
-    st.markdown("""
-<div style='padding:1.25rem 0.75rem 0.75rem'>
-  <div style='display:flex;align-items:center;gap:10px'>
-    <div style='background:linear-gradient(135deg,#2563eb,#4f46e5);
-      border-radius:10px;width:34px;height:34px;display:flex;flex-shrink:0;
-      align-items:center;justify-content:center;font-size:17px;
-      box-shadow:0 4px 12px rgba(79,70,229,0.4)'>🧠</div>
-    <div>
-      <div style='font-size:15px;font-weight:700;color:#0f172a;letter-spacing:-0.01em;line-height:1.2'>DataSense AI</div>
-      <div style='font-size:10px;color:#94a3b8;font-weight:500;letter-spacing:0.04em'>Insights That Drive Action</div>
-    </div>
-  </div>
-  <div style='height:1px;background:linear-gradient(90deg,#e2e8f0,transparent);margin-top:14px'></div>
-</div>
-""", unsafe_allow_html=True)
-
-    # ── UPLOAD SECTION ────────────────────────────────────────────────────────
-    st.markdown("<p style='color:#94a3b8;font-size:10px;text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:8px;padding-left:2px'>📂 Data Source</p>",
-                unsafe_allow_html=True)
-    uploaded = st.file_uploader("", type=["csv","xlsx","xls"], label_visibility="collapsed")
-    if uploaded:
-        st.success(f"✓ {uploaded.name}")
+# ── FILE STATE ────────────────────────────────────────────────────────────────
+_HERE = os.path.dirname(os.path.abspath(__file__))
+if "stored_file" not in st.session_state:
+    st.session_state["stored_file"] = None
 
 # ══════════════════════════════════════════════════════════════════════════════
 # WELCOME
 # ══════════════════════════════════════════════════════════════════════════════
-if not uploaded:
+if not st.session_state["stored_file"]:
     # ── SVG icon definitions ──────────────────────────────────────────────────
     ICONS = {
         "cart":    '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
@@ -1038,6 +1011,39 @@ if not uploaded:
               <div style='font-size:13px;color:#64748b;line-height:1.65'>{desc}</div>
             </div>""", unsafe_allow_html=True)
 
+    # ── UPLOAD ZONE ───────────────────────────────────────────────────────────
+    st.markdown("<div style='height:52px'></div>", unsafe_allow_html=True)
+    uz_l, uz_c, uz_r = st.columns([0.5, 3, 0.5])
+    with uz_c:
+        st.markdown("""
+        <div style='text-align:center;margin-bottom:20px'>
+          <h2 style='font-size:28px;font-weight:800;color:#0f172a;margin:0 0 8px;letter-spacing:-0.02em'>
+            Upload your dataset to get started
+          </h2>
+          <p style='font-size:14px;color:#64748b;margin:0'>
+            Supports CSV, XLSX and XLS &mdash; up to 200 MB
+          </p>
+        </div>""", unsafe_allow_html=True)
+        new_file = st.file_uploader("", type=["csv","xlsx","xls"], label_visibility="collapsed")
+        if new_file:
+            data = new_file.read()
+            st.session_state["stored_file"] = {"bytes": data, "name": new_file.name}
+            st.rerun()
+        st.markdown("""
+        <div style='display:flex;align-items:center;gap:12px;margin:18px 0'>
+          <div style='flex:1;height:1px;background:#e2e8f0'></div>
+          <span style='font-size:13px;color:#94a3b8;font-weight:500'>or try with sample data</span>
+          <div style='flex:1;height:1px;background:#e2e8f0'></div>
+        </div>""", unsafe_allow_html=True)
+        _sample_path = os.path.join(_HERE, "sample_sales_data.csv")
+        sc1, sc2, sc3 = st.columns([1, 2, 1])
+        with sc2:
+            if os.path.exists(_sample_path):
+                if st.button("⚡  Try with sample sales data", use_container_width=True, type="primary"):
+                    with open(_sample_path, "rb") as _f:
+                        st.session_state["stored_file"] = {"bytes": _f.read(), "name": "sample_sales_data.csv"}
+                    st.rerun()
+
     # ── DATASET TYPE SECTION HEADING ──────────────────────────────────────────
     st.markdown("""
     <div style='margin:56px 0 24px'>
@@ -1067,38 +1073,36 @@ if not uploaded:
     with r2c3:
         st.markdown(card("linechart","grid",  "Generic", "Works with any tabular dataset automatically",        "#f3f4f6", "#1f2937", "#6b7280"), unsafe_allow_html=True)
 
-    # Bottom row
+    # How it works (full width)
     st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
-    bw1, bw2 = st.columns([3, 2])
-    with bw1:
+    st.markdown("""
+    <div style='background:#fff;border-radius:16px;padding:1.75rem 2rem 1.2rem;
+      border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.05)'>
+      <p style='font-size:18px;font-weight:800;color:#0f172a;margin:0'>How it works</p>
+    </div>""", unsafe_allow_html=True)
+
+    hw_l, hw_c, hw_r = st.columns([1, 1.4, 1])
+
+    with hw_l:
         st.markdown("""
-        <div style='background:#fff;border-radius:16px;padding:1.75rem 2rem 1.5rem;
-          border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.05)'>
-          <p style='font-size:18px;font-weight:800;color:#0f172a;margin:0 0 20px'>How it works</p>
+        <div style='padding:0 0 0 0.5rem;display:flex;flex-direction:column;gap:32px;padding-top:8px'>
+          <div style='display:flex;gap:10px;align-items:flex-start'>
+            <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
+              padding:3px 8px;border-radius:8px;flex-shrink:0;margin-top:2px'>01</span>
+            <span style='font-size:13px;color:#334155;line-height:1.55'>
+              <b style="color:#0f172a">Upload</b> any CSV or Excel file
+            </span>
+          </div>
+          <div style='display:flex;gap:10px;align-items:flex-start'>
+            <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
+              padding:3px 8px;border-radius:8px;flex-shrink:0;margin-top:2px'>03</span>
+            <span style='font-size:13px;color:#334155;line-height:1.55'>
+              <b style="color:#0f172a">Explore</b> KPIs, charts &amp; trends
+            </span>
+          </div>
         </div>""", unsafe_allow_html=True)
 
-        hw_l, hw_c, hw_r = st.columns([1, 1.4, 1])
-
-        with hw_l:
-            st.markdown("""
-            <div style='padding:0 0 0 0.5rem;display:flex;flex-direction:column;gap:32px;padding-top:8px'>
-              <div style='display:flex;gap:10px;align-items:flex-start'>
-                <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
-                  padding:3px 8px;border-radius:8px;flex-shrink:0;margin-top:2px'>01</span>
-                <span style='font-size:13px;color:#334155;line-height:1.55'>
-                  <b style="color:#0f172a">Upload</b> any CSV or Excel file
-                </span>
-              </div>
-              <div style='display:flex;gap:10px;align-items:flex-start'>
-                <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
-                  padding:3px 8px;border-radius:8px;flex-shrink:0;margin-top:2px'>03</span>
-                <span style='font-size:13px;color:#334155;line-height:1.55'>
-                  <b style="color:#0f172a">Explore</b> KPIs, charts &amp; trends
-                </span>
-              </div>
-            </div>""", unsafe_allow_html=True)
-
-        with hw_c:
+    with hw_c:
             st.markdown("""
             <div style='display:flex;justify-content:center;align-items:center;padding:4px 0'>
             <svg width="180" height="132" viewBox="0 0 180 132" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1137,66 +1141,43 @@ if not uploaded:
             </svg>
             </div>""", unsafe_allow_html=True)
 
-        with hw_r:
-            st.markdown("""
-            <div style='padding:0 0.5rem 0 0;display:flex;flex-direction:column;gap:32px;padding-top:8px'>
-              <div style='display:flex;gap:10px;align-items:flex-start'>
-                <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
-                  padding:3px 8px;border-radius:8px;flex-shrink:0;margin-top:2px'>02</span>
-                <span style='font-size:13px;color:#334155;line-height:1.55'>
-                  <b style="color:#0f172a">Auto-detect</b> dataset type instantly
-                </span>
-              </div>
-              <div style='display:flex;gap:10px;align-items:flex-start'>
-                <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
-                  padding:3px 8px;border-radius:8px;flex-shrink:0;margin-top:2px'>04</span>
-                <span style='font-size:13px;color:#334155;line-height:1.55'>
-                  <b style="color:#0f172a">Ask</b> any question via Data Agent
-                </span>
-              </div>
-            </div>""", unsafe_allow_html=True)
-
-    with bw2:
-        # Dark card with dot-pattern background
+    with hw_r:
         st.markdown("""
-        <div style='background:#0c1220;border-radius:16px;padding:1.75rem 1.75rem 1.5rem;
-          border:1px solid #1a2540;box-shadow:0 2px 8px rgba(0,0,0,0.2);
-          background-image:radial-gradient(circle,rgba(255,255,255,0.07) 1px,transparent 1px);
-          background-size:22px 22px;min-height:148px;position:relative;overflow:hidden'>
-          <!-- Glow -->
-          <div style='position:absolute;top:-40px;right:-40px;width:140px;height:140px;
-            background:radial-gradient(circle,rgba(99,102,241,0.25) 0%,transparent 70%);
-            pointer-events:none'></div>
-          <p style='font-size:20px;font-weight:800;color:#f1f5f9;margin:0 0 10px;
-            letter-spacing:-0.01em;position:relative'>Try with sample data</p>
-          <p style='font-size:13px;color:#94a3b8;margin:0;line-height:1.7;position:relative'>
-            Download our sample sales dataset and upload it to explore every feature instantly.
-          </p>
+        <div style='padding:0 0.5rem 0 0;display:flex;flex-direction:column;gap:32px;padding-top:8px'>
+          <div style='display:flex;gap:10px;align-items:flex-start'>
+            <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
+              padding:3px 8px;border-radius:8px;flex-shrink:0;margin-top:2px'>02</span>
+            <span style='font-size:13px;color:#334155;line-height:1.55'>
+              <b style="color:#0f172a">Auto-detect</b> dataset type instantly
+            </span>
+          </div>
+          <div style='display:flex;gap:10px;align-items:flex-start'>
+            <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
+              padding:3px 8px;border-radius:8px;flex-shrink:0;margin-top:2px'>04</span>
+            <span style='font-size:13px;color:#334155;line-height:1.55'>
+              <b style="color:#0f172a">Ask</b> any question via Data Agent
+            </span>
+          </div>
         </div>""", unsafe_allow_html=True)
 
-        st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
-        _HERE = os.path.dirname(os.path.abspath(__file__))
-        sample_path = os.path.join(_HERE, "sample_sales_data.csv")
-        if os.path.exists(sample_path):
-            with open(sample_path, "rb") as f:
-                st.download_button(
-                    "⬇  Download sample_sales_data.csv",
-                    f, "sample_sales_data.csv", "text/csv",
-                    use_container_width=True
-                )
     st.stop()
 
 # ══════════════════════════════════════════════════════════════════════════════
 # LOAD DATA
 # ══════════════════════════════════════════════════════════════════════════════
+_stored = st.session_state["stored_file"]
+_file   = NamedBytesIO(_stored["bytes"], _stored["name"])
 try:
-    df = load_dataframe(uploaded)
+    df = load_dataframe(_file)
 except Exception as e:
-    st.error(f"Could not load file: {e}"); st.stop()
+    st.error(f"Could not load file: {e}")
+    if st.button("← Back to home"):
+        st.session_state["stored_file"] = None; st.rerun()
+    st.stop()
 
-if st.session_state.get("last_file") != uploaded.name:
+if st.session_state.get("last_file") != _stored["name"]:
     st.session_state["active_view"] = "overview"
-    st.session_state["last_file"]   = uploaded.name
+    st.session_state["last_file"]   = _stored["name"]
     st.session_state["messages"]    = []
     for k in list(st.session_state.keys()):
         if k.startswith("ai_"): del st.session_state[k]
@@ -1209,100 +1190,71 @@ correlations  = compute_correlations(df, col_analysis)
 time_insights = compute_time_insights(df, col_analysis)
 smart_insights= compute_smart_insights(df, col_analysis, dtype)
 
-# ── SIDEBAR NAV ───────────────────────────────────────────────────────────────
-with st.sidebar:
-    # Dataset badge
-    st.markdown(
-        f"<div style='background:#eff6ff;border:1px solid #bfdbfe;"
-        f"border-radius:8px;padding:8px 12px;margin-bottom:12px'>"
-        f"<span style='font-size:14px'>{cfg['icon']}</span>"
-        f"<span style='color:#1d4ed8;font-size:11px;font-weight:700;margin-left:6px'>{cfg['label']}</span>"
-        f"</div>",
-        unsafe_allow_html=True)
-    st.markdown("<p style='color:#94a3b8;font-size:10px;text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:6px;padding-left:2px'>🗂 Navigation</p>",
-                unsafe_allow_html=True)
-
-    pages = [("🏠  Overview","overview"),("💡  Smart Insights","smart"),
-             ("📊  KPI Report","kpis"),("📈  Trends","trends"),
-             ("📦  Categories","categories"),("🔗  Correlations","correlations"),
-             ("🔍  Anomalies","anomalies"),("🤖  AI Analysis","ai"),
-             ("📋  Data Table","table"),("🤖  Data Agent","agent")]
-
-    if not col_analysis["date"] or not col_analysis["numeric"]:
-        pages = [p for p in pages if p[1] != "trends"]
-    if not col_analysis["categorical"]:
-        pages = [p for p in pages if p[1] != "categories"]
-    if len(col_analysis["numeric"]) < 2:
-        pages = [p for p in pages if p[1] != "correlations"]
-
-    active_view_check = st.session_state.get("active_view", "overview")
-
-    for label, key in pages:
-        is_active = (active_view_check == key)
-        if is_active:
-            st.markdown(
-                f'<div style="background:#eff6ff;border-left:2px solid #3b82f6;'
-                f'border-radius:0 8px 8px 0;padding:0.45rem 0.85rem;margin-bottom:2px;'
-                f'font-size:13px;font-weight:600;color:#1d4ed8">{label}</div>',
-                unsafe_allow_html=True
-            )
-        else:
-            if st.button(label, key=f"pg_{key}", use_container_width=True):
-                st.session_state["active_view"] = key
-
-    # Footer stats
-    st.markdown(
-        f"<div style='margin-top:12px;padding:12px;background:#f8fafc;"
-        f"border:1px solid #e2e8f0;border-radius:10px'>"
-        f"<div style='font-size:10px;color:#94a3b8;font-weight:700;text-transform:uppercase;"
-        f"letter-spacing:0.1em;margin-bottom:8px'>Dataset Info</div>"
-        f"<div style='display:grid;grid-template-columns:1fr 1fr;gap:6px'>"
-        f"<div style='background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;text-align:center'>"
-        f"<div style='font-size:16px;font-weight:800;color:#2563eb'>{df.shape[0]:,}</div>"
-        f"<div style='font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em'>Rows</div></div>"
-        f"<div style='background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;text-align:center'>"
-        f"<div style='font-size:16px;font-weight:800;color:#059669'>{df.shape[1]}</div>"
-        f"<div style='font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em'>Columns</div></div>"
-        f"<div style='background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;text-align:center'>"
-        f"<div style='font-size:16px;font-weight:800;color:#7c3aed'>{len(col_analysis['numeric'])}</div>"
-        f"<div style='font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em'>Numeric</div></div>"
-        f"<div style='background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;text-align:center'>"
-        f"<div style='font-size:16px;font-weight:800;color:#ea580c'>{len(col_analysis['categorical'])}</div>"
-        f"<div style='font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em'>Category</div></div>"
-        f"</div></div>",
-        unsafe_allow_html=True)
-
-active_view = st.session_state.get("active_view", "overview")
-
-# ── PAGE HEADER ───────────────────────────────────────────────────────────────
-file_title = (uploaded.name.replace(".csv","").replace(".xlsx","").replace(".xls","")
+# ── TOP BAR: file info + actions ─────────────────────────────────────────────
+file_title = (_stored["name"].replace(".csv","").replace(".xlsx","").replace(".xls","")
               .replace("_"," ").replace("-"," ").title())
 
-ph1, ph2, ph3 = st.columns([3, 1, 1])
-with ph1:
+tb1, tb2, tb3, tb4 = st.columns([4, 1, 1, 1])
+with tb1:
     st.markdown(
-        f'<div style="margin-bottom:0.25rem">'
-        f'<span style="font-size:22px;font-weight:700;color:#0f172a">{cfg["icon"]} {file_title}</span>'
+        f'<div style="display:flex;align-items:center;gap:10px;padding:6px 0 2px">'
+        f'<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:4px 12px;display:flex;align-items:center;gap:6px">'
+        f'<span style="font-size:14px">{cfg["icon"]}</span>'
+        f'<span style="color:#1d4ed8;font-size:11px;font-weight:700">{cfg["label"]}</span>'
         f'</div>'
-        f'<div class="stat-row">'
-        f'<span class="stat-pill" style="background:rgba(37,99,235,0.08);border-color:rgba(37,99,235,0.2);color:#1d4ed8;font-weight:600">{dtype.title()}</span>'
-        f'<span class="stat-pill"><b>{df.shape[0]:,}</b> rows</span>'
-        f'<span class="stat-pill"><b>{df.shape[1]}</b> cols</span>'
-        f'<span class="stat-pill">{datetime.now().strftime("%d %b %Y")}</span>'
+        f'<span style="font-size:16px;font-weight:700;color:#0f172a">{file_title}</span>'
+        f'<span style="font-size:12px;color:#94a3b8">{df.shape[0]:,} rows · {df.shape[1]} cols</span>'
         f'</div>',
-        unsafe_allow_html=True
-    )
-with ph2:
+        unsafe_allow_html=True)
+with tb2:
     csv = df.to_csv(index=False).encode('utf-8')
-    st.download_button("⬇ Export CSV", csv, f"{file_title}.csv", "text/csv", use_container_width=True)
-with ph3:
+    st.download_button("⬇ Export", csv, f"{file_title}.csv", "text/csv", use_container_width=True)
+with tb3:
     if st.button("🔄 Refresh AI", use_container_width=True):
         for k in list(st.session_state.keys()):
             if k.startswith("ai_"): del st.session_state[k]
         st.rerun()
-st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+with tb4:
+    if st.button("↩ Home", use_container_width=True):
+        st.session_state["stored_file"] = None
+        for k in list(st.session_state.keys()):
+            if k.startswith(("df_","ai_","last_","messages","active_")): del st.session_state[k]
+        st.rerun()
 
-df_info = (f"Dataset: {uploaded.name} | Type: {dtype} | {df.shape[0]} rows x {df.shape[1]} cols\n"
+# ── HORIZONTAL NAV ───────────────────────────────────────────────────────────
+pages = [("🏠 Overview","overview"),("💡 Insights","smart"),
+         ("📊 KPIs","kpis"),("📈 Trends","trends"),
+         ("📦 Categories","categories"),("🔗 Correlations","correlations"),
+         ("🔍 Anomalies","anomalies"),("🤖 AI Analysis","ai"),
+         ("📋 Data Table","table"),("🤖 Data Agent","agent")]
+
+if not col_analysis["date"] or not col_analysis["numeric"]:
+    pages = [p for p in pages if p[1] != "trends"]
+if not col_analysis["categorical"]:
+    pages = [p for p in pages if p[1] != "categories"]
+if len(col_analysis["numeric"]) < 2:
+    pages = [p for p in pages if p[1] != "correlations"]
+
+active_view_check = st.session_state.get("active_view", "overview")
+nav_cols = st.columns(len(pages))
+for (label, key), col in zip(pages, nav_cols):
+    with col:
+        if active_view_check == key:
+            st.markdown(
+                f'<div style="background:#eff6ff;border-bottom:2px solid #3b82f6;border-radius:8px 8px 0 0;'
+                f'padding:0.4rem 0.2rem;text-align:center;font-size:11.5px;font-weight:700;color:#1d4ed8;'
+                f'white-space:nowrap">{label}</div>',
+                unsafe_allow_html=True)
+        else:
+            if st.button(label, key=f"pg_{key}", use_container_width=True):
+                st.session_state["active_view"] = key
+                st.rerun()
+
+st.markdown("<hr style='border:none;border-top:1px solid #e2e8f0;margin:4px 0 12px'>", unsafe_allow_html=True)
+
+active_view = st.session_state.get("active_view", "overview")
+
+df_info = (f"Dataset: {_stored['name']} | Type: {dtype} | {df.shape[0]} rows x {df.shape[1]} cols\n"
            f"Columns: {', '.join(df.columns.tolist())}\n"
            f"Numeric columns: {', '.join(col_analysis['numeric'])}\n"
            f"Categorical columns: {', '.join(col_analysis['categorical'])}\n"
@@ -1962,4 +1914,4 @@ Rules:
             st.rerun()
 
 else:
-    st.info("Select a page from the sidebar.")
+    st.info("Select a page from the navigation bar above.")
