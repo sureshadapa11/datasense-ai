@@ -892,19 +892,162 @@ if not uploaded:
           <div style='font-size:12px;color:#64748b;line-height:1.55'>{desc}</div>
         </div>"""
 
-    st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
-    # Hero
+    # ── HERO (2-column: text left, product mockup right) ─────────────────────
+    hero_l, hero_r = st.columns([1.05, 0.95])
+    with hero_l:
+        st.markdown("""
+        <div style='padding-top:1.5rem'>
+          <div style='display:inline-flex;align-items:center;gap:6px;
+            background:#f0f4ff;border:1px solid #c7d7fd;border-radius:20px;
+            padding:5px 14px;margin-bottom:22px'>
+            <span style='font-size:14px'>✨</span>
+            <span style='font-size:12px;font-weight:600;color:#3b5bdb;letter-spacing:0.01em'>Powered by Claude AI</span>
+          </div>
+          <h1 style='font-size:48px;font-weight:800;color:#0f172a;line-height:1.1;
+            margin:0 0 18px;letter-spacing:-0.03em'>
+            Turn any spreadsheet<br>into <span style='color:#4f46e5'>AI-powered</span><br>insights
+          </h1>
+          <p style='font-size:15px;color:#64748b;line-height:1.7;margin:0 0 2rem;max-width:440px'>
+            Upload a CSV or Excel file. DataSense AI auto-detects your dataset type and instantly
+            builds a full analytics dashboard &mdash; KPIs, charts, trends &amp; AI insights.
+          </p>
+          <div style='display:flex;flex-wrap:wrap;gap:20px'>
+            <div style='display:flex;align-items:center;gap:8px'>
+              <div style='width:30px;height:30px;background:#eff6ff;border-radius:8px;
+                display:flex;align-items:center;justify-content:center;font-size:15px'>📊</div>
+              <span style='font-size:13px;color:#475569;font-weight:500'>9 analytics views</span>
+            </div>
+            <div style='display:flex;align-items:center;gap:8px'>
+              <div style='width:30px;height:30px;background:#f0fdf4;border-radius:8px;
+                display:flex;align-items:center;justify-content:center;font-size:15px'>🔍</div>
+              <span style='font-size:13px;color:#475569;font-weight:500'>6 dataset types</span>
+            </div>
+            <div style='display:flex;align-items:center;gap:8px'>
+              <div style='width:30px;height:30px;background:#faf5ff;border-radius:8px;
+                display:flex;align-items:center;justify-content:center;font-size:15px'>🤖</div>
+              <span style='font-size:13px;color:#475569;font-weight:500'>Claude AI powered</span>
+            </div>
+          </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with hero_r:
+        st.markdown("""
+        <div style='padding-top:0.25rem;display:flex;justify-content:center'>
+          <div style='box-shadow:0 24px 64px rgba(79,70,229,0.13),0 4px 20px rgba(0,0,0,0.07);
+            border-radius:18px;overflow:hidden;width:100%;border:1px solid #e2e8f0'>
+            <svg viewBox="0 0 420 308" width="100%" xmlns="http://www.w3.org/2000/svg">
+              <rect width="420" height="308" fill="#fff"/>
+              <rect width="420" height="40" fill="#f8fafc"/>
+              <rect y="39" width="420" height="1" fill="#e2e8f0"/>
+              <circle cx="18" cy="20" r="5" fill="#fc5c5c"/>
+              <circle cx="32" cy="20" r="5" fill="#fdbc2c"/>
+              <circle cx="46" cy="20" r="5" fill="#34c759"/>
+              <text x="210" y="24" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="system-ui,sans-serif" font-weight="500">DataSense AI  ·  Sales Dashboard</text>
+              <rect y="40" width="420" height="268" fill="#f8fafc"/>
+              <rect x="12" y="52" width="122" height="56" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+              <text x="22" y="68" font-size="8" fill="#3b82f6" font-family="system-ui,sans-serif" font-weight="700">REVENUE</text>
+              <text x="22" y="87" font-size="19" fill="#1e3a8a" font-family="system-ui,sans-serif" font-weight="800">$23.8K</text>
+              <text x="22" y="100" font-size="8" fill="#22c55e" font-family="system-ui,sans-serif" font-weight="600">up 12.4% vs last month</text>
+              <rect x="142" y="52" width="122" height="56" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+              <text x="152" y="68" font-size="8" fill="#16a34a" font-family="system-ui,sans-serif" font-weight="700">ORDERS</text>
+              <text x="152" y="87" font-size="19" fill="#14532d" font-family="system-ui,sans-serif" font-weight="800">1,240</text>
+              <text x="152" y="100" font-size="8" fill="#22c55e" font-family="system-ui,sans-serif" font-weight="600">up 8.1% vs last month</text>
+              <rect x="272" y="52" width="136" height="56" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+              <text x="282" y="68" font-size="8" fill="#7c3aed" font-family="system-ui,sans-serif" font-weight="700">GROWTH RATE</text>
+              <text x="282" y="87" font-size="19" fill="#4c1d95" font-family="system-ui,sans-serif" font-weight="800">+18.4%</text>
+              <text x="282" y="100" font-size="8" fill="#22c55e" font-family="system-ui,sans-serif" font-weight="600">up 3.2% vs last quarter</text>
+              <text x="12" y="124" font-size="10" fill="#0f172a" font-family="system-ui,sans-serif" font-weight="700">Revenue Trend</text>
+              <text x="272" y="124" font-size="10" fill="#0f172a" font-family="system-ui,sans-serif" font-weight="700">Top Products</text>
+              <rect x="12" y="130" width="248" height="122" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+              <line x1="22" y1="162" x2="250" y2="162" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="22" y1="182" x2="250" y2="182" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="22" y1="202" x2="250" y2="202" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="22" y1="222" x2="250" y2="222" stroke="#f1f5f9" stroke-width="1"/>
+              <defs>
+                <linearGradient id="cg" x1="0" y1="140" x2="0" y2="242" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#4f46e5" stop-opacity="0.18"/>
+                  <stop offset="100%" stop-color="#4f46e5" stop-opacity="0.01"/>
+                </linearGradient>
+              </defs>
+              <path d="M22 232 L60 218 L100 200 L140 184 L180 168 L220 152 L250 140 L250 242 L22 242 Z" fill="url(#cg)"/>
+              <path d="M22 232 L60 218 L100 200 L140 184 L180 168 L220 152 L250 140" stroke="#4f46e5" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="22" cy="232" r="3" fill="#fff" stroke="#4f46e5" stroke-width="1.5"/>
+              <circle cx="100" cy="200" r="3" fill="#fff" stroke="#4f46e5" stroke-width="1.5"/>
+              <circle cx="180" cy="168" r="3" fill="#fff" stroke="#4f46e5" stroke-width="1.5"/>
+              <circle cx="250" cy="140" r="4" fill="#4f46e5" stroke="#fff" stroke-width="1.5"/>
+              <text x="22"  y="255" font-size="7" fill="#94a3b8" font-family="system-ui,sans-serif" text-anchor="middle">Jan</text>
+              <text x="60"  y="255" font-size="7" fill="#94a3b8" font-family="system-ui,sans-serif" text-anchor="middle">Feb</text>
+              <text x="100" y="255" font-size="7" fill="#94a3b8" font-family="system-ui,sans-serif" text-anchor="middle">Mar</text>
+              <text x="140" y="255" font-size="7" fill="#94a3b8" font-family="system-ui,sans-serif" text-anchor="middle">Apr</text>
+              <text x="180" y="255" font-size="7" fill="#94a3b8" font-family="system-ui,sans-serif" text-anchor="middle">May</text>
+              <text x="220" y="255" font-size="7" fill="#94a3b8" font-family="system-ui,sans-serif" text-anchor="middle">Jun</text>
+              <text x="250" y="255" font-size="7" fill="#94a3b8" font-family="system-ui,sans-serif" text-anchor="middle">Jul</text>
+              <rect x="272" y="130" width="136" height="122" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+              <text x="282" y="151" font-size="8" fill="#64748b" font-family="system-ui,sans-serif">Laptop Pro</text>
+              <rect x="282" y="154" width="116" height="8" rx="3" fill="#e0e7ff"/>
+              <rect x="282" y="154" width="105" height="8" rx="3" fill="#4f46e5"/>
+              <text x="282" y="175" font-size="8" fill="#64748b" font-family="system-ui,sans-serif">Monitor X</text>
+              <rect x="282" y="178" width="116" height="8" rx="3" fill="#e0e7ff"/>
+              <rect x="282" y="178" width="86" height="8" rx="3" fill="#818cf8"/>
+              <text x="282" y="199" font-size="8" fill="#64748b" font-family="system-ui,sans-serif">Keyboard</text>
+              <rect x="282" y="202" width="116" height="8" rx="3" fill="#e0e7ff"/>
+              <rect x="282" y="202" width="64" height="8" rx="3" fill="#a5b4fc"/>
+              <text x="282" y="223" font-size="8" fill="#64748b" font-family="system-ui,sans-serif">Mouse Elite</text>
+              <rect x="282" y="226" width="116" height="8" rx="3" fill="#e0e7ff"/>
+              <rect x="282" y="226" width="44" height="8" rx="3" fill="#c7d2fe"/>
+              <rect x="12" y="260" width="396" height="36" rx="10" fill="#faf5ff" stroke="#e9d5ff" stroke-width="1"/>
+              <text x="42" y="275" font-size="8.5" fill="#6d28d9" font-family="system-ui,sans-serif" font-weight="700">AI Insight:</text>
+              <text x="100" y="275" font-size="8.5" fill="#6d28d9" font-family="system-ui,sans-serif">Revenue grew 18.4% YoY — Laptop Pro drives 91% of category sales.</text>
+              <text x="42" y="288" font-size="7.5" fill="#7c3aed" font-family="system-ui,sans-serif" opacity="0.65">Powered by Claude AI · Generated in real-time from your data</text>
+            </svg>
+          </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # ── FEATURE HIGHLIGHTS ────────────────────────────────────────────────────
+    st.markdown("<div style='height:56px'></div>", unsafe_allow_html=True)
+    f1, f2, f3 = st.columns(3)
+    FEAT = [
+        ("#eff6ff","#dbeafe","#2563eb",
+         '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>',
+         "Auto-Detect Dataset",
+         "Instantly classifies your data as Sales, HR, Finance, Marketing, Inventory, or Generic — no setup needed."),
+        ("#f0fdf4","#dcfce7","#16a34a",
+         '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
+         "Smart Visualizations",
+         "Auto-generates trend lines, bar charts, heatmaps and scatter plots — all tailored to your data domain."),
+        ("#faf5ff","#ede9fe","#7c3aed",
+         '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+         "AI-Powered Analysis",
+         "Claude AI writes domain-specific insights grounded in your exact numbers and answers questions in plain English."),
+    ]
+    for col, (bg, ibg, ic, svg, title, desc) in zip([f1, f2, f3], FEAT):
+        icon = svg.replace('stroke="currentColor"', f'stroke="{ic}"')
+        with col:
+            st.markdown(f"""
+            <div style='background:{bg};border-radius:16px;padding:1.5rem 1.5rem 1.4rem;
+              border:1px solid rgba(0,0,0,0.05);height:100%'>
+              <div style='width:44px;height:44px;background:{ibg};border-radius:12px;
+                display:flex;align-items:center;justify-content:center;margin-bottom:16px'>
+                {icon}
+              </div>
+              <div style='font-size:15px;font-weight:700;color:#0f172a;margin-bottom:8px'>{title}</div>
+              <div style='font-size:13px;color:#64748b;line-height:1.65'>{desc}</div>
+            </div>""", unsafe_allow_html=True)
+
+    # ── DATASET TYPE SECTION HEADING ──────────────────────────────────────────
     st.markdown("""
-    <h1 style='font-size:52px;font-weight:800;color:#0f172a;line-height:1.08;
-      margin:0 0 18px;letter-spacing:-0.03em;max-width:760px'>
-      Turn any spreadsheet into<br>AI&#8209;powered insights
-    </h1>
-    <p style='font-size:15px;color:#64748b;line-height:1.75;margin:0 0 2rem;max-width:680px'>
-      Upload any CSV or Excel file. DataSense AI auto-detects your data type and instantly
-      builds a full analytics dashboard &mdash; KPIs, charts, trends, anomalies, and AI insights
-      written specifically for your data.
-    </p>
+    <div style='margin:56px 0 24px'>
+      <h2 style='font-size:32px;font-weight:800;color:#0f172a;margin:0 0 8px;letter-spacing:-0.02em'>
+        Works with any dataset
+      </h2>
+      <p style='font-size:15px;color:#64748b;margin:0'>
+        Upload your data and DataSense AI figures out everything else.
+      </p>
+    </div>
     """, unsafe_allow_html=True)
 
     # 3×2 card grid
