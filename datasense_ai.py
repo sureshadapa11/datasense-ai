@@ -1257,6 +1257,487 @@ if not st.session_state["stored_file"]:
           </div>
         </div>""", unsafe_allow_html=True)
 
+    # ══════════════════════════════════════════════════════════════════════
+    # SECTION: 9 ANALYTICS VIEWS
+    # ══════════════════════════════════════════════════════════════════════
+    st.markdown("<div style='height:88px'></div>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style='text-align:center;margin-bottom:48px'>
+      <span class='slabel' style='display:inline-block'>9 Built-In Views</span>
+      <h2 style='font-size:34px;font-weight:800;color:#0d1f3c;margin:8px 0 12px;letter-spacing:-0.025em'>
+        Every angle your data needs
+      </h2>
+      <p style='font-size:15px;color:#64748b;margin:0 auto;max-width:520px;line-height:1.7'>
+        No manual chart-building. DataSense AI generates all nine views automatically
+        the moment you upload your file.
+      </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    VIEWS = [
+        ("🏠", "Overview",      "#f5f3ff", "#5b4bff",
+         "Top KPIs + trend chart at a glance. The executive view."),
+        ("💡", "Smart Insights", "#f0fdf4", "#059669",
+         "Domain-specific insight cards with exact metric values from your data."),
+        ("📊", "KPI Report",     "#fffbeb", "#d97706",
+         "Detailed statistics, distributions and value breakdowns per column."),
+        ("📈", "Trends",         "#eff6ff", "#2563eb",
+         "Time-series lines + monthly performance heatmaps across segments."),
+        ("📦", "Categories",     "#fdf2f8", "#db2777",
+         "Segment breakdowns — bar charts, pie charts and cross-tab analysis."),
+        ("🔗", "Correlations",   "#f0fdf4", "#059669",
+         "Metric relationships, scatter plots and correlation heatmap matrix."),
+        ("🔍", "Anomalies",      "#fff7ed", "#ea580c",
+         "Data quality report: outliers, missing values, duplicates flagged."),
+        ("🤖", "AI Analysis",    "#f5f3ff", "#5b4bff",
+         "Deep Claude-generated narrative tailored to your exact dataset type."),
+        ("📋", "Data Table",     "#f8fafc", "#475569",
+         "Searchable, filterable raw data view with one-click CSV export."),
+    ]
+
+    va, vb, vc = st.columns(3)
+    for i, (icon, name, bg, color, desc) in enumerate(VIEWS):
+        col = [va, vb, vc][i % 3]
+        with col:
+            st.markdown(f"""
+            <div style='background:{bg};border-radius:14px;padding:1.4rem 1.5rem;
+              border:1px solid rgba(0,0,0,0.05);margin-bottom:16px;
+              display:flex;gap:14px;align-items:flex-start'>
+              <div style='width:40px;height:40px;border-radius:10px;background:#fff;
+                display:flex;align-items:center;justify-content:center;
+                font-size:18px;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,0.07)'>
+                {icon}
+              </div>
+              <div>
+                <div style='font-size:14px;font-weight:700;color:{color};margin-bottom:4px'>
+                  {name}
+                </div>
+                <div style='font-size:12.5px;color:#64748b;line-height:1.6'>{desc}</div>
+              </div>
+            </div>""", unsafe_allow_html=True)
+
+    # ══════════════════════════════════════════════════════════════════════
+    # SECTION: DATA AGENT SPOTLIGHT
+    # ══════════════════════════════════════════════════════════════════════
+    st.markdown("<div style='height:88px'></div>", unsafe_allow_html=True)
+    ag_l, ag_r = st.columns([1.1, 0.9])
+    with ag_l:
+        st.markdown("""
+        <div style='padding-top:1.5rem;padding-right:2rem'>
+          <span class='slabel'>Data Agent</span>
+          <h2 style='font-size:34px;font-weight:800;color:#0d1f3c;margin:8px 0 16px;
+            letter-spacing:-0.025em;line-height:1.15'>
+            Ask questions.<br>Get answers instantly.
+          </h2>
+          <p style='font-size:15px;color:#64748b;line-height:1.75;margin:0 0 28px'>
+            The Data Agent translates plain-English questions into live pandas
+            queries on your dataset — returning tables, charts and plain-English
+            summaries in seconds. No SQL. No Python. Just ask.
+          </p>
+          <div style='display:flex;flex-direction:column;gap:14px'>
+            <div style='display:flex;align-items:flex-start;gap:12px'>
+              <div style='width:32px;height:32px;background:#ede9fe;border-radius:8px;
+                display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px'>🔍</div>
+              <div>
+                <div style='font-size:13.5px;font-weight:600;color:#0d1f3c;margin-bottom:2px'>Filter &amp; search</div>
+                <div style='font-size:12.5px;color:#64748b'>"Show me all orders above $10,000 in Q3"</div>
+              </div>
+            </div>
+            <div style='display:flex;align-items:flex-start;gap:12px'>
+              <div style='width:32px;height:32px;background:#dcfce7;border-radius:8px;
+                display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px'>📊</div>
+              <div>
+                <div style='font-size:13.5px;font-weight:600;color:#0d1f3c;margin-bottom:2px'>Aggregate &amp; group</div>
+                <div style='font-size:12.5px;color:#64748b'>"What is total revenue by region this year?"</div>
+              </div>
+            </div>
+            <div style='display:flex;align-items:flex-start;gap:12px'>
+              <div style='width:32px;height:32px;background:#fef3c7;border-radius:8px;
+                display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px'>📈</div>
+              <div>
+                <div style='font-size:13.5px;font-weight:600;color:#0d1f3c;margin-bottom:2px'>Generate charts</div>
+                <div style='font-size:12.5px;color:#64748b'>"Plot monthly sales trend as a line chart"</div>
+              </div>
+            </div>
+            <div style='display:flex;align-items:flex-start;gap:12px'>
+              <div style='width:32px;height:32px;background:#fee2e2;border-radius:8px;
+                display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px'>🧮</div>
+              <div>
+                <div style='font-size:13.5px;font-weight:600;color:#0d1f3c;margin-bottom:2px'>Calculate stats</div>
+                <div style='font-size:12.5px;color:#64748b'>"What is the average salary by department?"</div>
+              </div>
+            </div>
+          </div>
+        </div>""", unsafe_allow_html=True)
+    with ag_r:
+        st.markdown("""
+        <div style='background:linear-gradient(145deg,#0d1f3c,#1e3a5f);border-radius:20px;
+          padding:1.5rem;box-shadow:0 24px 64px rgba(13,31,60,0.22)'>
+          <div style='display:flex;align-items:center;gap:8px;margin-bottom:16px'>
+            <div style='width:8px;height:8px;border-radius:50%;background:#ef4444'></div>
+            <div style='width:8px;height:8px;border-radius:50%;background:#f59e0b'></div>
+            <div style='width:8px;height:8px;border-radius:50%;background:#22c55e'></div>
+            <span style='font-size:11px;color:#64748b;margin-left:6px;font-weight:500'>Data Agent</span>
+          </div>
+          <div style='display:flex;flex-direction:column;gap:12px'>
+            <div style='background:rgba(91,75,255,0.2);border-radius:12px 12px 4px 12px;
+              padding:10px 14px;align-self:flex-end;max-width:85%'>
+              <p style='font-size:12.5px;color:#c7d2fe;margin:0;line-height:1.5'>
+                Show me the top 5 products by revenue
+              </p>
+            </div>
+            <div style='background:rgba(255,255,255,0.07);border-radius:4px 12px 12px 12px;
+              padding:12px 14px;max-width:95%'>
+              <p style='font-size:11px;color:#94a3b8;margin:0 0 8px;font-weight:600;
+                text-transform:uppercase;letter-spacing:0.06em'>🤖 Data Agent</p>
+              <p style='font-size:12.5px;color:#e2e8f0;margin:0 0 10px;line-height:1.55'>
+                Here are the top 5 products by total revenue:
+              </p>
+              <div style='background:rgba(0,0,0,0.2);border-radius:8px;padding:8px 10px;
+                font-size:11.5px;color:#94a3b8;font-family:monospace'>
+                <div style='display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.07);padding-bottom:5px;margin-bottom:5px'>
+                  <span style='color:#c7d2fe;font-weight:600'>Product</span>
+                  <span style='color:#c7d2fe;font-weight:600'>Revenue</span>
+                </div>
+                <div style='display:flex;justify-content:space-between;margin-bottom:3px'>
+                  <span>Laptop Pro</span><span style='color:#34d399'>$84,200</span>
+                </div>
+                <div style='display:flex;justify-content:space-between;margin-bottom:3px'>
+                  <span>Monitor X</span><span style='color:#34d399'>$62,100</span>
+                </div>
+                <div style='display:flex;justify-content:space-between;margin-bottom:3px'>
+                  <span>Keyboard Elite</span><span style='color:#34d399'>$38,450</span>
+                </div>
+                <div style='display:flex;justify-content:space-between;margin-bottom:3px'>
+                  <span>Mouse Pro</span><span style='color:#34d399'>$29,800</span>
+                </div>
+                <div style='display:flex;justify-content:space-between'>
+                  <span>Webcam HD</span><span style='color:#34d399'>$21,600</span>
+                </div>
+              </div>
+            </div>
+            <div style='background:rgba(91,75,255,0.2);border-radius:12px 12px 4px 12px;
+              padding:10px 14px;align-self:flex-end;max-width:85%'>
+              <p style='font-size:12.5px;color:#c7d2fe;margin:0;line-height:1.5'>
+                Now show it as a bar chart
+              </p>
+            </div>
+            <div style='background:rgba(255,255,255,0.07);border-radius:4px 12px 12px 12px;
+              padding:10px 14px;max-width:95%'>
+              <p style='font-size:12px;color:#64748b;margin:0;line-height:1.5'>
+                📊 Chart generated — Laptop Pro leads with 36% of top-5 revenue share.
+              </p>
+            </div>
+          </div>
+        </div>""", unsafe_allow_html=True)
+
+    # ══════════════════════════════════════════════════════════════════════
+    # SECTION: WHY DATASENSE AI — BENEFITS
+    # ══════════════════════════════════════════════════════════════════════
+    st.markdown("<div style='height:88px'></div>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style='background:linear-gradient(135deg,#0d1f3c 0%,#1e3a5f 100%);
+      border-radius:24px;padding:3.5rem 3rem 3rem;'>
+      <div style='text-align:center;margin-bottom:40px'>
+        <span class='slabel' style='color:#a78bfa'>Why DataSense AI</span>
+        <h2 style='font-size:34px;font-weight:800;color:#f1f5f9;margin:8px 0 12px;
+          letter-spacing:-0.025em'>
+          Ditch the spreadsheet bottleneck
+        </h2>
+        <p style='font-size:15px;color:#94a3b8;margin:0 auto;max-width:500px;line-height:1.7'>
+          Most teams spend hours building reports manually. DataSense AI delivers
+          the same results in seconds — automatically.
+        </p>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    ben_cols = st.columns(2)
+    BENEFITS = [
+        ("⏱️", "Hours → Seconds",
+         "What used to take an analyst half a day — cleaning data, building charts, writing commentary — DataSense AI does in under 10 seconds.",
+         "#f5f3ff", "#5b4bff"),
+        ("🧠", "AI That Reads Your Data",
+         "Claude AI doesn't just show charts — it reads your actual numbers and writes specific, grounded insights like a senior analyst would.",
+         "#f0fdf4", "#059669"),
+        ("🎯", "Domain-Specific Intelligence",
+         "Sales, HR, Finance, Marketing, Inventory — each dataset type gets a tailored set of KPIs, charts and AI prompts built for that domain.",
+         "#fffbeb", "#d97706"),
+        ("💬", "Ask In Plain English",
+         "No SQL, no Python, no formulas. Type a question in plain English and the Data Agent queries your dataset and returns results instantly.",
+         "#eff6ff", "#2563eb"),
+        ("📤", "Zero Setup, Zero Config",
+         "Drop a CSV or Excel file. That's it. No schema mapping, no column renaming, no data transformation required before analysis.",
+         "#fdf2f8", "#db2777"),
+        ("🔒", "Your Data Stays Local",
+         "Files are processed in your browser session only. Nothing is stored server-side. Your data never leaves your Streamlit session.",
+         "#fff7ed", "#ea580c"),
+    ]
+    for i, (icon, title, desc, bg, color) in enumerate(BENEFITS):
+        with ben_cols[i % 2]:
+            st.markdown(f"""
+            <div style='background:{bg};border-radius:16px;padding:1.5rem 1.75rem;
+              margin-bottom:16px;border:1px solid rgba(0,0,0,0.05)'>
+              <div style='font-size:24px;margin-bottom:10px'>{icon}</div>
+              <div style='font-size:15px;font-weight:700;color:{color};margin-bottom:8px'>{title}</div>
+              <div style='font-size:13.5px;color:#475569;line-height:1.7'>{desc}</div>
+            </div>""", unsafe_allow_html=True)
+
+    # ══════════════════════════════════════════════════════════════════════
+    # SECTION: WHO IT'S FOR
+    # ══════════════════════════════════════════════════════════════════════
+    st.markdown("<div style='height:88px'></div>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style='text-align:center;margin-bottom:48px'>
+      <span class='slabel' style='display:inline-block'>Use Cases</span>
+      <h2 style='font-size:34px;font-weight:800;color:#0d1f3c;margin:8px 0 12px;
+        letter-spacing:-0.025em'>
+        Built for everyone who works with data
+      </h2>
+      <p style='font-size:15px;color:#64748b;margin:0 auto;max-width:500px;line-height:1.7'>
+        Whether you're a business analyst, team manager, or a founder
+        — DataSense AI meets you where you are.
+      </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    wif1, wif2, wif3 = st.columns(3)
+    PERSONAS = [
+        ("👩‍💼", "Business Analysts",   "#f5f3ff", "#5b4bff", "#ede9fe",
+         [("📁","Upload client data and generate a full report in seconds"),
+          ("🔍","Surface anomalies and data quality issues automatically"),
+          ("📊","Export charts and KPI summaries for presentations"),
+          ("💬","Use Data Agent to answer ad-hoc stakeholder questions")]),
+        ("📋", "Team Managers",        "#f0fdf4", "#059669", "#dcfce7",
+         [("📈","Track team KPIs — revenue, headcount, performance"),
+          ("🏆","Identify top performers and underperforming segments"),
+          ("📅","Spot trends over time without needing a data team"),
+          ("🎯","Get AI-written summaries you can paste straight into reports")]),
+        ("🚀", "Founders & Operators", "#fffbeb", "#d97706", "#fef3c7",
+         [("💰","Understand your sales funnel and revenue drivers instantly"),
+          ("📦","Monitor inventory, margins and supplier performance"),
+          ("🌍","Analyse regional performance and market penetration"),
+          ("🤖","Get Claude AI to write the analysis narrative for you")]),
+    ]
+    for col, (icon, title, bg, color, ibg, points) in zip([wif1, wif2, wif3], PERSONAS):
+        pts_html = "".join(
+            f"<div style='display:flex;gap:10px;align-items:flex-start;margin-bottom:10px'>"
+            f"<span style='font-size:14px;flex-shrink:0'>{p[0]}</span>"
+            f"<span style='font-size:13px;color:#475569;line-height:1.55'>{p[1]}</span>"
+            f"</div>" for p in points
+        )
+        with col:
+            st.markdown(f"""
+            <div style='background:{bg};border-radius:20px;padding:1.75rem 1.75rem 1.5rem;
+              border:1px solid rgba(0,0,0,0.05);height:100%'>
+              <div style='width:52px;height:52px;background:{ibg};border-radius:14px;
+                display:flex;align-items:center;justify-content:center;
+                font-size:24px;margin-bottom:16px'>
+                {icon}
+              </div>
+              <div style='font-size:17px;font-weight:800;color:{color};
+                margin-bottom:16px;letter-spacing:-0.01em'>{title}</div>
+              {pts_html}
+            </div>""", unsafe_allow_html=True)
+
+    # ══════════════════════════════════════════════════════════════════════
+    # SECTION: COMPARISON TABLE
+    # ══════════════════════════════════════════════════════════════════════
+    st.markdown("<div style='height:88px'></div>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style='text-align:center;margin-bottom:40px'>
+      <span class='slabel' style='display:inline-block'>Comparison</span>
+      <h2 style='font-size:34px;font-weight:800;color:#0d1f3c;margin:8px 0 12px;
+        letter-spacing:-0.025em'>
+        DataSense AI vs. doing it manually
+      </h2>
+    </div>
+    <div style='overflow-x:auto'>
+    <table style='width:100%;border-collapse:collapse;font-size:13.5px;'>
+      <thead>
+        <tr>
+          <th style='text-align:left;padding:14px 20px;background:#f8f7ff;
+            border-bottom:2px solid #e4e0ff;color:#0d1f3c;font-weight:700;
+            border-radius:12px 0 0 0'>Task</th>
+          <th style='text-align:center;padding:14px 20px;background:#f8f7ff;
+            border-bottom:2px solid #e4e0ff;color:#64748b;font-weight:600'>
+            Manual (Excel / Tableau)</th>
+          <th style='text-align:center;padding:14px 20px;
+            background:linear-gradient(135deg,#5b4bff,#7c3aed);
+            border-bottom:2px solid #4c3de0;color:#fff;font-weight:700;
+            border-radius:0 12px 0 0'>DataSense AI</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style='border-bottom:1px solid #f1f5f9'>
+          <td style='padding:13px 20px;color:#334155;font-weight:500'>Time to first insight</td>
+          <td style='padding:13px 20px;text-align:center;color:#94a3b8'>2–4 hours</td>
+          <td style='padding:13px 20px;text-align:center;font-weight:700;color:#5b4bff'>
+            &lt; 10 seconds</td>
+        </tr>
+        <tr style='border-bottom:1px solid #f1f5f9;background:#fafafa'>
+          <td style='padding:13px 20px;color:#334155;font-weight:500'>Requires technical skills</td>
+          <td style='padding:13px 20px;text-align:center;color:#94a3b8'>SQL / Python / BI tool</td>
+          <td style='padding:13px 20px;text-align:center;color:#059669;font-weight:700'>None</td>
+        </tr>
+        <tr style='border-bottom:1px solid #f1f5f9'>
+          <td style='padding:13px 20px;color:#334155;font-weight:500'>Auto-detect dataset type</td>
+          <td style='padding:13px 20px;text-align:center;color:#ef4444'>✗</td>
+          <td style='padding:13px 20px;text-align:center;color:#059669;font-weight:700'>✓</td>
+        </tr>
+        <tr style='border-bottom:1px solid #f1f5f9;background:#fafafa'>
+          <td style='padding:13px 20px;color:#334155;font-weight:500'>AI-written narrative insights</td>
+          <td style='padding:13px 20px;text-align:center;color:#ef4444'>✗</td>
+          <td style='padding:13px 20px;text-align:center;color:#059669;font-weight:700'>✓ Claude AI</td>
+        </tr>
+        <tr style='border-bottom:1px solid #f1f5f9'>
+          <td style='padding:13px 20px;color:#334155;font-weight:500'>Plain-English data queries</td>
+          <td style='padding:13px 20px;text-align:center;color:#ef4444'>✗</td>
+          <td style='padding:13px 20px;text-align:center;color:#059669;font-weight:700'>✓ Data Agent</td>
+        </tr>
+        <tr style='border-bottom:1px solid #f1f5f9;background:#fafafa'>
+          <td style='padding:13px 20px;color:#334155;font-weight:500'>Anomaly &amp; outlier detection</td>
+          <td style='padding:13px 20px;text-align:center;color:#94a3b8'>Manual</td>
+          <td style='padding:13px 20px;text-align:center;color:#059669;font-weight:700'>✓ Automatic</td>
+        </tr>
+        <tr>
+          <td style='padding:13px 20px;color:#334155;font-weight:500'>Setup &amp; configuration</td>
+          <td style='padding:13px 20px;text-align:center;color:#94a3b8'>Schema mapping, ETL</td>
+          <td style='padding:13px 20px;text-align:center;color:#059669;font-weight:700'>Zero</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ══════════════════════════════════════════════════════════════════════
+    # SECTION: TECH STACK TRUST BAR
+    # ══════════════════════════════════════════════════════════════════════
+    st.markdown("<div style='height:80px'></div>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style='text-align:center;margin-bottom:28px'>
+      <span class='slabel' style='display:inline-block'>Powered By</span>
+      <h3 style='font-size:20px;font-weight:700;color:#0d1f3c;margin:8px 0 0;
+        letter-spacing:-0.01em'>
+        Enterprise-grade technology, zero enterprise complexity
+      </h3>
+    </div>
+    <div style='display:flex;flex-wrap:wrap;justify-content:center;gap:16px'>
+      <div style='background:#fff;border:1px solid #e9ecf0;border-radius:12px;
+        padding:14px 24px;display:flex;align-items:center;gap:10px;
+        box-shadow:0 1px 3px rgba(0,0,0,0.04)'>
+        <span style='font-size:22px'>🤖</span>
+        <div>
+          <div style='font-size:12px;font-weight:700;color:#0d1f3c'>Claude AI</div>
+          <div style='font-size:11px;color:#94a3b8'>by Anthropic</div>
+        </div>
+      </div>
+      <div style='background:#fff;border:1px solid #e9ecf0;border-radius:12px;
+        padding:14px 24px;display:flex;align-items:center;gap:10px;
+        box-shadow:0 1px 3px rgba(0,0,0,0.04)'>
+        <span style='font-size:22px'>🐼</span>
+        <div>
+          <div style='font-size:12px;font-weight:700;color:#0d1f3c'>Pandas</div>
+          <div style='font-size:11px;color:#94a3b8'>Data processing</div>
+        </div>
+      </div>
+      <div style='background:#fff;border:1px solid #e9ecf0;border-radius:12px;
+        padding:14px 24px;display:flex;align-items:center;gap:10px;
+        box-shadow:0 1px 3px rgba(0,0,0,0.04)'>
+        <span style='font-size:22px'>📊</span>
+        <div>
+          <div style='font-size:12px;font-weight:700;color:#0d1f3c'>Plotly</div>
+          <div style='font-size:11px;color:#94a3b8'>Interactive charts</div>
+        </div>
+      </div>
+      <div style='background:#fff;border:1px solid #e9ecf0;border-radius:12px;
+        padding:14px 24px;display:flex;align-items:center;gap:10px;
+        box-shadow:0 1px 3px rgba(0,0,0,0.04)'>
+        <span style='font-size:22px'>⚡</span>
+        <div>
+          <div style='font-size:12px;font-weight:700;color:#0d1f3c'>Streamlit</div>
+          <div style='font-size:11px;color:#94a3b8'>Web framework</div>
+        </div>
+      </div>
+      <div style='background:#fff;border:1px solid #e9ecf0;border-radius:12px;
+        padding:14px 24px;display:flex;align-items:center;gap:10px;
+        box-shadow:0 1px 3px rgba(0,0,0,0.04)'>
+        <span style='font-size:22px'>🔢</span>
+        <div>
+          <div style='font-size:12px;font-weight:700;color:#0d1f3c'>NumPy</div>
+          <div style='font-size:11px;color:#94a3b8'>Numerical analysis</div>
+        </div>
+      </div>
+      <div style='background:#fff;border:1px solid #e9ecf0;border-radius:12px;
+        padding:14px 24px;display:flex;align-items:center;gap:10px;
+        box-shadow:0 1px 3px rgba(0,0,0,0.04)'>
+        <span style='font-size:22px'>📁</span>
+        <div>
+          <div style='font-size:12px;font-weight:700;color:#0d1f3c'>OpenPyXL</div>
+          <div style='font-size:11px;color:#94a3b8'>Excel support</div>
+        </div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ══════════════════════════════════════════════════════════════════════
+    # SECTION: FINAL CTA
+    # ══════════════════════════════════════════════════════════════════════
+    st.markdown("<div style='height:88px'></div>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style='background:linear-gradient(135deg,#5b4bff 0%,#7c3aed 100%);
+      border-radius:24px;padding:4rem 3rem;text-align:center;
+      box-shadow:0 24px 64px rgba(91,75,255,0.28)'>
+      <span style='display:inline-block;background:rgba(255,255,255,0.15);
+        border:1px solid rgba(255,255,255,0.25);border-radius:20px;
+        padding:4px 14px;font-size:11.5px;font-weight:700;color:#e0d9ff;
+        letter-spacing:0.08em;text-transform:uppercase;margin-bottom:20px'>
+        Free · No sign-up · Instant
+      </span>
+      <h2 style='font-size:40px;font-weight:800;color:#fff;margin:0 0 16px;
+        letter-spacing:-0.03em;line-height:1.1'>
+        Ready to understand<br>your data?
+      </h2>
+      <p style='font-size:16px;color:rgba(255,255,255,0.75);margin:0 auto 32px;
+        max-width:440px;line-height:1.7'>
+        Drop any CSV or Excel file and get a full AI-powered analytics
+        dashboard in under 10 seconds.
+      </p>
+      <div style='display:flex;justify-content:center;gap:16px;flex-wrap:wrap'>
+        <div style='background:#fff;border-radius:12px;padding:10px 24px;
+          font-size:13.5px;font-weight:700;color:#5b4bff;
+          box-shadow:0 4px 16px rgba(0,0,0,0.15);cursor:pointer'>
+          ↑ Upload your file above
+        </div>
+        <div style='background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.3);
+          border-radius:12px;padding:10px 24px;font-size:13.5px;font-weight:600;color:#fff'>
+          ⚡ Or try the sample dataset
+        </div>
+      </div>
+      <div style='display:flex;justify-content:center;gap:32px;margin-top:32px;
+        flex-wrap:wrap'>
+        <div style='text-align:center'>
+          <div style='font-size:28px;font-weight:800;color:#fff'>9</div>
+          <div style='font-size:12px;color:rgba(255,255,255,0.6)'>Analytics views</div>
+        </div>
+        <div style='text-align:center'>
+          <div style='font-size:28px;font-weight:800;color:#fff'>6</div>
+          <div style='font-size:12px;color:rgba(255,255,255,0.6)'>Dataset types</div>
+        </div>
+        <div style='text-align:center'>
+          <div style='font-size:28px;font-weight:800;color:#fff'>0</div>
+          <div style='font-size:12px;color:rgba(255,255,255,0.6)'>Setup required</div>
+        </div>
+        <div style='text-align:center'>
+          <div style='font-size:28px;font-weight:800;color:#fff'>∞</div>
+          <div style='font-size:12px;color:rgba(255,255,255,0.6)'>Questions to ask</div>
+        </div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<div style='height:48px'></div>", unsafe_allow_html=True)
+
     st.stop()
 
 # ══════════════════════════════════════════════════════════════════════════════
