@@ -1,4 +1,4 @@
-import os, io, json
+import os, io, json, re
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -1692,8 +1692,7 @@ elif active_view == "table":
     search = st.text_input("", placeholder="🔍 Search / filter rows...", label_visibility="collapsed")
     display_df = df
     if search:
-        import re as _re
-        _safe = _re.escape(search)
+        _safe = re.escape(search)
         mask = df.apply(lambda row: row.astype(str).str.contains(_safe, case=False, na=False, regex=True).any(), axis=1)
         display_df = df[mask]
         st.caption(f"{len(display_df):,} rows matching '{search}'")
@@ -1876,8 +1875,7 @@ Rules:
                 code = response.content[0].text.strip()
                 # Remove any accidental markdown fences
                 if "```" in code:
-                    import re as _re
-                    m = _re.search(r"```(?:python)?\n?(.*?)```", code, _re.DOTALL)
+                    m = re.search(r"```(?:python)?\n?(.*?)```", code, re.DOTALL)
                     if m:
                         code = m.group(1).strip()
                     else:
@@ -1908,6 +1906,8 @@ Rules:
                         if "chart_type" in result and "dataframe" in result:
                             try:
                                 cdf = result["dataframe"]
+                                if len(cdf.columns) == 0:
+                                    raise ValueError("Chart DataFrame has no columns")
                                 cx  = result.get("chart_x", cdf.columns[0])
                                 cy  = result.get("chart_y", cdf.columns[1] if len(cdf.columns)>1 else cdf.columns[0])
                                 cc  = result.get("chart_color")
