@@ -1810,17 +1810,10 @@ if not st.session_state["stored_file"]:
 
     # ── CTA BUTTONS (real Streamlit widgets, centered) ────────────────────────
     st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
+    _sample_path = os.path.join(_HERE, "sample_sales_data.csv")
     _cta_l, _cta_c1, _cta_c2, _cta_r = st.columns([1.2, 1.3, 1.3, 1.2])
 
-    _sample_path = os.path.join(_HERE, "sample_sales_data.csv")
-
     with _cta_c1:
-        st.markdown("""
-        <style>
-        div[data-testid="stButton"] button[kind="primary"] {
-            width:100%;font-size:15px !important;padding:0.75rem 1.5rem !important;
-        }
-        </style>""", unsafe_allow_html=True)
         if st.button("📂  Upload your data", use_container_width=True, type="primary",
                      key="cta_upload_btn"):
             st.session_state["show_uploader"] = True
@@ -1828,7 +1821,7 @@ if not st.session_state["stored_file"]:
 
     with _cta_c2:
         if os.path.exists(_sample_path):
-            if st.button("⚡  Try sample data", use_container_width=True,
+            if st.button("⚡  Try sample data", use_container_width=True, type="primary",
                          key="cta_sample_btn"):
                 with open(_sample_path, "rb") as _f:
                     st.session_state["stored_file"] = {"bytes": _f.read(),
