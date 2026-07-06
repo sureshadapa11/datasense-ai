@@ -924,50 +924,142 @@ if not uploaded:
         st.markdown(card("linechart","grid",  "Generic", "Works with any tabular dataset automatically",        "#f3f4f6", "#1f2937", "#6b7280"), unsafe_allow_html=True)
 
     # Bottom row
-    st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
     bw1, bw2 = st.columns([3, 2])
     with bw1:
         st.markdown("""
-        <div style='background:#fff;border-radius:14px;padding:1.5rem 2rem;
-          border:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,0.04)'>
-          <p style='font-weight:700;color:#0f172a;font-size:14px;margin:0 0 16px'>How it works</p>
-          <div style='display:grid;grid-template-columns:1fr 1fr;gap:12px'>
-            <div style='display:flex;gap:10px;align-items:flex-start'>
-              <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
-                padding:2px 7px;border-radius:6px;flex-shrink:0;margin-top:1px'>01</span>
-              <span style='font-size:13px;color:#475569;line-height:1.5'><b style='color:#0f172a'>Upload</b> any CSV or Excel file</span>
+        <div style='background:#fff;border-radius:16px;padding:1.75rem 2rem;
+          border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.05)'>
+          <p style='font-size:18px;font-weight:800;color:#0f172a;margin:0 0 20px'>How it works</p>
+          <div style='display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center'>
+
+            <!-- Left steps -->
+            <div style='display:flex;flex-direction:column;gap:36px'>
+              <div style='display:flex;gap:10px;align-items:flex-start;max-width:150px'>
+                <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
+                  padding:3px 8px;border-radius:8px;flex-shrink:0;margin-top:2px'>01</span>
+                <span style='font-size:13px;color:#334155;line-height:1.55'>
+                  <b style="color:#0f172a">Upload</b> any CSV or Excel file
+                </span>
+              </div>
+              <div style='display:flex;gap:10px;align-items:flex-start;max-width:150px'>
+                <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
+                  padding:3px 8px;border-radius:8px;flex-shrink:0;margin-top:2px'>03</span>
+                <span style='font-size:13px;color:#334155;line-height:1.55'>
+                  <b style="color:#0f172a">Explore</b> KPIs, charts &amp; trends
+                </span>
+              </div>
             </div>
-            <div style='display:flex;gap:10px;align-items:flex-start'>
-              <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
-                padding:2px 7px;border-radius:6px;flex-shrink:0;margin-top:1px'>02</span>
-              <span style='font-size:13px;color:#475569;line-height:1.5'><b style='color:#0f172a'>Auto-detect</b> dataset type instantly</span>
+
+            <!-- Central illustration -->
+            <div style='display:flex;justify-content:center;align-items:center'>
+              <svg width="190" height="140" viewBox="0 0 190 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Upload icon box top-left -->
+                <rect x="8" y="12" width="72" height="56" rx="10" fill="#EEF4FF" stroke="#C7D7FD" stroke-width="1.2"/>
+                <path d="M44 44v-14M38 36l6-6 6 6" stroke="#4F76F6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <rect x="28" y="50" width="32" height="3" rx="1.5" fill="#C7D7FD"/>
+                <rect x="32" y="56" width="24" height="3" rx="1.5" fill="#C7D7FD"/>
+
+                <!-- Table/detect icon box top-right -->
+                <rect x="110" y="12" width="72" height="56" rx="10" fill="#F0FDF4" stroke="#A7F3D0" stroke-width="1.2"/>
+                <rect x="124" y="26" width="44" height="30" rx="4" fill="none" stroke="#34D399" stroke-width="1.4"/>
+                <line x1="124" y1="36" x2="168" y2="36" stroke="#34D399" stroke-width="1.2"/>
+                <line x1="146" y1="26" x2="146" y2="56" stroke="#34D399" stroke-width="1.2"/>
+                <circle cx="157" cy="48" r="7" fill="#F0FDF4" stroke="#34D399" stroke-width="1.4"/>
+                <line x1="162" y1="53" x2="166" y2="57" stroke="#34D399" stroke-width="1.8" stroke-linecap="round"/>
+
+                <!-- Arrow top: left to right -->
+                <path d="M82 40 Q95 32 108 40" stroke="#CBD5E1" stroke-width="1.4" stroke-dasharray="3 2" fill="none" marker-end="url(#ar)"/>
+
+                <!-- Chart icon box bottom-left -->
+                <rect x="8" y="80" width="72" height="52" rx="10" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.2"/>
+                <rect x="24" y="112" width="8" height="8" rx="1" fill="#FB923C"/>
+                <rect x="36" y="104" width="8" height="16" rx="1" fill="#FB923C" opacity=".75"/>
+                <rect x="48" y="96" width="8" height="24" rx="1" fill="#FB923C" opacity=".5"/>
+                <polyline points="22,106 36,96 50,100 62,88" stroke="#EF4444" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+                <!-- Bot icon box bottom-right -->
+                <rect x="110" y="80" width="72" height="52" rx="10" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1.2"/>
+                <rect x="130" y="90" width="30" height="26" rx="8" fill="none" stroke="#3B82F6" stroke-width="1.4"/>
+                <circle cx="141" cy="103" r="2.5" fill="#3B82F6"/>
+                <circle cx="150" cy="103" r="2.5" fill="#3B82F6"/>
+                <path d="M139 110 Q145 114 152 110" stroke="#3B82F6" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+                <path d="M145 90 L145 86" stroke="#3B82F6" stroke-width="1.4" stroke-linecap="round"/>
+                <circle cx="145" cy="84" r="2" fill="#3B82F6"/>
+                <path d="M155 98 L162 94" stroke="#3B82F6" stroke-width="1.2" stroke-linecap="round"/>
+                <circle cx="163" cy="93" r="4" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.2"/>
+                <text x="161" y="96" font-size="5" fill="#3B82F6" font-weight="bold">?</text>
+
+                <!-- Arrow left: top to bottom -->
+                <path d="M44 70 Q44 75 44 78" stroke="#CBD5E1" stroke-width="1.4" stroke-dasharray="3 2" fill="none" marker-end="url(#ar)"/>
+                <!-- Arrow bottom: right to left -->
+                <path d="M108 104 Q95 112 84 104" stroke="#CBD5E1" stroke-width="1.4" stroke-dasharray="3 2" fill="none" marker-end="url(#ar2)"/>
+                <!-- Arrow right: bottom to top (side) -->
+                <path d="M146 78 Q146 73 146 70" stroke="#CBD5E1" stroke-width="1.4" stroke-dasharray="3 2" fill="none" marker-end="url(#ar3)"/>
+
+                <defs>
+                  <marker id="ar" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                    <path d="M0,0 L6,3 L0,6 Z" fill="#CBD5E1"/>
+                  </marker>
+                  <marker id="ar2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                    <path d="M6,0 L0,3 L6,6 Z" fill="#CBD5E1"/>
+                  </marker>
+                  <marker id="ar3" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                    <path d="M0,6 L3,0 L6,6 Z" fill="#CBD5E1"/>
+                  </marker>
+                </defs>
+              </svg>
             </div>
-            <div style='display:flex;gap:10px;align-items:flex-start'>
-              <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
-                padding:2px 7px;border-radius:6px;flex-shrink:0;margin-top:1px'>03</span>
-              <span style='font-size:13px;color:#475569;line-height:1.5'><b style='color:#0f172a'>Explore</b> KPIs, charts &amp; trends</span>
+
+            <!-- Right steps -->
+            <div style='display:flex;flex-direction:column;gap:36px'>
+              <div style='display:flex;gap:10px;align-items:flex-start;max-width:150px'>
+                <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
+                  padding:3px 8px;border-radius:8px;flex-shrink:0;margin-top:2px'>02</span>
+                <span style='font-size:13px;color:#334155;line-height:1.55'>
+                  <b style="color:#0f172a">Auto-detect</b> dataset type instantly
+                </span>
+              </div>
+              <div style='display:flex;gap:10px;align-items:flex-start;max-width:150px'>
+                <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
+                  padding:3px 8px;border-radius:8px;flex-shrink:0;margin-top:2px'>04</span>
+                <span style='font-size:13px;color:#334155;line-height:1.55'>
+                  <b style="color:#0f172a">Ask</b> any question via Data Agent
+                </span>
+              </div>
             </div>
-            <div style='display:flex;gap:10px;align-items:flex-start'>
-              <span style='background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;
-                padding:2px 7px;border-radius:6px;flex-shrink:0;margin-top:1px'>04</span>
-              <span style='font-size:13px;color:#475569;line-height:1.5'><b style='color:#0f172a'>Ask</b> any question via Data Agent</span>
-            </div>
+
           </div>
         </div>""", unsafe_allow_html=True)
+
     with bw2:
+        # Dark card with dot-pattern background
         st.markdown("""
-        <div style='background:#0f172a;border-radius:14px;padding:1.5rem 1.75rem;
-          border:1px solid #1e293b;box-shadow:0 1px 3px rgba(0,0,0,0.1)'>
-          <p style='font-weight:700;color:#f1f5f9;font-size:14px;margin:0 0 8px'>Try with sample data</p>
-          <p style='font-size:12.5px;color:#64748b;margin:0 0 18px;line-height:1.65'>
+        <div style='background:#0c1220;border-radius:16px;padding:1.75rem 1.75rem 1.5rem;
+          border:1px solid #1a2540;box-shadow:0 2px 8px rgba(0,0,0,0.2);
+          background-image:radial-gradient(circle,rgba(255,255,255,0.07) 1px,transparent 1px);
+          background-size:22px 22px;min-height:148px;position:relative;overflow:hidden'>
+          <!-- Glow -->
+          <div style='position:absolute;top:-40px;right:-40px;width:140px;height:140px;
+            background:radial-gradient(circle,rgba(99,102,241,0.25) 0%,transparent 70%);
+            pointer-events:none'></div>
+          <p style='font-size:20px;font-weight:800;color:#f1f5f9;margin:0 0 10px;
+            letter-spacing:-0.01em;position:relative'>Try with sample data</p>
+          <p style='font-size:13px;color:#94a3b8;margin:0;line-height:1.7;position:relative'>
             Download our sample sales dataset and upload it to explore every feature instantly.
           </p>
         </div>""", unsafe_allow_html=True)
+
+        st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
         _HERE = os.path.dirname(os.path.abspath(__file__))
         sample_path = os.path.join(_HERE, "sample_sales_data.csv")
         if os.path.exists(sample_path):
             with open(sample_path, "rb") as f:
-                st.download_button("⬇ Download sample_sales_data.csv", f, "sample_sales_data.csv", "text/csv", use_container_width=True)
+                st.download_button(
+                    "⬇  Download sample_sales_data.csv",
+                    f, "sample_sales_data.csv", "text/csv",
+                    use_container_width=True
+                )
     st.stop()
 
 # ══════════════════════════════════════════════════════════════════════════════
